@@ -3,7 +3,7 @@ spring:
     name: base_spring_boot
   datasource:
     url: jdbc:mysql://localhost:3307/base_core?createDatabaseIfNotExist=true
-    username:
+    username:root
     password: 
   jooq:
     sql-dialect: org.hibernate.dialect.MySQL8Dialect
