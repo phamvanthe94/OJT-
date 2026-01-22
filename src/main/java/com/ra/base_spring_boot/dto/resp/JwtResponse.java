@@ -1,13 +1,12 @@
 package com.ra.base_spring_boot.dto.resp;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ra.base_spring_boot.model.User;
+import com.ra.base_spring_boot.model.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
