@@ -1,6 +1,6 @@
 package com.ra.base_spring_boot.security.principle;
 
-import com.ra.base_spring_boot.model.User;
+import com.ra.base_spring_boot.model.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.model;
+package com.ra.base_spring_boot.model.entity.user;
 
 import com.ra.base_spring_boot.model.base.BaseObject;
 import com.ra.base_spring_boot.model.constants.RoleName;

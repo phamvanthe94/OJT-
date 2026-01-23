@@ -1,0 +1,40 @@
+package com.ra.base_spring_boot.model.entity.theater;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ra.base_spring_boot.model.base.BaseObject;
+import com.ra.base_spring_boot.model.constants.SeatType;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "seats")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
+public class Seat extends BaseObject {
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "screen_id", nullable = false)
+    private Screen screen;
+
+    @Column(name = "seat_number", nullable = false, length = 50)
+    private String seatNumber;
+
+    @Column(name = "is_variable")
+    private Boolean isVariable = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private SeatType type;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+}
