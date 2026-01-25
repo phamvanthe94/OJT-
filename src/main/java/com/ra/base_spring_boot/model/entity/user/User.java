@@ -21,7 +21,7 @@ public class User extends BaseObject
     private String username;
 
     @JsonIgnore
-    @Column(name = "passwordF")
+    @Column(name = "password")
     private String password;
 
     private Boolean status;
