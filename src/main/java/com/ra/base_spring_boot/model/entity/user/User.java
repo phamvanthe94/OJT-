@@ -13,15 +13,14 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class User extends BaseObject
-{
+public class User extends BaseObject {
     @Column(name = "full_name")
     private String fullName;
     @Column(name = "username")
     private String username;
 
     @JsonIgnore
-    @Column(name = "passwordF")
+    @Column(name = "password")
     private String password;
 
     private Boolean status;
