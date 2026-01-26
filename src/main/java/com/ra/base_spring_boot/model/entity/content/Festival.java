@@ -4,6 +4,7 @@ import com.ra.base_spring_boot.model.base.BaseObject;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,8 +23,8 @@ public class Festival extends BaseObject {
     private String image;
 
     @Column(name = "start_time")
-    private LocalDateTime startTime;
+    private LocalDate startTime;
 
     @Column(name = "end_time")
-    private LocalDateTime endTime;
+    private LocalDate endTime;
 }
