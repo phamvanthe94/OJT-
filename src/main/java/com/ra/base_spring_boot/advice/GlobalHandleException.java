@@ -1,7 +1,7 @@
 package com.ra.base_spring_boot.advice;
 
-import com.ra.base_spring_boot.exception.*;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
+import com.ra.base_spring_boot.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,15 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-public class GlobalHandleException
-{
+public class GlobalHandleException {
     /**
      * @param ex MethodArgumentNotValidException
      * @apiNote handle valid exception for validation (400)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidException(MethodArgumentNotValidException ex)
-    {
+    public ResponseEntity<?> handleValidException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -40,8 +38,7 @@ public class GlobalHandleException
      * @apiNote handle exception max upload file (400)
      */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex)
-    {
+    public ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 ResponseWrapper.builder()
                         .data(ex.getMessage())
@@ -54,10 +51,10 @@ public class GlobalHandleException
     /**
      * @param ex NoResourceFoundException
      * @apiNote handle exception not found resource (404)
-     * */
+     *
+     */
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException ex)
-    {
+    public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ResponseWrapper.builder()
                         .data(ex.getMessage())
@@ -70,10 +67,10 @@ public class GlobalHandleException
     /**
      * @param ex UsernameNotFoundException
      * @apiNote handle username not found exception
-     * */
+     *
+     */
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException ex)
-    {
+    public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ResponseWrapper.builder()
                         .data(ex.getMessage())
@@ -86,10 +83,10 @@ public class GlobalHandleException
     /**
      * @param ex HttpBadRequest
      * @apiNote handle exception bad request (400)
-     * */
+     *
+     */
     @ExceptionHandler(HttpBadRequest.class)
-    public ResponseEntity<?> handleHttpBadReqeust(HttpBadRequest ex)
-    {
+    public ResponseEntity<?> handleHttpBadReqeust(HttpBadRequest ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 ResponseWrapper.builder()
                         .data(ex.getMessage())
@@ -102,10 +99,10 @@ public class GlobalHandleException
     /**
      * @param ex HttpUnAuthorized
      * @apiNote handle exception unauthorized (401)
-     * */
+     *
+     */
     @ExceptionHandler(HttpUnAuthorized.class)
-    public ResponseEntity<?> handleHttpUnAuthorized(HttpUnAuthorized ex)
-    {
+    public ResponseEntity<?> handleHttpUnAuthorized(HttpUnAuthorized ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                 ResponseWrapper.builder()
                         .data(ex.getMessage())
@@ -118,10 +115,10 @@ public class GlobalHandleException
     /**
      * @param ex HttpForbiden
      * @apiNote handle exception forbiden (403)
-     * */
+     *
+     */
     @ExceptionHandler(HttpForbiden.class)
-    public ResponseEntity<?> handleHttpForbiden(HttpForbiden ex)
-    {
+    public ResponseEntity<?> handleHttpForbiden(HttpForbiden ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                 ResponseWrapper.builder()
                         .data(ex.getMessage())
@@ -134,10 +131,10 @@ public class GlobalHandleException
     /**
      * @param ex HttpNotFound
      * @apiNote handle exception not found (404)
-     * */
+     *
+     */
     @ExceptionHandler(HttpNotFound.class)
-    public ResponseEntity<?> handleHttpNotFound(HttpNotFound ex)
-    {
+    public ResponseEntity<?> handleHttpNotFound(HttpNotFound ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ResponseWrapper.builder()
                         .data(ex.getMessage())
@@ -150,10 +147,10 @@ public class GlobalHandleException
     /**
      * @param ex HttpConflict
      * @apiNote handle exception conflict (409)
-     * */
+     *
+     */
     @ExceptionHandler(HttpConflict.class)
-    public ResponseEntity<?> handleHttpConflict(HttpConflict ex)
-    {
+    public ResponseEntity<?> handleHttpConflict(HttpConflict ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 ResponseWrapper.builder()
                         .data(ex.getMessage())
@@ -163,5 +160,19 @@ public class GlobalHandleException
         );
     }
 
-
+    /**
+     * @param ex RuntimeException
+     * @apiNote handle exception server error (500)
+     *
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ResponseWrapper.builder()
+                        .data(ex.getMessage())
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .status(HttpStatus.BAD_REQUEST)
+                        .build()
+        );
+    }
 }
