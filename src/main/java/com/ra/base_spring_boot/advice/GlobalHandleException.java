@@ -5,6 +5,7 @@ import com.ra.base_spring_boot.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -172,6 +173,23 @@ public class GlobalHandleException {
                         .data(ex.getMessage())
                         .code(HttpStatus.BAD_REQUEST.value())
                         .status(HttpStatus.BAD_REQUEST)
+                        .build()
+        );
+    }
+
+    /*
+     * @param ex HttpRequestMethodNotSupportedException
+     * @apiNote handle exception method not allowed (405)
+     *
+     * */
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(
+                ResponseWrapper.builder()
+                        .data(ex.getMessage())
+                        .code(HttpStatus.METHOD_NOT_ALLOWED.value())
+                        .status(HttpStatus.METHOD_NOT_ALLOWED)
                         .build()
         );
     }
