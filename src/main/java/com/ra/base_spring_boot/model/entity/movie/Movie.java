@@ -5,6 +5,7 @@ import com.ra.base_spring_boot.model.constants.MovieType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -40,13 +41,13 @@ public class Movie extends BaseObject {
     private Integer duration;
 
     @Column(name = "release_date")
-    private LocalDateTime releaseDate;
+    private LocalDate releaseDate;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private LocalDate updatedAt;
 
     // style thầy: ManyToMany => bảng movie_genre
     @ManyToMany(fetch = FetchType.LAZY)
