@@ -1,5 +1,6 @@
 package com.ra.base_spring_boot.security.jwt;
 
+import com.ra.base_spring_boot.repository.IBlacklistTokenRepository;
 import com.ra.base_spring_boot.security.principle.MyUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,40 +20,42 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtTokenFilter extends OncePerRequestFilter
-{
+public class JwtTokenFilter extends OncePerRequestFilter {
     private final MyUserDetailsService userDetailsService;
     private final JwtProvider jwtProvider;
+    private final IBlacklistTokenRepository blacklistTokenRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
-    {
-        try
-        {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        try {
             String token = getTokenFromRequest(request);
-            if (token != null)
-            {
+            if (token != null) {
+                String jti = jwtProvider.extractJti(token);
+                if (jti != null && blacklistTokenRepository.existsById(jti)) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":401 \"Token has been blacklisted\"}");
+                    return;
+                }
+
                 String username = jwtProvider.extractUsername(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (jwtProvider.validateToken(token, userDetails) )
-                {
+
+                if (jwtProvider.validateToken(token, userDetails)) {
                     Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("Un Authentication {}", e.getMessage());
         }
         filterChain.doFilter(request, response);
     }
 
-    public String getTokenFromRequest(HttpServletRequest request)
-    {
+    public String getTokenFromRequest(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer "))
-        {
+        if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7);
         }
         return null;
