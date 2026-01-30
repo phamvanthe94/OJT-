@@ -37,3 +37,4 @@ public class Screen extends BaseObject {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
+
