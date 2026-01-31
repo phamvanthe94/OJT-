@@ -2,7 +2,7 @@ package com.ra.base_spring_boot.controller;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.GenreRequest;
-import com.ra.base_spring_boot.services.impl.IGenreService;
+import com.ra.base_spring_boot.services.IGenreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

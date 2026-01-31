@@ -4,7 +4,7 @@ import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.MovieDTO;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.services.CloudinaryService;
-import com.ra.base_spring_boot.services.MovieService;
+import com.ra.base_spring_boot.services.impl.MovieServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,21 +18,23 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/movies")
 public class MovieController {
     @Autowired
-    private MovieService movieService;
+    private MovieServiceImpl movieService;
     @Autowired
     private CloudinaryService cloudinaryService;
+
     @GetMapping
-    public ResponseEntity<ResponseWrapper<Page<Movie>>> getAllMovie(@RequestParam(name="title", required = false) String title,
-                                                                    @RequestParam(name="author", required = false) String author,
-                                                                    @RequestParam(name="type", required = false) String type,
-                                                                    @RequestParam(name="page", defaultValue = "0") int page,
-                                                                    @RequestParam(name="size", defaultValue = "5") int size){
+    public ResponseEntity<ResponseWrapper<Page<Movie>>> getAllMovie(@RequestParam(name = "title", required = false) String title,
+                                                                    @RequestParam(name = "author", required = false) String author,
+                                                                    @RequestParam(name = "type", required = false) String type,
+                                                                    @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                    @RequestParam(name = "size", defaultValue = "5") int size) {
         return movieService.getAllMovie(title, author, type, PageRequest.of(page, size));
     }
+
     @PostMapping("/add")
-    public ResponseEntity<ResponseWrapper<?>> addMovie(@Valid @ModelAttribute MovieDTO movieDTO, BindingResult bindingResult){
+    public ResponseEntity<ResponseWrapper<?>> addMovie(@Valid @ModelAttribute MovieDTO movieDTO, BindingResult bindingResult) {
         ResponseEntity<ResponseWrapper<?>> responseEntity = movieService.createMovie(movieDTO, bindingResult);
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(
                     ResponseWrapper
                             .<Object>builder()
@@ -44,9 +46,10 @@ public class MovieController {
         }
         return responseEntity;
     }
+
     @PutMapping("/edit/{id}")
     public ResponseEntity<ResponseWrapper<?>> updateMovie(@PathVariable Long id, @Valid @ModelAttribute MovieDTO movieDTO, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(
                     ResponseWrapper
                             .<Object>builder()
@@ -58,8 +61,25 @@ public class MovieController {
         }
         return movieService.updateMovie(id, movieDTO);
     }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ResponseWrapper<String>> deleteMovie(@PathVariable Long id) {
         return movieService.deleteMovie(id);
+    }
+
+    @GetMapping("/now-showing")
+    public ResponseEntity<?> getNowShowingMovies(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "ASC") String direction
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(movieService.getNowShowingMovies(page, size, sortBy, direction))
+                        .build()
+        );
     }
 }
