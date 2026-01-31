@@ -2,8 +2,6 @@ package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.MovieDTO;
-import com.ra.base_spring_boot.dto.resp.MovieListResponse;
-import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.repository.MovieRepository;
@@ -11,9 +9,7 @@ import com.ra.base_spring_boot.services.CloudinaryService;
 import com.ra.base_spring_boot.services.IMovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -151,23 +147,4 @@ public class MovieServiceImpl implements IMovieService {
                 .build();
     }
 
-    @Override
-    public Page<MovieListResponse> getNowShowingMovies(int page, int size, String sortBy, String direction) {
-        String sortField = (sortBy == null || sortBy.isBlank()) ? "releaseDate" : sortBy;
-
-        Sort sort = Sort.by(sortField);
-        sort = "desc".equalsIgnoreCase(direction) ? sort.descending() : sort.ascending();
-
-        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), sort);
-
-        Page<Movie> movies = movieRepository.findByStatus(MovieStatus.NOW_SHOWING, pageable);
-
-        return movies.map(movie -> MovieListResponse.builder()
-                .id(movie.getId())
-                .title(movie.getTitle())
-                .image(movie.getImage())
-                .duration(movie.getDuration())
-                .releaseDate(movie.getReleaseDate())
-                .build());
-    }
 }

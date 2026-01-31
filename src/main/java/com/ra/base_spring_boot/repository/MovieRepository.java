@@ -1,6 +1,5 @@
 package com.ra.base_spring_boot.repository;
 
-import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,5 +19,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
                        @Param("type") String type,
                        Pageable pageable);
 
-    Page<Movie> findByStatus(MovieStatus status, Pageable pageable);
+
 }

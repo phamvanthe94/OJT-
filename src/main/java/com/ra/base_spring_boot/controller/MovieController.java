@@ -66,20 +66,5 @@ public class MovieController {
     public ResponseEntity<ResponseWrapper<String>> deleteMovie(@PathVariable Long id) {
         return movieService.deleteMovie(id);
     }
-
-    @GetMapping("/now-showing")
-    public ResponseEntity<?> getNowShowingMovies(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
-        return ResponseEntity.ok(
-                ResponseWrapper.builder()
-                        .status(HttpStatus.OK)
-                        .code(200)
-                        .data(movieService.getNowShowingMovies(page, size, sortBy, direction))
-                        .build()
-        );
-    }
+    
 }

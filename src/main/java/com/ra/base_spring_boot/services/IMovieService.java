@@ -2,7 +2,6 @@ package com.ra.base_spring_boot.services;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.MovieDTO;
-import com.ra.base_spring_boot.dto.resp.MovieListResponse;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +25,5 @@ public interface IMovieService {
 
     Movie convertMovieDTOToMovie(MovieDTO movieDTO);
 
-    Page<MovieListResponse> getNowShowingMovies(int page, int size, String sortBy, String Direction);
 
 }
