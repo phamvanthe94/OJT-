@@ -56,7 +56,7 @@ public class Movie extends BaseObject {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "movie_genre",
+            name = "movie_genres",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
