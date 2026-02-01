@@ -1,7 +1,7 @@
 package com.ra.base_spring_boot.services.homeService.impl;
 
-import com.ra.base_spring_boot.dto.resp.MovieDetailResponse;
-import com.ra.base_spring_boot.dto.resp.MovieListResponse;
+import com.ra.base_spring_boot.dto.resp.homeresp.MovieDetailResponse;
+import com.ra.base_spring_boot.dto.resp.homeresp.MovieListResponse;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.repository.IMovieHomeRepository;

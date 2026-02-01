@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.dto.resp;
+package com.ra.base_spring_boot.dto.resp.homeresp;
 
 import lombok.*;
 
