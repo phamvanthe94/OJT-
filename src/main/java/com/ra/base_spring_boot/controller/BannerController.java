@@ -28,7 +28,7 @@ public ResponseEntity<ResponseWrapper<Page<Banner>>> getAllBanner(@RequestParam(
 
     @PostMapping("add")
     public ResponseEntity<ResponseWrapper<?>> addBanner(@Valid @ModelAttribute BannerDTO bannerDTO, BindingResult bindingResult){
-        ResponseEntity<ResponseWrapper<?>> responseEntity = bannerService.CreateBanner(bannerDTO, bindingResult);
+        ResponseEntity<ResponseWrapper<?>> responseEntity = bannerService.createBanner(bannerDTO, bindingResult);
         if(bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(
                     ResponseWrapper
