@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.services.homeService.impl;
 import com.ra.base_spring_boot.dto.resp.GenreResponse;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.entity.movie.Genre;
-import com.ra.base_spring_boot.repository.IMovieHomeRepository;
+import com.ra.base_spring_boot.repository.homerpo.IMovieHomeRepository;
 import com.ra.base_spring_boot.services.homeService.IGenreHomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

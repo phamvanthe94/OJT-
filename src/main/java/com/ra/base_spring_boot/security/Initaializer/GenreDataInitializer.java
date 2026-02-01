@@ -1,7 +1,7 @@
 package com.ra.base_spring_boot.security.Initaializer;
 
 import com.ra.base_spring_boot.model.entity.movie.Genre;
-import com.ra.base_spring_boot.repository.IGenreRepository;
+import com.ra.base_spring_boot.repository.homerpo.IGenreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;

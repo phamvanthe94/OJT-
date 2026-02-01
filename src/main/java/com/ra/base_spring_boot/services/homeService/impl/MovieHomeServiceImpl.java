@@ -4,7 +4,7 @@ import com.ra.base_spring_boot.dto.resp.homeresp.MovieDetailResponse;
 import com.ra.base_spring_boot.dto.resp.homeresp.MovieListResponse;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
-import com.ra.base_spring_boot.repository.IMovieHomeRepository;
+import com.ra.base_spring_boot.repository.homerpo.IMovieHomeRepository;
 import com.ra.base_spring_boot.services.homeService.IMovieHomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

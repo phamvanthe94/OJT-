@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.repository;
+package com.ra.base_spring_boot.repository.homerpo;
 
 import com.ra.base_spring_boot.model.entity.movie.Genre;
 import org.springframework.data.domain.Page;
