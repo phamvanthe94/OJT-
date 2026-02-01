@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
 
@@ -23,4 +24,20 @@ public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
             AND (m.releaseDate IS NULL OR m.releaseDate <= CURRENT_DATE)
             """)
     List<Genre> findNowShowingGenres(@Param("status") MovieStatus status);
+
+    @Query("""
+                SELECT m
+                FROM Movie m
+                LEFT JOIN FETCH m.genres g
+                WHERE m.id = :id
+                AND m.status = :status
+                AND (m.releaseDate IS NULL OR m.releaseDate <= CURRENT_DATE)
+            """)
+    Optional<Movie> findNowShowingMovieDetail(
+            @Param("id") Long id,
+            @Param("status") MovieStatus status
+    );
+
+    Optional<Movie> findByTitleIgnoreCase(String title);
+
 }

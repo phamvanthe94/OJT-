@@ -1,5 +1,6 @@
 package com.ra.base_spring_boot.services.homeService.impl;
 
+import com.ra.base_spring_boot.dto.resp.MovieDetailResponse;
 import com.ra.base_spring_boot.dto.resp.MovieListResponse;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,5 +39,30 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
                 .duration(movie.getDuration())
                 .releaseDate(movie.getReleaseDate())
                 .build());
+    }
+
+    @Override
+    public MovieDetailResponse getNowShowingMovieDetail(Long id) {
+
+        Movie movie = movieHomeRepository.findNowShowingMovieDetail(id, MovieStatus.NOW_SHOWING)
+                .orElseThrow(() -> new RuntimeException("Phim không tồn tại hoặc không chiếu"));
+
+        return MovieDetailResponse.builder()
+                .id(movie.getId())
+                .title(movie.getTitle())
+                .description(movie.getDescriptions())
+                .author(movie.getAuthor())
+                .image(movie.getImage())
+                .trailer(movie.getTrailer())
+                .duration(movie.getDuration())
+                .releaseDate(movie.getReleaseDate())
+                .type(movie.getType().name())
+                .status(movie.getStatus().name())
+                .genres(
+                        movie.getGenres().stream()
+                                .map(genre -> genre.getGenreName())
+                                .collect(Collectors.toSet())
+                )
+                .build();
     }
 }

@@ -4,11 +4,13 @@ import com.ra.base_spring_boot.model.entity.movie.Genre;
 import com.ra.base_spring_boot.repository.IGenreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+@Order(2)
 public class GenreDataInitializer implements CommandLineRunner {
 
     private final IGenreRepository genreRepository;
@@ -18,7 +20,7 @@ public class GenreDataInitializer implements CommandLineRunner {
     public void run(String... args) {
         if (genreRepository.count() > 0)
             return;
-        
+
         saveIfNotExists("Hành Động");
         saveIfNotExists("Phiêu Lưu");
         saveIfNotExists("Hài Hước");

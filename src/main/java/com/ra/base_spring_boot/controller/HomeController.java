@@ -6,10 +6,7 @@ import com.ra.base_spring_boot.services.homeService.IMovieHomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/home")
@@ -42,6 +39,17 @@ public class HomeController {
                         .status(HttpStatus.OK)
                         .code(200)
                         .data(genreHomeService.getNowShowingGenres())
+                        .build()
+        );
+    }
+
+    @GetMapping("/movies/now-showing/{id}")
+    public ResponseEntity<?> getNowShowingMovieDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(movieHomeService.getNowShowingMovieDetail(id))
                         .build()
         );
     }
