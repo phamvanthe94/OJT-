@@ -3,6 +3,7 @@ package com.ra.base_spring_boot.controller;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.services.homeService.IGenreHomeService;
 import com.ra.base_spring_boot.services.homeService.IMovieHomeService;
+import com.ra.base_spring_boot.services.homeService.ITrailerHomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ public class HomeController {
 
     private final IMovieHomeService movieHomeService;
     private final IGenreHomeService genreHomeService;
+    private final ITrailerHomeService trailerHomeService;
 
     @GetMapping("/movies/now-showing")
     public ResponseEntity<?> getNowShowingMovies(
@@ -50,6 +52,17 @@ public class HomeController {
                         .status(HttpStatus.OK)
                         .code(200)
                         .data(movieHomeService.getNowShowingMovieDetail(id))
+                        .build()
+        );
+    }
+
+    @GetMapping("/movies/now-showing/{id}/trailer")
+    public ResponseEntity<?> getNowShowingMovieTrailer(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(trailerHomeService.getNowShowingMovieTrailer(id))
                         .build()
         );
     }
