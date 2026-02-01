@@ -65,4 +65,25 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
                 )
                 .build();
     }
+
+    @Override
+    public Page<MovieListResponse> getComingSoonMovies(int page, int size, String sortBy, String Direction) {
+
+        String sortField = (sortBy == null || sortBy.isBlank()) ? "releaseDate" : sortBy;
+
+        Sort sort = Sort.by(sortField);
+        sort = "desc".equalsIgnoreCase(Direction) ? sort.descending() : sort.ascending();
+
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), sort);
+
+        Page<Movie> movies = movieHomeRepository.findByStatus(MovieStatus.COMING_SOON, pageable);
+
+        return movies.map(movie -> MovieListResponse.builder()
+                .id(movie.getId())
+                .title(movie.getTitle())
+                .image(movie.getImage())
+                .duration(movie.getDuration())
+                .releaseDate(movie.getReleaseDate())
+                .build());
+    }
 }

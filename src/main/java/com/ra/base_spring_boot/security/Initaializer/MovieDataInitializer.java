@@ -19,6 +19,32 @@ import java.util.List;
 public class MovieDataInitializer implements CommandLineRunner {
 
     private final MovieRepository movieRepository;
+    List<Movie> comSoonMovies = List.of(
+            Movie.builder()
+                    .title("Chí Phèo")
+                    .image("image3.jpg")
+                    .trailer("example_trailer_link")
+                    .author("Nam Cao")
+                    .descriptions("Chí Phèo là một tác phẩm văn học nổi tiếng của nhà văn Nam Cao, kể về cuộc đời bi kịch của nhân vật Chí Phèo...")
+                    .duration(110)
+                    .releaseDate(LocalDate.of(2024, 12, 1))
+                    .status(MovieStatus.COMING_SOON)
+                    .type(MovieType._2D)
+                    .createdAt(LocalDate.now())
+                    .build(),
+            Movie.builder()
+                    .title("Tuổi thơ dữ dội")
+                    .image("image4.jpg")
+                    .trailer("example_trailer_link")
+                    .author("Phùng Quán")
+                    .descriptions("Tuổi thơ dữ dội là một tiểu thuyết nổi tiếng của nhà văn Phùng Quán, kể về những năm tháng chiến tranh khốc liệt...")
+                    .duration(95)
+                    .releaseDate(LocalDate.of(2024, 11, 15))
+                    .status(MovieStatus.COMING_SOON)
+                    .type(MovieType._2D)
+                    .createdAt(LocalDate.now())
+                    .build()
+    );
 
     @Transactional
     @Override
@@ -54,6 +80,7 @@ public class MovieDataInitializer implements CommandLineRunner {
                         .build()
         );
         movieRepository.saveAll(movies);
+        movieRepository.saveAll(comSoonMovies);
 
     }
 }
