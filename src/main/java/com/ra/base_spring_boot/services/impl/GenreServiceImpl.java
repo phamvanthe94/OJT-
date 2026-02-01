@@ -4,6 +4,7 @@ import com.ra.base_spring_boot.dto.req.GenreRequest;
 import com.ra.base_spring_boot.dto.resp.GenreResponse;
 import com.ra.base_spring_boot.model.entity.movie.Genre;
 import com.ra.base_spring_boot.repository.IGenreRepository;
+import com.ra.base_spring_boot.services.IGenreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
