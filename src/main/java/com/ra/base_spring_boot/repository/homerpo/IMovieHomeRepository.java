@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.repository;
+package com.ra.base_spring_boot.repository.homerpo;
 
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.entity.movie.Genre;
@@ -66,4 +66,6 @@ public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
             @Param("status") MovieStatus status,
             Pageable pageable
     );
+
+
 }

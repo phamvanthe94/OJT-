@@ -3,6 +3,7 @@ package com.ra.base_spring_boot.controller;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.services.homeService.IGenreHomeService;
 import com.ra.base_spring_boot.services.homeService.IMovieHomeService;
+import com.ra.base_spring_boot.services.homeService.INewsHomeService;
 import com.ra.base_spring_boot.services.homeService.ITrailerHomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ public class HomeController {
     private final IMovieHomeService movieHomeService;
     private final IGenreHomeService genreHomeService;
     private final ITrailerHomeService trailerHomeService;
+    private final INewsHomeService newsHomeService;
 
     /**
      * Get Now Showing Movies with pagination and sorting
@@ -99,6 +101,39 @@ public class HomeController {
                         .status(HttpStatus.OK)
                         .code(200)
                         .data(movieHomeService.getComingSoonMovies(page, size, sortBy, direction))
+                        .build()
+        );
+    }
+
+
+    /**
+     * Get Home News with pagination
+     */
+    @GetMapping("/news")
+    public ResponseEntity<?> getHomeNews(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(newsHomeService.getHomeNews(page, size))
+                        .build()
+        );
+    }
+
+
+    /**
+     * Get Home News Detail by ID
+     */
+    @GetMapping("/news/{id}")
+    public ResponseEntity<?> getHomeNewsDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(newsHomeService.getHomeNewDetail(id))
                         .build()
         );
     }
