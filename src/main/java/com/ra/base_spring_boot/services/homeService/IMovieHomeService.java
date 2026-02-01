@@ -10,5 +10,5 @@ public interface IMovieHomeService {
 
     MovieDetailResponse getNowShowingMovieDetail(Long id);
 
-
+    Page<MovieListResponse> getComingSoonMovies(int page, int size, String sortBy, String Direction);
 }

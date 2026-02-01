@@ -14,8 +14,14 @@ import java.util.Optional;
 
 public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
 
+    /**
+     * Find movies by their status with pagination.
+     */
     Page<Movie> findByStatus(MovieStatus status, Pageable pageable);
 
+    /**
+     * Find distinct genres from movies that are now showing.
+     */
     @Query("""
             SELECT DISTINCT g
             FROM Movie m
@@ -25,6 +31,9 @@ public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
             """)
     List<Genre> findNowShowingGenres(@Param("status") MovieStatus status);
 
+    /**
+     * Find detailed information of a now showing movie by its ID.
+     */
     @Query("""
                 SELECT m
                 FROM Movie m
@@ -38,6 +47,23 @@ public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
             @Param("status") MovieStatus status
     );
 
+    /**
+     * Find a movie by its title, ignoring case.
+     */
     Optional<Movie> findByTitleIgnoreCase(String title);
 
+    /**
+     * Find coming soon movies with pagination.
+     */
+    @Query("""
+                        SELECT m
+                        FROM Movie m
+                        WHERE m.status = :status
+                        AND m.releaseDate IS NOT NULL
+                        AND m.releaseDate > CURRENT_DATE
+            """)
+    Page<Movie> findComingSoonMovies(
+            @Param("status") MovieStatus status,
+            Pageable pageable
+    );
 }
