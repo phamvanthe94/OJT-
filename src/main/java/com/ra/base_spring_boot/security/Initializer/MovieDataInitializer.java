@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.security.Initaializer;
+package com.ra.base_spring_boot.security.Initializer;
 
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.constants.MovieType;
