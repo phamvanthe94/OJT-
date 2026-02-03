@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class MovieDTO {
+    private Long id;
     @NotBlank(message = "Title cannot be blank")
     private String title;
     @NotBlank(message = "Descriptions cannot be blank")

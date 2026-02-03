@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 @Query("""
 select m from Movie m 
@@ -18,4 +20,17 @@ Page<Movie> search(@Param("title") String title,
                    @Param("author") String author,
                    @Param("type") String type,
                    Pageable pageable);
+
+    @Query("""
+        SELECT m FROM Movie m
+        WHERE m.releaseDate <= CURRENT_TIMESTAMP
+    """)
+    List<Movie> findNowShowing();
+
+    // phim sắp chiếu
+    @Query("""
+        SELECT m FROM Movie m
+        WHERE m.releaseDate > CURRENT_TIMESTAMP
+    """)
+    List<Movie> findComingSoon();
 }

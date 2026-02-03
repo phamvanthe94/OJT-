@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import java.util.List;
+
 @Service
 public class MovieService {
     @Autowired
@@ -105,5 +107,19 @@ public class MovieService {
                 .createdAt(movieDTO.getCreatedAt())
                 .updatedAt(movieDTO.getUpdatedAt())
                 .build();
+    }
+    public List<MovieDTO> getNowShowing() {
+        return movieRepository.findNowShowing()
+                .stream()
+                .map(movie -> MovieDTO.builder()
+                        .id(movie.getId())
+                        .title(movie.getTitle())
+                        .duration(movie.getDuration())
+                        .releaseDate(movie.getReleaseDate())
+                        // image: KHÔNG set MultipartFile
+                        // nếu muốn trả ảnh thì thêm field imageUrl (String)
+                        .build()
+                )
+                .toList();
     }
 }
