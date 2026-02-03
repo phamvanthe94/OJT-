@@ -1,6 +1,8 @@
 package com.ra.base_spring_boot.services.homeService.impl;
 
+import com.ra.base_spring_boot.dto.resp.homeresp.FestivalDetailResponse;
 import com.ra.base_spring_boot.dto.resp.homeresp.FestivalListResponse;
+import com.ra.base_spring_boot.model.entity.content.Festival;
 import com.ra.base_spring_boot.repository.homerpo.IFestivalHomeRepository;
 import com.ra.base_spring_boot.services.homeService.IFestivalHomeService;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +31,20 @@ public class FestivalHomeServiceImpl implements IFestivalHomeService {
                         .startTime(festival.getStartTime())
                         .endTime(festival.getEndTime())
                         .build());
+    }
+
+    @Override
+    public FestivalDetailResponse getFestivalDetail(Long id) {
+
+        Festival festival = festivalHomeRepository.findById(id).
+                orElseThrow(() -> new RuntimeException("Không tìm thấy festival !"));
+
+        return FestivalDetailResponse.builder()
+                .id(festival.getId())
+                .title(festival.getTitle())
+                .image(festival.getImage())
+                .startTime(festival.getStartTime())
+                .endTime(festival.getEndTime())
+                .build();
     }
 }

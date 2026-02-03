@@ -136,6 +136,9 @@ public class HomeController {
         );
     }
 
+    /**
+     * Get Festivals with pagination
+     */
     @GetMapping("/festivals")
     public ResponseEntity<?> getFestivals(
             @RequestParam(defaultValue = "0") int page,
@@ -146,6 +149,20 @@ public class HomeController {
                         .status(HttpStatus.OK)
                         .code(200)
                         .data(festivalHomeService.getFestivals(page, size))
+                        .build()
+        );
+    }
+
+    /**
+     * Get Festival Detail by ID
+     */
+    @GetMapping("/festivals/{id}")
+    public ResponseEntity<?> getFestivalDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(festivalHomeService.getFestivalDetail(id))
                         .build()
         );
     }

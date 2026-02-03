@@ -12,4 +12,5 @@ public interface IFestivalHomeRepository extends JpaRepository<Festival, Long> {
             ORDER BY f.startTime DESC
             """)
     Page<Festival> findAllFestivals(Pageable pageable);
+
 }
