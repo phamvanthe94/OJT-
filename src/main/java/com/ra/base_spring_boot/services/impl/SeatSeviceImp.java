@@ -2,7 +2,11 @@ package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.req.SeatReq;
 import com.ra.base_spring_boot.dto.resp.SeatResp;
+import com.ra.base_spring_boot.dto.resp.SeatSelectResp;
+import com.ra.base_spring_boot.model.constants.SeatType;
 import com.ra.base_spring_boot.model.entity.theater.Seat;
+import com.ra.base_spring_boot.model.entity.theater.ShowTime;
+import com.ra.base_spring_boot.repository.IShowTimeRepository;
 import com.ra.base_spring_boot.repository.SeatRepository;
 import com.ra.base_spring_boot.services.SeatService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +16,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 public class SeatSeviceImp implements SeatService {
     @Autowired
     private SeatRepository seatRepository;
+    @Autowired
+    private IShowTimeRepository showTimeRepository;
+
 
     @Override
     public Page<SeatResp> findAll(Pageable pageable) {
@@ -105,4 +114,25 @@ public class SeatSeviceImp implements SeatService {
 
         seatRepository.delete(seat);
     }
+
+    @Override
+    public List<SeatSelectResp> getSeatsByShowTime(Long showTimeId) {
+
+        ShowTime showTime = showTimeRepository.findById(showTimeId)
+                .orElseThrow(() -> new RuntimeException("ShowTime not found"));
+
+        Long screenId = showTime.getScreen().getId();
+
+        return seatRepository.findSeatsWithBookingStatus(screenId, showTimeId)
+                .stream()
+                .map(obj -> SeatSelectResp.builder()
+                        .seatId(((Number) obj[0]).longValue())
+                        .seatNumber((String) obj[1])
+                        .type(SeatType.valueOf(obj[2].toString()))
+                        .booked((Boolean) obj[3])
+                        .build())
+                .toList();
+    }
+
+
 }
