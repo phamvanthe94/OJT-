@@ -1,11 +1,15 @@
 package com.ra.base_spring_boot.controller;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
+import com.ra.base_spring_boot.model.constants.MovieType;
+import com.ra.base_spring_boot.model.constants.SeatType;
 import com.ra.base_spring_boot.services.homeService.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/api/v1/home")
@@ -17,6 +21,7 @@ public class HomeController {
     private final ITrailerHomeService trailerHomeService;
     private final INewsHomeService newsHomeService;
     private final IFestivalHomeService festivalHomeService;
+    private final ITicketHomeService ticketHomeService;
 
     /**
      * Get Now Showing Movies with pagination and sorting
@@ -163,6 +168,25 @@ public class HomeController {
                         .status(HttpStatus.OK)
                         .code(200)
                         .data(festivalHomeService.getFestivalDetail(id))
+                        .build()
+        );
+    }
+
+    /**
+     * Get Ticket Prices based on parameters
+     */
+    @GetMapping("/ticket-price")
+    public ResponseEntity<?> getTicketPrices(
+            @RequestParam(required = false) SeatType seatType,
+            @RequestParam(required = false) MovieType movieType,
+            @RequestParam(required = false) Boolean dayType,
+            @RequestParam(required = false) LocalTime time
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(ticketHomeService.getTicketPrices(seatType, movieType, dayType, time))
                         .build()
         );
     }

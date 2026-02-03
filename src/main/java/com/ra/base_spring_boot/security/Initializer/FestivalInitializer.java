@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.security.Initaializer;
+package com.ra.base_spring_boot.security.Initializer;
 
 import com.ra.base_spring_boot.model.entity.content.Festival;
 import com.ra.base_spring_boot.repository.homerpo.IFestivalHomeRepository;
