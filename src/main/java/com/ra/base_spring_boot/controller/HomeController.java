@@ -1,10 +1,7 @@
 package com.ra.base_spring_boot.controller;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
-import com.ra.base_spring_boot.services.homeService.IGenreHomeService;
-import com.ra.base_spring_boot.services.homeService.IMovieHomeService;
-import com.ra.base_spring_boot.services.homeService.INewsHomeService;
-import com.ra.base_spring_boot.services.homeService.ITrailerHomeService;
+import com.ra.base_spring_boot.services.homeService.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +16,7 @@ public class HomeController {
     private final IGenreHomeService genreHomeService;
     private final ITrailerHomeService trailerHomeService;
     private final INewsHomeService newsHomeService;
+    private final IFestivalHomeService festivalHomeService;
 
     /**
      * Get Now Showing Movies with pagination and sorting
@@ -134,6 +132,20 @@ public class HomeController {
                         .status(HttpStatus.OK)
                         .code(200)
                         .data(newsHomeService.getHomeNewDetail(id))
+                        .build()
+        );
+    }
+
+    @GetMapping("/festivals")
+    public ResponseEntity<?> getFestivals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(festivalHomeService.getFestivals(page, size))
                         .build()
         );
     }
