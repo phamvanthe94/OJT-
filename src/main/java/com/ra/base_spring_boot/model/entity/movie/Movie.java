@@ -1,11 +1,12 @@
 package com.ra.base_spring_boot.model.entity.movie;
 
 import com.ra.base_spring_boot.model.base.BaseObject;
+import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -40,18 +41,22 @@ public class Movie extends BaseObject {
     private Integer duration;
 
     @Column(name = "release_date")
-    private LocalDateTime releaseDate;
+    private LocalDate releaseDate;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private LocalDate updatedAt;
 
-    // style thầy: ManyToMany => bảng movie_genre
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private MovieStatus status;
+
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "movie_genre",
+            name = "movie_genres",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )

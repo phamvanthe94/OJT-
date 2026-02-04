@@ -12,4 +12,6 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
         WHERE (:search IS NULL OR f.title LIKE %:search%)
     """)
     Page<Festival> findByTitle(String search, Pageable pageable);
+    @Query("SELECT COUNT(f) FROM Festival f")
+    Long countFestival();
 }

@@ -3,6 +3,8 @@ package com.ra.base_spring_boot.model.entity.theater;
 import com.ra.base_spring_boot.model.base.BaseObject;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -24,9 +26,11 @@ public class Theater extends BaseObject {
     @Column(name = "phone", length = 11)
     private String phone;
 
+    @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "update_at")
     private LocalDateTime updateAt;
 }

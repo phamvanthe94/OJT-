@@ -8,15 +8,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-public class AuthController
-{
+public class AuthController {
     private final IAuthService authService;
 
     /**
@@ -24,8 +26,7 @@ public class AuthController
      * @apiNote handle login with { username , password }
      */
     @PostMapping("/login")
-    public ResponseEntity<?> handleLogin(@Valid @RequestBody FormLogin formLogin)
-    {
+    public ResponseEntity<?> handleLogin(@Valid @RequestBody FormLogin formLogin) {
         return ResponseEntity.ok().body(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
@@ -40,8 +41,7 @@ public class AuthController
      * @apiNote handle register with { fullName , username , password }
      */
     @PostMapping("/register")
-    public ResponseEntity<?> handleRegister(@Valid @RequestBody FormRegister formRegister)
-    {
+    public ResponseEntity<?> handleRegister(@Valid @RequestBody FormRegister formRegister) {
         authService.register(formRegister);
         return ResponseEntity.created(URI.create("api/v1/auth/register")).body(
                 ResponseWrapper.builder()
