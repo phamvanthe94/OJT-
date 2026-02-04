@@ -1,11 +1,14 @@
-package com.ra.base_spring_boot.services.impl;
+package com.ra.base_spring_boot.services.authsv.impl;
 
 import com.ra.base_spring_boot.dto.req.ChangeUserStatusRequest;
 import com.ra.base_spring_boot.dto.resp.UserAdminResponse;
 import com.ra.base_spring_boot.model.entity.user.User;
-import com.ra.base_spring_boot.repository.UserAdminRepository;
-import com.ra.base_spring_boot.services.IUserAdminService;
-import org.springframework.data.domain.*;
+import com.ra.base_spring_boot.repository.authrp.UserAdminRepository;
+import com.ra.base_spring_boot.services.authsv.IUserAdminService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +38,9 @@ public class UserAdminServiceImpl implements IUserAdminService {
 
         return result.map(u -> UserAdminResponse.builder()
                 .id(u.getId())
-                .fullName(u.getFullName())
-                .username(u.getUsername())
+                .firstName(u.getFirstName())
+                .lastName(u.getLastName())
+                .email(u.getEmail())
                 .status(u.getStatus())
                 .roles(
                         u.getRoles().stream()
@@ -58,8 +62,9 @@ public class UserAdminServiceImpl implements IUserAdminService {
 
         return UserAdminResponse.builder()
                 .id(saved.getId())
-                .fullName(saved.getFullName())
-                .username(saved.getUsername())
+                .firstName(saved.getFirstName())
+                .lastName(saved.getLastName())
+                .email(saved.getEmail())
                 .status(saved.getStatus())
                 .roles(
                         saved.getRoles().stream()

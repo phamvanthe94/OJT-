@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.authsv;
 
 import com.ra.base_spring_boot.dto.req.ChangeUserStatusRequest;
 import com.ra.base_spring_boot.dto.resp.UserAdminResponse;

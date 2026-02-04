@@ -1,7 +1,7 @@
 package com.ra.base_spring_boot.security.Initializer;
 
 import com.ra.base_spring_boot.model.constants.RoleName;
-import com.ra.base_spring_boot.repository.IRoleRepository;
+import com.ra.base_spring_boot.repository.authrp.IRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

@@ -1,7 +1,7 @@
-package com.ra.base_spring_boot.services.impl;
+package com.ra.base_spring_boot.services.authsv.impl;
 
-import com.ra.base_spring_boot.repository.IBlacklistTokenRepository;
-import com.ra.base_spring_boot.services.ITokenBlacklistCleanupService;
+import com.ra.base_spring_boot.repository.authrp.IBlacklistTokenRepository;
+import com.ra.base_spring_boot.services.authsv.ITokenBlacklistCleanupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

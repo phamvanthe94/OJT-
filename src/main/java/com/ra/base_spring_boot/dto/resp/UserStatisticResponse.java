@@ -1,5 +1,6 @@
 package com.ra.base_spring_boot.dto.resp;
 
+import com.ra.base_spring_boot.model.constants.UserStatus;
 import lombok.*;
 
 import java.util.List;
@@ -9,11 +10,10 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-
 public class UserStatisticResponse {
     private Group total;
     private Group active;
-    private Group inactive;
+    private Group blocked;
 
     @Getter
     @Setter
@@ -32,8 +32,9 @@ public class UserStatisticResponse {
     @Builder
     public static class UserItem {
         private Long id;
-        private String fullName;
-        private String username;
-        private Boolean status;
+        private String firstName;
+        private String lastName;
+        private String email;
+        private UserStatus status;
     }
 }
