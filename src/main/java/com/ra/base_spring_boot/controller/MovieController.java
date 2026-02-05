@@ -66,5 +66,10 @@ public class MovieController {
     public ResponseEntity<ResponseWrapper<String>> deleteMovie(@PathVariable Long id) {
         return movieService.deleteMovie(id);
     }
-    
+    @GetMapping("/now-showing")
+    public ResponseEntity<?> getNowShowing() {
+        return ResponseEntity.ok(
+                movieService.getNowShowing()
+        );
+    }
 }
