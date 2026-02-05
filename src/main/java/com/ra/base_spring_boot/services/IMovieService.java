@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
+import java.util.List;
+
 public interface IMovieService {
 
     ResponseEntity<ResponseWrapper<Page<Movie>>> getAllMovie(
@@ -24,6 +26,8 @@ public interface IMovieService {
     ResponseEntity<ResponseWrapper<String>> deleteMovie(Long id);
 
     Movie convertMovieDTOToMovie(MovieDTO movieDTO);
+
+    ResponseEntity<ResponseWrapper<List<Movie>>> getNowShowing();
 
 
 }

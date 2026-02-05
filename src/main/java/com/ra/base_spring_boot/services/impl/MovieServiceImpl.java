@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.util.List;
+
 @Service
 public class MovieServiceImpl implements IMovieService {
 
@@ -121,6 +123,20 @@ public class MovieServiceImpl implements IMovieService {
 
         return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<ResponseWrapper<List<Movie>>> getNowShowing() {
+        List<Movie> movies = movieRepository.findNowShowing();
+
+        ResponseWrapper<List<Movie>> wrapper = ResponseWrapper.<List<Movie>>builder()
+                .status(HttpStatus.OK)
+                .code(200)
+                .data(movies)
+                .build();
+
+        return ResponseEntity.ok(wrapper);
+    }
+
 
     @Override
     public Movie convertMovieDTOToMovie(MovieDTO movieDTO) {

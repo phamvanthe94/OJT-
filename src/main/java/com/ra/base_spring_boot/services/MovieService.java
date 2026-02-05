@@ -49,9 +49,10 @@ public class MovieService {
                     .code(201)
                     .status(HttpStatus.CREATED)
                     .build();
-            return new ResponseEntity<>(responseWrapper,HttpStatus.CREATED);
+            return new ResponseEntity<>(responseWrapper, HttpStatus.CREATED);
         }
     }
+
     public ResponseEntity<ResponseWrapper<?>> updateMovie(Long id, MovieDTO movieDTO) {
         Movie oldMovie = movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Movie not found with id: " + id));
         if (movieDTO != null) {
@@ -75,6 +76,7 @@ public class MovieService {
             throw new RuntimeException("MovieDTO is null");
         }
     }
+
     public ResponseEntity<ResponseWrapper<String>> deleteMovie(Long id) {
         Movie movie = movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Movie not found with id: " + id));
         movieRepository.delete(movie);
@@ -103,11 +105,12 @@ public class MovieService {
                 .trailer(movieDTO.getTrailer())
                 .type(movieType)
                 .duration(movieDTO.getDuration())
-                .releaseDate(movieDTO.getReleaseDate() == null ? null : movieDTO.getReleaseDate().atStartOfDay())
-                .createdAt(movieDTO.getCreatedAt() == null ? null : movieDTO.getCreatedAt().atStartOfDay())
-                .updatedAt(movieDTO.getUpdatedAt() == null ? null : movieDTO.getUpdatedAt().atStartOfDay())
+                .releaseDate(movieDTO.getReleaseDate() == null ? null : movieDTO.getReleaseDate())
+                .createdAt(movieDTO.getCreatedAt() == null ? null : movieDTO.getCreatedAt())
+                .updatedAt(movieDTO.getUpdatedAt() == null ? null : movieDTO.getUpdatedAt())
                 .build();
     }
+
     public List<MovieDTO> getNowShowing() {
         return movieRepository.findNowShowing()
                 .stream()
