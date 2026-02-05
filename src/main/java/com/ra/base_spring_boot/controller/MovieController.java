@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/movies")
 public class MovieController {
@@ -66,10 +68,10 @@ public class MovieController {
     public ResponseEntity<ResponseWrapper<String>> deleteMovie(@PathVariable Long id) {
         return movieService.deleteMovie(id);
     }
+    
     @GetMapping("/now-showing")
-    public ResponseEntity<?> getNowShowing() {
-        return ResponseEntity.ok(
-                movieService.getNowShowing()
-        );
+    public ResponseEntity<ResponseWrapper<List<Movie>>> getNowShowing() {
+        return movieService.getNowShowing();
     }
+
 }
