@@ -5,6 +5,8 @@ import com.ra.base_spring_boot.model.base.BaseObject;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -33,9 +35,11 @@ public class ShowTime extends BaseObject {
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
+    @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
