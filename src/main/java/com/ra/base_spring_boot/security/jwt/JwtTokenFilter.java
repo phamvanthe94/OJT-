@@ -1,6 +1,6 @@
 package com.ra.base_spring_boot.security.jwt;
 
-import com.ra.base_spring_boot.repository.IBlacklistTokenRepository;
+import com.ra.base_spring_boot.repository.authrp.IBlacklistTokenRepository;
 import com.ra.base_spring_boot.security.principle.MyUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

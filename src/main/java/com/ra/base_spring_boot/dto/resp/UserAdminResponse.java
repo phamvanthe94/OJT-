@@ -1,6 +1,10 @@
 package com.ra.base_spring_boot.dto.resp;
 
-import lombok.*;
+import com.ra.base_spring_boot.model.constants.UserStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
@@ -9,9 +13,15 @@ import java.util.Set;
 @Data
 @Builder
 public class UserAdminResponse {
+
     private Long id;
-    private String fullName;
-    private String username;
-    private Boolean status;
+
+    private String firstName;
+    private String lastName;
+
+    private String email;
+
+    private UserStatus status;
+
     private Set<String> roles;
 }

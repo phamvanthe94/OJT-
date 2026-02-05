@@ -18,5 +18,7 @@ public interface NewRepository extends JpaRepository<News, Long> {
                       @Param("content") String content,
                       @Param("festivalId") Long festivalId,
                       Pageable pageable);
+    @Query("SELECT COUNT(n) FROM News n")
+    Long countNews();
 
 }

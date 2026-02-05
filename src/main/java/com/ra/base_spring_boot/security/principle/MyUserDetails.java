@@ -14,50 +14,42 @@ import java.util.Collection;
 @AllArgsConstructor
 @Data
 @Builder
-public class MyUserDetails implements UserDetails
-{
+public class MyUserDetails implements UserDetails {
     private User user;
     private Collection<? extends GrantedAuthority> authorities;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities()
-    {
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.authorities;
     }
 
     @Override
-    public String getPassword()
-    {
+    public String getPassword() {
         return this.user.getPassword();
     }
 
     @Override
-    public String getUsername()
-    {
-        return this.user.getUsername();
+    public String getUsername() {
+        return this.user.getEmail();
     }
 
     @Override
-    public boolean isAccountNonExpired()
-    {
+    public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
-    public boolean isAccountNonLocked()
-    {
+    public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
-    public boolean isCredentialsNonExpired()
-    {
+    public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return true;
     }
 }

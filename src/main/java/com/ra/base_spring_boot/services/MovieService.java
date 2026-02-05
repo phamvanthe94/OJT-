@@ -103,9 +103,9 @@ public class MovieService {
                 .trailer(movieDTO.getTrailer())
                 .type(movieType)
                 .duration(movieDTO.getDuration())
-                .releaseDate(movieDTO.getReleaseDate())
-                .createdAt(movieDTO.getCreatedAt())
-                .updatedAt(movieDTO.getUpdatedAt())
+                .releaseDate(movieDTO.getReleaseDate() == null ? null : movieDTO.getReleaseDate().atStartOfDay())
+                .createdAt(movieDTO.getCreatedAt() == null ? null : movieDTO.getCreatedAt().atStartOfDay())
+                .updatedAt(movieDTO.getUpdatedAt() == null ? null : movieDTO.getUpdatedAt().atStartOfDay())
                 .build();
     }
     public List<MovieDTO> getNowShowing() {

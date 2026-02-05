@@ -1,0 +1,18 @@
+package com.ra.base_spring_boot.repository.homerpo;
+
+import com.ra.base_spring_boot.model.entity.movie.Genre;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface IGenreRepository extends JpaRepository<Genre, Long> {
+
+    Page<Genre> findByGenreNameContainingIgnoreCase(String keyword, Pageable pageable);
+
+    boolean existsByGenreNameIgnoreCase(String genreName);
+
+    Optional<Genre> findByGenreNameIgnoreCase(String genreName);
+
+}

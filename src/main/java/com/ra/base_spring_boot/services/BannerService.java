@@ -30,7 +30,7 @@ public class BannerService {
         return ResponseEntity.ok(responseWrapper);
     }
 
-    public ResponseEntity<ResponseWrapper<?>> CreateBanner(BannerDTO bannerDTO, BindingResult bindingResult) {
+    public ResponseEntity<ResponseWrapper<?>> createBanner(BannerDTO bannerDTO, BindingResult bindingResult) {
         if (bannerDTO.getUrl() == null || bannerDTO.getUrl().isEmpty()) {
             bindingResult.rejectValue("url", "400", "URL cannot be null or empty");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

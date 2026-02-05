@@ -7,6 +7,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FormUpdateProfile {
+
     @NotBlank(message = "Không được để trống")
-    private String fullName;
+    private String firstName;
+
+    @NotBlank(message = "Không được để trống")
+    private String lastName;
+
+
+    private String phone;
+    private String address;
+    private String avatar;
 }

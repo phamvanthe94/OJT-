@@ -12,7 +12,7 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -20,7 +20,7 @@ spring:
 
 jwt:
   secret:
-    key:  TMhrYUdu0sHnjWmA9nvyOVnpW39yTdyyvotysrVnDyc
+    key: TMhrYUdu0sHnjWmA9nvyOVnpW39yTdyyvotysrVnDyc
   expired:
     access: 864000
 

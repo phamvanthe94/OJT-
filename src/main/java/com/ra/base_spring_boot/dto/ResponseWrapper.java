@@ -10,8 +10,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Data
 @Builder
-public class ResponseWrapper<T>
-{
+public class ResponseWrapper<T> {
     private HttpStatus status;
     private int code;
     private T data;
