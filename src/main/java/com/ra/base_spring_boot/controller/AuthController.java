@@ -3,15 +3,13 @@ package com.ra.base_spring_boot.controller;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.FormLogin;
 import com.ra.base_spring_boot.dto.req.FormRegister;
-import com.ra.base_spring_boot.services.IAuthService;
+import com.ra.base_spring_boot.services.authsv.IAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -23,7 +21,7 @@ public class AuthController {
 
     /**
      * @param formLogin FormLogin
-     * @apiNote handle login with { username , password }
+     * @apiNote handle login with { email, password }
      */
     @PostMapping("/login")
     public ResponseEntity<?> handleLogin(@Valid @RequestBody FormLogin formLogin) {
@@ -38,10 +36,10 @@ public class AuthController {
 
     /**
      * @param formRegister FormRegister
-     * @apiNote handle register with { fullName , username , password }
+     * @apiNote handle register with { firstName, lastName, email, password, phone, address, avatar }
      */
-    @PostMapping("/register")
-    public ResponseEntity<?> handleRegister(@Valid @RequestBody FormRegister formRegister) {
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> handleRegister(@Valid @ModelAttribute FormRegister formRegister) {
         authService.register(formRegister);
         return ResponseEntity.created(URI.create("api/v1/auth/register")).body(
                 ResponseWrapper.builder()

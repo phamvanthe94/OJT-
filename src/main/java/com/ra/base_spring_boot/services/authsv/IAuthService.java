@@ -1,11 +1,10 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.authsv;
 
 import com.ra.base_spring_boot.dto.req.FormLogin;
 import com.ra.base_spring_boot.dto.req.FormRegister;
 import com.ra.base_spring_boot.dto.resp.JwtResponse;
 
-public interface IAuthService
-{
+public interface IAuthService {
 
     void register(FormRegister formRegister);
 

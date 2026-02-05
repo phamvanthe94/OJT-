@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.repository;
+package com.ra.base_spring_boot.repository.authrp;
 
 import com.ra.base_spring_boot.model.constants.RoleName;
 import com.ra.base_spring_boot.model.entity.user.Role;
