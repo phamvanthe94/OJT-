@@ -44,7 +44,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-
+    // Source: https://mvnrepository.com/artifact/com.google.zxing/core
+    implementation("com.google.zxing:core:3.5.3")
+    // Source: https://mvnrepository.com/artifact/com.google.zxing/javase
+    implementation("com.google.zxing:javase:3.5.3")
 }
 
 tasks.named('test') {
