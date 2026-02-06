@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +23,14 @@ public class NewController {
                                                                  @RequestParam(name="content", required = false) String content,
                                                                  @RequestParam(name="festivalId", required = false) Long festivalId,
                                                                  @RequestParam(name="page", defaultValue = "0") int page,
-                                                                 @RequestParam(name="size", defaultValue = "5") int size){
-        return newService.getAllAndSearchNew(title, content, festivalId, PageRequest.of(page, size));
+                                                                 @RequestParam(name="size", defaultValue = "5") int size,
+                                                                 @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+                                                                 @RequestParam(name = "direction", defaultValue = "desc") String direction){
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        return newService.getAllAndSearchNew(title, content, festivalId, pageRequest);
     }
     @PostMapping("/add")
     public ResponseEntity<ResponseWrapper<?>> addNew(@RequestBody @Valid NewDTO newDTO, BindingResult bindingResult){

@@ -8,7 +8,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +25,18 @@ public class BannerController {
     @GetMapping
 public ResponseEntity<ResponseWrapper<Page<Banner>>> getAllBanner(@RequestParam(name="search", required = false) String search,
                                                                   @RequestParam(name="page", defaultValue = "0") int page,
-                                                                  @RequestParam(name="size", defaultValue = "5") int size){
-        return bannerService.getAllAndSearch(search, PageRequest.of(page, size));
+                                                                  @RequestParam(name="size", defaultValue = "5") int size,
+                                                                  @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+                                                                  @RequestParam(name = "direction", defaultValue = "desc") String direction){
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return bannerService.getAllAndSearch(search, pageable);
     }
 
-    @PostMapping("add")
+    @PostMapping(value = "add",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseWrapper<?>> addBanner(@Valid @ModelAttribute BannerDTO bannerDTO, BindingResult bindingResult){
         ResponseEntity<ResponseWrapper<?>> responseEntity = bannerService.createBanner(bannerDTO, bindingResult);
         if(bindingResult.hasErrors()) {

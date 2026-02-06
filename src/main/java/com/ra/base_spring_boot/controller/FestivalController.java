@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class FestivalController {
                                                                           @RequestParam(name="size", defaultValue = "5") int size){
         return festivalService.getAllAndSearchFestival(keyword, PageRequest.of(page, size));
     }
-    @PostMapping("/add")
+    @PostMapping(value ="/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseWrapper<?>> addFestival(@Valid @ModelAttribute FestivalDTO festivalDTO, BindingResult bindingResult){
         ResponseEntity<ResponseWrapper<?>> responseEntity = festivalService.createFestival(festivalDTO, bindingResult);
         if(bindingResult.hasErrors()) {
@@ -40,7 +41,7 @@ public class FestivalController {
         }
         return responseEntity;
     }
-    @PutMapping("/edit/{id}")
+    @PutMapping(value ="/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseWrapper<?>> updateFestival(@Valid @ModelAttribute FestivalDTO festivalDTO, @PathVariable Long id){
         return festivalService.updateFestival(id, festivalDTO);
     }

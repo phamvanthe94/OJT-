@@ -15,7 +15,7 @@ public class StatisticController {
     private StatisticService statisticService;
 
     @GetMapping("/news-festival")
-    public ResponseEntity<ResponseWrapper<?>> statisticNewsFestival() {
-        return statisticService.statisticNewAndFestival();
+    public ResponseEntity<ResponseWrapper<?>> statisticNewsFestivalDetail() {
+        return statisticService.statisticNewsAndFestivalDetail();
     }
 }
