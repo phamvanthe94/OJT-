@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,14 @@ public class TicketPricceController {
                                                                                  @RequestParam(name="seatType", required = false) String seatType,
                                                                                  @RequestParam(name="movieType", required = false) String movieType,
                                                                                  @RequestParam(name="page", defaultValue = "0") int page,
-                                                                                 @RequestParam(name="size", defaultValue = "5") int size){
-        return ticketPriceService.getAllAndSearchTicketPrice(dayType, seatType, movieType,  PageRequest.of(page, size));
+                                                                                 @RequestParam(name="size", defaultValue = "5") int size,
+                                                                                @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+                                                                                @RequestParam(name = "direction", defaultValue = "desc") String direction){
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        return ticketPriceService.getAllAndSearchTicketPrice(dayType, seatType, movieType, pageRequest);
     }
     @PostMapping("/add")
     public ResponseEntity<ResponseWrapper<?>> createTicketPrice(@RequestBody @Valid TicketPriceDTO ticketPriceDTO, BindingResult bindingResult){

@@ -18,10 +18,16 @@ public class StatisticService {
     @Autowired
     private FestivalRepository festivalRepository;
 
-    public ResponseEntity<ResponseWrapper<?>> statisticNewAndFestival(){
-        Map<String, Long> result = new HashMap<>();
-        result.put("totalNews", newRepository.countNews());
-        result.put("totalFestivals", festivalRepository.countFestival());
+    public ResponseEntity<ResponseWrapper<?>> statisticNewsAndFestivalDetail() {
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("totalNews", newRepository.count());
+        result.put("news", newRepository.findAllNewsTitle());
+
+        result.put("totalFestivals", festivalRepository.count());
+        result.put("festivals", festivalRepository.findAllFestivalTitle());
+
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .data(result)
