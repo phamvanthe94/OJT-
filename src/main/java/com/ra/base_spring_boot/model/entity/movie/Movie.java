@@ -1,12 +1,17 @@
 package com.ra.base_spring_boot.model.entity.movie;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ra.base_spring_boot.model.base.BaseObject;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -16,6 +21,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Movie extends BaseObject {
 
     @Column(name = "title", nullable = false, length = 255)
@@ -43,16 +49,17 @@ public class Movie extends BaseObject {
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    @Column(name = "created_at")
-    private LocalDate createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private MovieStatus status;
-
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -60,5 +67,6 @@ public class Movie extends BaseObject {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
-    private Set<Genre> genres;
+    @Builder.Default
+    private Set<Genre> genres = new HashSet<>();
 }

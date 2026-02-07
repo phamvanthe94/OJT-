@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.NewDTO;
@@ -22,9 +22,9 @@ public class NewService {
     private FestivalRepository festivalRepository;
 
     public ResponseEntity<ResponseWrapper<Page<News>>> getAllAndSearchNew(String title,
-                                                                           String content,
-                                                                           Long festivalId,
-                                                                           Pageable pageable) {
+                                                                          String content,
+                                                                          Long festivalId,
+                                                                          Pageable pageable) {
         Page<News> newsPage = newRepository.search(title, content, festivalId, pageable);
         ResponseWrapper<Page<News>> responseWrapper = ResponseWrapper.<Page<News>>builder()
                 .data(newsPage)
@@ -33,8 +33,9 @@ public class NewService {
                 .build();
         return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
     }
-    public ResponseEntity<ResponseWrapper<?>> createNew(NewDTO newDTO, BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
+
+    public ResponseEntity<ResponseWrapper<?>> createNew(NewDTO newDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             ResponseWrapper<String> responseWrapper = ResponseWrapper.<String>builder()
                     .data(bindingResult.getAllErrors().toString())
                     .code(400)
@@ -53,7 +54,8 @@ public class NewService {
             return new ResponseEntity<>(responseWrapper, HttpStatus.CREATED);
         }
     }
-    public ResponseEntity<ResponseWrapper<?>> updateNew(Long id, NewDTO newDTO){
+
+    public ResponseEntity<ResponseWrapper<?>> updateNew(Long id, NewDTO newDTO) {
         News oldNews = newRepository.findById(id).orElseThrow(() -> new RuntimeException("News not found with id: " + id));
         if (newDTO != null) {
             News news = convertNewDTOToNews(newDTO);
@@ -77,7 +79,7 @@ public class NewService {
         }
     }
 
-    public ResponseEntity<ResponseWrapper<String>> deleteNew(Long id){
+    public ResponseEntity<ResponseWrapper<String>> deleteNew(Long id) {
         News news = newRepository.findById(id).orElseThrow(() -> new RuntimeException("News not found with id: " + id));
         newRepository.delete(news);
         ResponseWrapper<String> responseWrapper = ResponseWrapper
@@ -89,7 +91,7 @@ public class NewService {
         return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
     }
 
-    public News convertNewDTOToNews(NewDTO newDTO){
+    public News convertNewDTOToNews(NewDTO newDTO) {
         Festival festival = festivalRepository.findById(newDTO.getFestivalId())
                 .orElseThrow(() -> new RuntimeException("Festival not found with id: " + newDTO.getFestivalId()));
         return News.builder()

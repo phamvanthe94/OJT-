@@ -1,8 +1,8 @@
 package com.ra.base_spring_boot.controller;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
-import com.ra.base_spring_boot.dto.req.FormChangePassword;
 import com.ra.base_spring_boot.dto.req.FormUpdateProfile;
+import com.ra.base_spring_boot.dto.req.authreq.FormChangePassword;
 import com.ra.base_spring_boot.services.authsv.IUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

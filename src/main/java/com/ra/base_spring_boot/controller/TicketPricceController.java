@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.controller;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.TicketPriceDTO;
 import com.ra.base_spring_boot.model.entity.booking.TicketPrice;
-import com.ra.base_spring_boot.services.TicketPriceService;
+import com.ra.base_spring_boot.services.impl.TicketPriceService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,23 +20,24 @@ public class TicketPricceController {
     private TicketPriceService ticketPriceService;
 
     @GetMapping
-    public ResponseEntity<ResponseWrapper<Page<TicketPrice>>> getAllTicketPrice(@RequestParam(name="dayType", required = false) Boolean dayType,
-                                                                                 @RequestParam(name="seatType", required = false) String seatType,
-                                                                                 @RequestParam(name="movieType", required = false) String movieType,
-                                                                                 @RequestParam(name="page", defaultValue = "0") int page,
-                                                                                 @RequestParam(name="size", defaultValue = "5") int size,
+    public ResponseEntity<ResponseWrapper<Page<TicketPrice>>> getAllTicketPrice(@RequestParam(name = "dayType", required = false) Boolean dayType,
+                                                                                @RequestParam(name = "seatType", required = false) String seatType,
+                                                                                @RequestParam(name = "movieType", required = false) String movieType,
+                                                                                @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                                @RequestParam(name = "size", defaultValue = "5") int size,
                                                                                 @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
-                                                                                @RequestParam(name = "direction", defaultValue = "desc") String direction){
+                                                                                @RequestParam(name = "direction", defaultValue = "desc") String direction) {
         Sort sort = direction.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
         PageRequest pageRequest = PageRequest.of(page, size, sort);
         return ticketPriceService.getAllAndSearchTicketPrice(dayType, seatType, movieType, pageRequest);
     }
+
     @PostMapping("/add")
-    public ResponseEntity<ResponseWrapper<?>> createTicketPrice(@RequestBody @Valid TicketPriceDTO ticketPriceDTO, BindingResult bindingResult){
+    public ResponseEntity<ResponseWrapper<?>> createTicketPrice(@RequestBody @Valid TicketPriceDTO ticketPriceDTO, BindingResult bindingResult) {
         ResponseEntity<ResponseWrapper<?>> responseEntity = ticketPriceService.createTicketPrice(ticketPriceDTO, bindingResult);
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(
                     ResponseWrapper
                             .<Object>builder()
@@ -51,7 +52,7 @@ public class TicketPricceController {
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<ResponseWrapper<?>> updateTicketPrice(@PathVariable Long id, @RequestBody @Valid TicketPriceDTO ticketPriceDTO){
+    public ResponseEntity<ResponseWrapper<?>> updateTicketPrice(@PathVariable Long id, @RequestBody @Valid TicketPriceDTO ticketPriceDTO) {
         return ticketPriceService.updateTicketPrice(id, ticketPriceDTO);
     }
 

@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.security.Initializer;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
-import com.ra.base_spring_boot.repository.MovieRepository;
+import com.ra.base_spring_boot.repository.IMovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -18,7 +18,7 @@ import java.util.List;
 @Order(1)
 public class MovieDataInitializer implements CommandLineRunner {
 
-    private final MovieRepository movieRepository;
+    private final IMovieRepository movieRepository;
     List<Movie> comSoonMovies = List.of(
             Movie.builder()
                     .title("Chí Phèo")
@@ -30,7 +30,6 @@ public class MovieDataInitializer implements CommandLineRunner {
                     .releaseDate(LocalDate.of(2024, 12, 1))
                     .status(MovieStatus.COMING_SOON)
                     .type(MovieType._2D)
-                    .createdAt(LocalDate.now())
                     .build(),
             Movie.builder()
                     .title("Tuổi thơ dữ dội")
@@ -42,7 +41,6 @@ public class MovieDataInitializer implements CommandLineRunner {
                     .releaseDate(LocalDate.of(2024, 11, 15))
                     .status(MovieStatus.COMING_SOON)
                     .type(MovieType._2D)
-                    .createdAt(LocalDate.now())
                     .build()
     );
 
@@ -63,7 +61,7 @@ public class MovieDataInitializer implements CommandLineRunner {
                         .releaseDate(LocalDate.of(2024, 1, 1))
                         .status(MovieStatus.NOW_SHOWING)
                         .type(MovieType._2D)
-                        .createdAt(LocalDate.now())
+
                         .build(),
 
                 Movie.builder()
@@ -76,7 +74,7 @@ public class MovieDataInitializer implements CommandLineRunner {
                         .releaseDate(LocalDate.of(2024, 2, 1))
                         .status(MovieStatus.NOW_SHOWING)
                         .type(MovieType._2D)
-                        .createdAt(LocalDate.now())
+
                         .build()
         );
         movieRepository.saveAll(movies);

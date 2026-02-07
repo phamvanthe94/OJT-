@@ -1,7 +1,7 @@
 package com.ra.base_spring_boot.services.authsv.impl;
 
-import com.ra.base_spring_boot.dto.req.FormLogin;
-import com.ra.base_spring_boot.dto.req.FormRegister;
+import com.ra.base_spring_boot.dto.req.authreq.FormLogin;
+import com.ra.base_spring_boot.dto.req.authreq.FormRegister;
 import com.ra.base_spring_boot.dto.resp.JwtResponse;
 import com.ra.base_spring_boot.exception.HttpBadRequest;
 import com.ra.base_spring_boot.model.constants.RoleName;
@@ -11,7 +11,7 @@ import com.ra.base_spring_boot.model.entity.user.User;
 import com.ra.base_spring_boot.repository.authrp.IUserRepository;
 import com.ra.base_spring_boot.security.jwt.JwtProvider;
 import com.ra.base_spring_boot.security.principle.MyUserDetails;
-import com.ra.base_spring_boot.services.CloudinaryService;
+import com.ra.base_spring_boot.services.impl.CloudinaryService;
 import com.ra.base_spring_boot.services.authsv.IAuthService;
 import com.ra.base_spring_boot.services.authsv.IRoleService;
 import lombok.RequiredArgsConstructor;

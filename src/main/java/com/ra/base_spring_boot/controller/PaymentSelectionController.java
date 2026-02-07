@@ -1,7 +1,7 @@
 package com.ra.base_spring_boot.controller;
 
 import com.ra.base_spring_boot.dto.req.ChoosePaymentSelectionDTO;
-import com.ra.base_spring_boot.services.PaymentSelectionService;
+import com.ra.base_spring_boot.services.impl.PaymentSelectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +24,7 @@ public class PaymentSelectionController {
                                     @RequestBody ChoosePaymentSelectionDTO dto) {
         return paymentSelectionService.choose(bookingId, dto);
     }
+
     @PostMapping("/{bookingId}/complete")
     public ResponseEntity<?> complete(@PathVariable Long bookingId,
                                       @RequestBody(required = false) com.ra.base_spring_boot.dto.req.CompleteBookingDTO dto) {

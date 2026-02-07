@@ -14,11 +14,30 @@ public class TrailerHomeServiceImpl implements ITrailerHomeService {
 
     private final IMovieHomeRepository movieHomeRepository;
 
+
     @Override
     public MovieTrailerResponse getNowShowingMovieTrailer(Long id) {
 
         Movie movie = movieHomeRepository.findNowShowingMovieDetail(id, MovieStatus.NOW_SHOWING)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phim đang chiếu !"));
+
+        if (movie.getTrailer() == null || movie.getTrailer().isBlank()) {
+            throw new RuntimeException("Phim hiện không có trailer !");
+        }
+
+        return MovieTrailerResponse.builder()
+                .movieId(movie.getId())
+                .title(movie.getTitle())
+                .trailer(movie.getTrailer())
+                .build();
+    }
+
+    
+    @Override
+    public MovieTrailerResponse getMovieTrailer(Long id) {
+
+        Movie movie = movieHomeRepository.findMovieDetail(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phim !"));
 
         if (movie.getTrailer() == null || movie.getTrailer().isBlank()) {
             throw new RuntimeException("Phim hiện không có trailer !");

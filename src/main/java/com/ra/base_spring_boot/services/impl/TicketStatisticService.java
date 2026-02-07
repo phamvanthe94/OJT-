@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByMovieResponse;
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByMovieStatisticResponse;
@@ -20,7 +20,7 @@ public class TicketStatisticService {
     private BookingSeatRepository bookingSeatRepository;
 
 
-    public TicketByMovieStatisticResponse statisticByMovie(){
+    public TicketByMovieStatisticResponse statisticByMovie() {
         List<TicketByMovieResponse> ticketByMovieResponses = bookingSeatRepository.statisticTicketByMovie(PaymentStatus.COMPLETED);
         Long totalTickets = ticketByMovieResponses.stream()
                 .mapToLong(TicketByMovieResponse::getTotalTicket)
@@ -31,7 +31,8 @@ public class TicketStatisticService {
         );
 
     }
-    public TicketByScreenStatisticResponse statisticByScreen(){
+
+    public TicketByScreenStatisticResponse statisticByScreen() {
         List<TicketByScreenResponse> ticketByScreenResponses = bookingSeatRepository.statisticTicketByScreen(PaymentStatus.COMPLETED);
         Long totalTickets = ticketByScreenResponses.stream()
                 .mapToLong(TicketByScreenResponse::getTotalTicket)

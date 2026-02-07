@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.FestivalDTO;
@@ -49,6 +49,7 @@ public class FestivalService {
         }
 
     }
+
     public ResponseEntity<ResponseWrapper<?>> updateFestival(Long id, FestivalDTO festivalDTO) {
         Festival oldFestival = festivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Festival not found with id: " + id));
         if (festivalDTO != null) {
@@ -71,6 +72,7 @@ public class FestivalService {
         }
         return null;
     }
+
     public ResponseEntity<ResponseWrapper<String>> deleteFestival(Long id) {
         Festival festival = festivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Festival not found with id: " + id));
         festivalRepository.delete(festival);
@@ -82,7 +84,8 @@ public class FestivalService {
                 .build();
         return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
     }
-    public Festival convertFestivalDTOToFestival(FestivalDTO festivalDTO){
+
+    public Festival convertFestivalDTOToFestival(FestivalDTO festivalDTO) {
         return Festival.builder()
                 .title(festivalDTO.getTitle())
                 .image(null)

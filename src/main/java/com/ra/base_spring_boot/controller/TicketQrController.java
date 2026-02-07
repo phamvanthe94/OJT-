@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ra.base_spring_boot.dto.resp.TicketQrData;
 import com.ra.base_spring_boot.services.Theater.QrCodeService;
-import com.ra.base_spring_boot.services.TicketQrService;
+import com.ra.base_spring_boot.services.impl.TicketQrService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

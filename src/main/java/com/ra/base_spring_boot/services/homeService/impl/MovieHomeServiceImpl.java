@@ -23,30 +23,61 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
 
     @Override
     public Page<MovieListResponse> getNowShowingMovies(int page, int size, String sortBy, String direction) {
+        Pageable pageable = buildPageable(page, size, sortBy, direction);
+
+        Page<Movie> movies = movieHomeRepository.findByStatus(MovieStatus.NOW_SHOWING, pageable);
+
+        return movies.map(this::toListResponse);
+    }
+
+    @Override
+    public MovieDetailResponse getNowShowingMovieDetail(Long id) {
+        Movie movie = movieHomeRepository.findNowShowingMovieDetail(id, MovieStatus.NOW_SHOWING)
+                .orElseThrow(() -> new RuntimeException("Phim không tồn tại hoặc không chiếu"));
+
+        return toDetailResponse(movie);
+    }
+
+    @Override
+    public Page<MovieListResponse> getComingSoonMovies(int page, int size, String sortBy, String direction) {
+        Pageable pageable = buildPageable(page, size, sortBy, direction);
+
+        Page<Movie> movies = movieHomeRepository.findByStatus(MovieStatus.COMING_SOON, pageable);
+
+        return movies.map(this::toListResponse);
+    }
+
+    // ✅ NEW: Chi tiết phim chung (mọi status)
+    @Override
+    public MovieDetailResponse getMovieDetail(Long id) {
+        Movie movie = movieHomeRepository.findMovieDetail(id)
+                .orElseThrow(() -> new RuntimeException("Phim không tồn tại"));
+
+        return toDetailResponse(movie);
+    }
+
+    // ===================== HELPER =====================
+
+    private Pageable buildPageable(int page, int size, String sortBy, String direction) {
         String sortField = (sortBy == null || sortBy.isBlank()) ? "releaseDate" : sortBy;
 
         Sort sort = Sort.by(sortField);
         sort = "desc".equalsIgnoreCase(direction) ? sort.descending() : sort.ascending();
 
-        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), sort);
+        return PageRequest.of(Math.max(page, 0), Math.max(size, 1), sort);
+    }
 
-        Page<Movie> movies = movieHomeRepository.findByStatus(MovieStatus.NOW_SHOWING, pageable);
-
-        return movies.map(movie -> MovieListResponse.builder()
+    private MovieListResponse toListResponse(Movie movie) {
+        return MovieListResponse.builder()
                 .id(movie.getId())
                 .title(movie.getTitle())
                 .image(movie.getImage())
                 .duration(movie.getDuration())
                 .releaseDate(movie.getReleaseDate())
-                .build());
+                .build();
     }
 
-    @Override
-    public MovieDetailResponse getNowShowingMovieDetail(Long id) {
-
-        Movie movie = movieHomeRepository.findNowShowingMovieDetail(id, MovieStatus.NOW_SHOWING)
-                .orElseThrow(() -> new RuntimeException("Phim không tồn tại hoặc không chiếu"));
-
+    private MovieDetailResponse toDetailResponse(Movie movie) {
         return MovieDetailResponse.builder()
                 .id(movie.getId())
                 .title(movie.getTitle())
@@ -56,34 +87,12 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
                 .trailer(movie.getTrailer())
                 .duration(movie.getDuration())
                 .releaseDate(movie.getReleaseDate())
-                .type(movie.getType().name())
-                .status(movie.getStatus().name())
-                .genres(
-                        movie.getGenres().stream()
-                                .map(genre -> genre.getGenreName())
-                                .collect(Collectors.toSet())
-                )
+                .type(movie.getType() == null ? null : movie.getType().toValue()) // ✅ 2D/3D đẹp
+                .status(movie.getStatus() == null ? null : movie.getStatus().name())
+                .genres(movie.getGenres() == null ? java.util.Set.of()
+                        : movie.getGenres().stream()
+                        .map(g -> g.getGenreName())
+                        .collect(Collectors.toSet()))
                 .build();
-    }
-
-    @Override
-    public Page<MovieListResponse> getComingSoonMovies(int page, int size, String sortBy, String Direction) {
-
-        String sortField = (sortBy == null || sortBy.isBlank()) ? "releaseDate" : sortBy;
-
-        Sort sort = Sort.by(sortField);
-        sort = "desc".equalsIgnoreCase(Direction) ? sort.descending() : sort.ascending();
-
-        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), sort);
-
-        Page<Movie> movies = movieHomeRepository.findByStatus(MovieStatus.COMING_SOON, pageable);
-
-        return movies.map(movie -> MovieListResponse.builder()
-                .id(movie.getId())
-                .title(movie.getTitle())
-                .image(movie.getImage())
-                .duration(movie.getDuration())
-                .releaseDate(movie.getReleaseDate())
-                .build());
     }
 }

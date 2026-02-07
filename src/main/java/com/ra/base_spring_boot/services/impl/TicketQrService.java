@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.resp.TicketQrData;
 import com.ra.base_spring_boot.repository.TicketQrRepository;
@@ -13,7 +13,7 @@ public class TicketQrService {
     private final TicketQrRepository ticketQrRepository;
 
     public List<TicketQrData> getQrData(Long bookingId) {
-    List<TicketQrData> qrDataList = ticketQrRepository.getQrDataByBookingId(bookingId);
+        List<TicketQrData> qrDataList = ticketQrRepository.getQrDataByBookingId(bookingId);
         if (qrDataList.isEmpty()) {
             throw new RuntimeException("Booking not paid or not found");
         }

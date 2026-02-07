@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.controller;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.resp.ChangePaymentStatusDTO;
 import com.ra.base_spring_boot.model.entity.booking.Booking;
-import com.ra.base_spring_boot.services.BookingAdminService;
+import com.ra.base_spring_boot.services.impl.BookingAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;

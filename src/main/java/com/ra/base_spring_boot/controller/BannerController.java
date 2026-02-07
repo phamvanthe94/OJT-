@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.controller;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.BannerDTO;
 import com.ra.base_spring_boot.model.entity.content.Banner;
-import com.ra.base_spring_boot.services.BannerService;
+import com.ra.base_spring_boot.services.impl.BannerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,11 +23,11 @@ public class BannerController {
     private BannerService bannerService;
 
     @GetMapping
-public ResponseEntity<ResponseWrapper<Page<Banner>>> getAllBanner(@RequestParam(name="search", required = false) String search,
-                                                                  @RequestParam(name="page", defaultValue = "0") int page,
-                                                                  @RequestParam(name="size", defaultValue = "5") int size,
-                                                                  @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
-                                                                  @RequestParam(name = "direction", defaultValue = "desc") String direction){
+    public ResponseEntity<ResponseWrapper<Page<Banner>>> getAllBanner(@RequestParam(name = "search", required = false) String search,
+                                                                      @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                      @RequestParam(name = "size", defaultValue = "5") int size,
+                                                                      @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+                                                                      @RequestParam(name = "direction", defaultValue = "desc") String direction) {
         Sort sort = direction.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -36,10 +36,10 @@ public ResponseEntity<ResponseWrapper<Page<Banner>>> getAllBanner(@RequestParam(
         return bannerService.getAllAndSearch(search, pageable);
     }
 
-    @PostMapping(value = "add",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseWrapper<?>> addBanner(@Valid @ModelAttribute BannerDTO bannerDTO, BindingResult bindingResult){
+    @PostMapping(value = "add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseWrapper<?>> addBanner(@Valid @ModelAttribute BannerDTO bannerDTO, BindingResult bindingResult) {
         ResponseEntity<ResponseWrapper<?>> responseEntity = bannerService.createBanner(bannerDTO, bindingResult);
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(
                     ResponseWrapper
                             .<Object>builder()
@@ -51,9 +51,10 @@ public ResponseEntity<ResponseWrapper<Page<Banner>>> getAllBanner(@RequestParam(
         }
         return responseEntity;
     }
+
     @DeleteMapping("delete/{id}")
     public ResponseEntity<ResponseWrapper<String>> deleteBanner(@PathVariable Long id) {
         return bannerService.deleteBanner(id);
 
     }
-    }
+}

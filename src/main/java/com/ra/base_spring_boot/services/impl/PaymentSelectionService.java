@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.ChoosePaymentSelectionDTO;
@@ -30,6 +30,7 @@ public class PaymentSelectionService {
     private final PaymentRepository paymentRepository;
     private final IPaymentProviderRepository paymentProviderRepository;
     private final BookingSeatRepository bookingSeatRepository;
+
     public ResponseEntity<?> getBookingDetail(Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
@@ -205,6 +206,7 @@ public class PaymentSelectionService {
                         .build()
         );
     }
+
     public ResponseEntity<?> complete(Long bookingId, CompleteBookingDTO dto) {
 
         Payment payment = paymentRepository.findByBooking_Id(bookingId)
@@ -311,6 +313,7 @@ public class PaymentSelectionService {
         // Nếu enum không có trạng thái thành công rõ ràng, dùng giá trị đầu tiên để tránh crash
         return PaymentStatus.values()[0];
     }
+
     /**
      * Resolve user email safely without compile-time dependency on a specific getter name.
      */
@@ -324,7 +327,8 @@ public class PaymentSelectionService {
                     String s = String.valueOf(v);
                     if (s.contains("@")) return s; // chỉ nhận nếu giống email
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         String[] fieldCandidates = {"email", "mail", "gmail", "emailAddress", "username"};
@@ -337,7 +341,8 @@ public class PaymentSelectionService {
                     String s = String.valueOf(v);
                     if (s.contains("@")) return s;
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         return null;

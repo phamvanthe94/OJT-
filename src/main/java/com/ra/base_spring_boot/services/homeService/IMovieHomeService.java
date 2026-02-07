@@ -6,9 +6,12 @@ import org.springframework.data.domain.Page;
 
 public interface IMovieHomeService {
 
-    Page<MovieListResponse> getNowShowingMovies(int page, int size, String sortBy, String Direction);
+    Page<MovieListResponse> getNowShowingMovies(int page, int size, String sortBy, String direction);
 
     MovieDetailResponse getNowShowingMovieDetail(Long id);
 
-    Page<MovieListResponse> getComingSoonMovies(int page, int size, String sortBy, String Direction);
+    Page<MovieListResponse> getComingSoonMovies(int page, int size, String sortBy, String direction);
+
+    // ✅ NEW: Chi tiết phim chung
+    MovieDetailResponse getMovieDetail(Long id);
 }

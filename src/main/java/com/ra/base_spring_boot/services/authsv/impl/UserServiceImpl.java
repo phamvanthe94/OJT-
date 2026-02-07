@@ -1,7 +1,7 @@
 package com.ra.base_spring_boot.services.authsv.impl;
 
-import com.ra.base_spring_boot.dto.req.FormChangePassword;
 import com.ra.base_spring_boot.dto.req.FormUpdateProfile;
+import com.ra.base_spring_boot.dto.req.authreq.FormChangePassword;
 import com.ra.base_spring_boot.exception.HttpBadRequest;
 import com.ra.base_spring_boot.model.entity.user.BlacklistedToken;
 import com.ra.base_spring_boot.model.entity.user.User;

@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.BannerDTO;
@@ -48,6 +48,7 @@ public class BannerService {
             return new ResponseEntity<>(responseWrapper, HttpStatus.CREATED);
         }
     }
+
     public ResponseEntity<ResponseWrapper<String>> deleteBanner(Long id) {
         Banner banner = bannerRepository.findById(id).orElseThrow(() -> new RuntimeException("Banner not found with id: " + id));
         bannerRepository.delete(banner);
@@ -60,14 +61,14 @@ public class BannerService {
         return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
     }
 
-public Banner convertBannerDTOToBanner(BannerDTO bannerDTO) {
-    BannerType type = null;
-    if (bannerDTO.getType() != null && !bannerDTO.getType().isEmpty()) {
-        try {
-            type = BannerType.valueOf(bannerDTO.getType());
-        } catch (IllegalArgumentException e) {
+    public Banner convertBannerDTOToBanner(BannerDTO bannerDTO) {
+        BannerType type = null;
+        if (bannerDTO.getType() != null && !bannerDTO.getType().isEmpty()) {
+            try {
+                type = BannerType.valueOf(bannerDTO.getType());
+            } catch (IllegalArgumentException e) {
+            }
         }
-    }
         return Banner.builder()
                 .url(null)
                 .type(type)

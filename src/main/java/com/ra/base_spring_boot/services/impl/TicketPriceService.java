@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.TicketPriceDTO;
@@ -59,50 +59,53 @@ public class TicketPriceService {
         return ResponseEntity.ok(responseWrapper);
     }
 
-public ResponseEntity<ResponseWrapper<?>> createTicketPrice(TicketPriceDTO ticketPriceDTO, BindingResult bindingResult){
-    if(ticketPriceDTO == null){
-        bindingResult.rejectValue("price", "400", "Ticket Price data cannot be null");
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }else {
-        TicketPrice ticketPrice = convertTicketPriceDTOToTicketPrice(ticketPriceDTO);
-        TicketPrice newTicketPrice = ticketPriceRepository.save(ticketPrice);
-        ResponseWrapper<TicketPrice> responseWrapper = ResponseWrapper
-                .<TicketPrice>builder()
-                .data(newTicketPrice)
-                .code(201)
-                .status(HttpStatus.CREATED)
-                .build();
-        return new ResponseEntity<>(responseWrapper, HttpStatus.CREATED);
+    public ResponseEntity<ResponseWrapper<?>> createTicketPrice(TicketPriceDTO ticketPriceDTO, BindingResult bindingResult) {
+        if (ticketPriceDTO == null) {
+            bindingResult.rejectValue("price", "400", "Ticket Price data cannot be null");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            TicketPrice ticketPrice = convertTicketPriceDTOToTicketPrice(ticketPriceDTO);
+            TicketPrice newTicketPrice = ticketPriceRepository.save(ticketPrice);
+            ResponseWrapper<TicketPrice> responseWrapper = ResponseWrapper
+                    .<TicketPrice>builder()
+                    .data(newTicketPrice)
+                    .code(201)
+                    .status(HttpStatus.CREATED)
+                    .build();
+            return new ResponseEntity<>(responseWrapper, HttpStatus.CREATED);
+        }
     }
-}
-public ResponseEntity<ResponseWrapper<?>> updateTicketPrice(Long id, TicketPriceDTO ticketPriceDTO){
-    TicketPrice oldTicketPrice = ticketPriceRepository.findById(id).orElseThrow(() -> new RuntimeException("Ticket Price not found with id: " + id));
-    if(ticketPriceDTO != null){
-        TicketPrice ticketPrice = convertTicketPriceDTOToTicketPrice(ticketPriceDTO);
-        ticketPrice.setId(oldTicketPrice.getId());
-        TicketPrice updatedTicketPrice = ticketPriceRepository.save(ticketPrice);
-        ResponseWrapper<TicketPrice> responseWrapper = ResponseWrapper
-                .<TicketPrice>builder()
-                .data(updatedTicketPrice)
+
+    public ResponseEntity<ResponseWrapper<?>> updateTicketPrice(Long id, TicketPriceDTO ticketPriceDTO) {
+        TicketPrice oldTicketPrice = ticketPriceRepository.findById(id).orElseThrow(() -> new RuntimeException("Ticket Price not found with id: " + id));
+        if (ticketPriceDTO != null) {
+            TicketPrice ticketPrice = convertTicketPriceDTOToTicketPrice(ticketPriceDTO);
+            ticketPrice.setId(oldTicketPrice.getId());
+            TicketPrice updatedTicketPrice = ticketPriceRepository.save(ticketPrice);
+            ResponseWrapper<TicketPrice> responseWrapper = ResponseWrapper
+                    .<TicketPrice>builder()
+                    .data(updatedTicketPrice)
+                    .code(200)
+                    .status(HttpStatus.OK)
+                    .build();
+            return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity<ResponseWrapper<String>> deleteTicketPrice(Long id) {
+        TicketPrice ticketPrice = ticketPriceRepository.findById(id).orElseThrow(() -> new RuntimeException("Ticket Price not found with id: " + id));
+        ticketPriceRepository.delete(ticketPrice);
+        ResponseWrapper<String> responseWrapper = ResponseWrapper
+                .<String>builder()
+                .data("Delete Ticket Price successfully")
                 .code(200)
                 .status(HttpStatus.OK)
                 .build();
         return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
-    }else {
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-}
-public ResponseEntity<ResponseWrapper<String>> deleteTicketPrice(Long id){
-    TicketPrice ticketPrice = ticketPriceRepository.findById(id).orElseThrow(() -> new RuntimeException("Ticket Price not found with id: " + id));
-    ticketPriceRepository.delete(ticketPrice);
-    ResponseWrapper<String> responseWrapper = ResponseWrapper
-            .<String>builder()
-            .data("Delete Ticket Price successfully")
-            .code(200)
-            .status(HttpStatus.OK)
-            .build();
-    return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
-}
+
     public TicketPrice convertTicketPriceDTOToTicketPrice(TicketPriceDTO ticketPriceDTO) {
 
         SeatType seatType = null;

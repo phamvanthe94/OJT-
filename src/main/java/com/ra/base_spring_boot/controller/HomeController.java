@@ -88,6 +88,34 @@ public class HomeController {
         );
     }
 
+    /**
+     * Get Movie Detail by ID (any status)
+     */
+    @GetMapping("/movies/{id}")
+    public ResponseEntity<?> getMovieDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(movieHomeService.getMovieDetail(id))
+                        .build()
+        );
+    }
+
+    /**
+     * Get Movie Trailer by ID (any status)
+     */
+    @GetMapping("/movies/{id}/trailer")
+    public ResponseEntity<?> getMovieTrailer(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(trailerHomeService.getMovieTrailer(id))
+                        .build()
+        );
+    }
+
 
     /**
      * Get Coming Soon Movies with pagination and sorting

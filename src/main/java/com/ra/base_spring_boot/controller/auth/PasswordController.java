@@ -1,7 +1,7 @@
-package com.ra.base_spring_boot.controller;
+package com.ra.base_spring_boot.controller.auth;
 
-import com.ra.base_spring_boot.dto.req.ForgotPasswordRequest;
-import com.ra.base_spring_boot.dto.req.ResetPasswordRequest;
+import com.ra.base_spring_boot.dto.req.authreq.ForgotPasswordRequest;
+import com.ra.base_spring_boot.dto.req.authreq.ResetPasswordRequest;
 import com.ra.base_spring_boot.services.authsv.IPasswordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,8 @@
-package com.ra.base_spring_boot.controller;
+package com.ra.base_spring_boot.controller.auth;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
-import com.ra.base_spring_boot.dto.req.FormLogin;
-import com.ra.base_spring_boot.dto.req.FormRegister;
+import com.ra.base_spring_boot.dto.req.authreq.FormLogin;
+import com.ra.base_spring_boot.dto.req.authreq.FormRegister;
 import com.ra.base_spring_boot.services.authsv.IAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
