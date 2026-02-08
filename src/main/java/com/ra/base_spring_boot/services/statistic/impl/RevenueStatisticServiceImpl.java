@@ -1,9 +1,9 @@
-package com.ra.base_spring_boot.services.impl;
+package com.ra.base_spring_boot.services.statistic.impl;
 
-import com.ra.base_spring_boot.dto.req.RevenueStatisticRequest;
-import com.ra.base_spring_boot.dto.resp.RevenueStatisticResponse;
-import com.ra.base_spring_boot.repository.IRevenueStatisticRepository;
-import com.ra.base_spring_boot.services.IRevenueStatisticService;
+import com.ra.base_spring_boot.dto.statistic.req.RevenueStatisticRequest;
+import com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse;
+import com.ra.base_spring_boot.repository.Statistic.IRevenueStatisticRepository;
+import com.ra.base_spring_boot.services.statistic.IRevenueStatisticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

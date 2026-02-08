@@ -1,10 +1,10 @@
-package com.ra.base_spring_boot.services.impl;
+package com.ra.base_spring_boot.services.statistic.impl;
 
-import com.ra.base_spring_boot.dto.resp.UserStatisticResponse;
+import com.ra.base_spring_boot.dto.statistic.resp.UserStatisticResponse;
 import com.ra.base_spring_boot.model.constants.UserStatus;
 import com.ra.base_spring_boot.model.entity.user.User;
-import com.ra.base_spring_boot.repository.IUserStatisticRepository;
-import com.ra.base_spring_boot.services.IUserStatisticService;
+import com.ra.base_spring_boot.repository.Statistic.IUserStatisticRepository;
+import com.ra.base_spring_boot.services.statistic.IUserStatisticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

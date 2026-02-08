@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.repository;
+package com.ra.base_spring_boot.repository.Statistic;
 
 import com.ra.base_spring_boot.model.constants.UserStatus;
 import com.ra.base_spring_boot.model.entity.user.User;

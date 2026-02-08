@@ -1,7 +1,7 @@
-package com.ra.base_spring_boot.controller;
+package com.ra.base_spring_boot.controller.statistic;
 
-import com.ra.base_spring_boot.dto.resp.UserStatisticResponse;
-import com.ra.base_spring_boot.services.IUserStatisticService;
+import com.ra.base_spring_boot.dto.statistic.resp.UserStatisticResponse;
+import com.ra.base_spring_boot.services.statistic.IUserStatisticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.dto.req;
+package com.ra.base_spring_boot.dto.statistic.req;
 
 
 import lombok.Getter;
