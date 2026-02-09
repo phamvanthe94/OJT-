@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.security.Initializer;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
-import com.ra.base_spring_boot.repository.MovieRepository;
+import com.ra.base_spring_boot.repository.IMovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -18,7 +18,7 @@ import java.util.List;
 @Order(1)
 public class MovieDataInitializer implements CommandLineRunner {
 
-    private final MovieRepository movieRepository;
+    private final IMovieRepository IMovieRepository;
     List<Movie> comSoonMovies = List.of(
             Movie.builder()
                     .title("Chí Phèo")
@@ -49,7 +49,7 @@ public class MovieDataInitializer implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) {
-        if (movieRepository.count() > 0)
+        if (IMovieRepository.count() > 0)
             return;
 
         List<Movie> movies = List.of(
@@ -79,8 +79,8 @@ public class MovieDataInitializer implements CommandLineRunner {
                         .createdAt(LocalDate.now())
                         .build()
         );
-        movieRepository.saveAll(movies);
-        movieRepository.saveAll(comSoonMovies);
+        IMovieRepository.saveAll(movies);
+        IMovieRepository.saveAll(comSoonMovies);
 
     }
 }
