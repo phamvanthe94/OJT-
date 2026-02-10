@@ -2,12 +2,14 @@ package com.ra.base_spring_boot.model.entity.booking;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ra.base_spring_boot.model.base.BaseObject;
+import com.ra.base_spring_boot.model.constants.PaymentStatus;
 import com.ra.base_spring_boot.model.entity.theater.ShowTime;
 import com.ra.base_spring_boot.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "bookings")
@@ -39,4 +41,9 @@ public class Booking extends BaseObject {
 
     @Column(name = "update_at")
     private LocalDateTime updateAt;
+
+
+    @OneToMany(mappedBy = "booking", fetch = FetchType.LAZY)
+    private List<Payment> payments;
+
 }

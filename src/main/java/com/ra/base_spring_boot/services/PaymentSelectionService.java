@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
-import com.ra.base_spring_boot.repository.BookingSeatRepository;
+import com.ra.base_spring_boot.repository.IBookingSeatRepository;
 
 import java.util.*;
 
@@ -29,7 +29,7 @@ public class PaymentSelectionService {
     private final BookingRepository bookingRepository;
     private final PaymentRepository paymentRepository;
     private final IPaymentProviderRepository paymentProviderRepository;
-    private final BookingSeatRepository bookingSeatRepository;
+    private final IBookingSeatRepository bookingSeatRepository;
     public ResponseEntity<?> getBookingDetail(Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface TicketQrRepository extends JpaRepository<Booking, Long> {
+public interface ITicketQrRepository extends JpaRepository<Booking, Long> {
     @Query("""
                 SELECT new com.ra.base_spring_boot.dto.resp.TicketQrData(
                     b.id,

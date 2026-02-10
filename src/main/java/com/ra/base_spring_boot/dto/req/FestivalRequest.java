@@ -9,7 +9,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @ValidFestivalTime
-public class FestivalDTO {
+public class FestivalRequest {
     @NotBlank(message = "Title cannot be blank")
     private String title;
     private MultipartFile image;

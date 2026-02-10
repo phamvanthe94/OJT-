@@ -7,7 +7,7 @@ import com.ra.base_spring_boot.model.entity.booking.Booking;
 import com.ra.base_spring_boot.model.entity.booking.BookingSeat;
 import com.ra.base_spring_boot.model.entity.booking.Payment;
 import com.ra.base_spring_boot.repository.BookingRepository;
-import com.ra.base_spring_boot.repository.BookingSeatRepository;
+import com.ra.base_spring_boot.repository.IBookingSeatRepository;
 import com.ra.base_spring_boot.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class BookingAdminService {
 
     private final BookingRepository bookingRepository;
-    private final BookingSeatRepository bookingSeatRepository;
+    private final IBookingSeatRepository bookingSeatRepository;
     private final PaymentRepository paymentRepository;
 
     // ✅ 1) LIST + SEARCH + PAGING

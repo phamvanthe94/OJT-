@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.services.impl;
 import com.ra.base_spring_boot.dto.resp.UserStatisticResponse;
 import com.ra.base_spring_boot.model.constants.UserStatus;
 import com.ra.base_spring_boot.model.entity.user.User;
-import com.ra.base_spring_boot.repository.IUserStatisticRepository;
+import com.ra.base_spring_boot.repository.statisticRp.IUserStatisticRepository;
 import com.ra.base_spring_boot.services.IUserStatisticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

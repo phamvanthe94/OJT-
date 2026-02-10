@@ -5,6 +5,7 @@ import com.ra.base_spring_boot.dto.req.MovieDTO;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.repository.MovieRepository;
+import com.ra.base_spring_boot.services.more.CloudinaryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

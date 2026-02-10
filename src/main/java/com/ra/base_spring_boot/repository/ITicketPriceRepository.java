@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface TicketPriceRepository extends JpaRepository<TicketPrice, Long> {
+public interface ITicketPriceRepository extends JpaRepository<TicketPrice, Long> {
     @Query("SELECT t FROM TicketPrice t " +
             "WHERE (:dayType IS NULL OR t.dayType = :dayType) " +
             "AND (:seatType IS NULL OR t.typeSeat = :seatType) " +

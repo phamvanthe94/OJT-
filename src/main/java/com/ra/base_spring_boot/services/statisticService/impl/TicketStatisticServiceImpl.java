@@ -1,13 +1,13 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.statisticService.impl;
 
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByMovieResponse;
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByMovieStatisticResponse;
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByScreenResponse;
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByScreenStatisticResponse;
 import com.ra.base_spring_boot.model.constants.PaymentStatus;
-import com.ra.base_spring_boot.repository.BookingSeatRepository;
+import com.ra.base_spring_boot.repository.statisticRp.ITicketStatisticRepository;
+import com.ra.base_spring_boot.services.statisticService.ITicketStatisticService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +15,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TicketStatisticService {
-    @Autowired
-    private BookingSeatRepository bookingSeatRepository;
+public class TicketStatisticServiceImpl implements ITicketStatisticService {
+    private final ITicketStatisticRepository bookingSeatRepository;
 
 
     public TicketByMovieStatisticResponse statisticByMovie(){

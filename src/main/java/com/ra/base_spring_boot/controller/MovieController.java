@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.controller;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.MovieDTO;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
-import com.ra.base_spring_boot.services.CloudinaryService;
+import com.ra.base_spring_boot.services.more.CloudinaryService;
 import com.ra.base_spring_boot.services.impl.MovieServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

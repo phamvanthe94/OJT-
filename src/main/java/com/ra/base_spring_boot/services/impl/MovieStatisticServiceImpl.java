@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.services.impl;
 import com.ra.base_spring_boot.dto.req.MovieStatisticRequest;
 import com.ra.base_spring_boot.dto.resp.MovieStatisticResponse;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
-import com.ra.base_spring_boot.repository.IMovieStatisticRepository;
+import com.ra.base_spring_boot.repository.statisticRp.IMovieStatisticRepository;
 import com.ra.base_spring_boot.services.IMovieStatisticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
