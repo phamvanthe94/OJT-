@@ -12,6 +12,6 @@ import java.util.Date;
 public interface IBlacklistTokenRepository extends JpaRepository<BlacklistedToken, String> {
     @Modifying
     @Transactional
-    @Query("DELETE FROM BlacklistedToken b WHERE b.expiredAt <: now")
+    @Query("DELETE FROM BlacklistedToken b WHERE b.expiredAt < :now")
     void deleteExpired(@Param("now") Date now);
 }

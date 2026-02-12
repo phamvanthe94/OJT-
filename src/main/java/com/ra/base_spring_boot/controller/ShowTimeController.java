@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1/admin/showtimes")
+@RequestMapping("/api/v1/admin/showtimes")
 @RequiredArgsConstructor
 public class ShowTimeController {
 
@@ -22,13 +22,13 @@ public class ShowTimeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String ascending
+            @RequestParam(defaultValue = "asc") String direction
     ) {
         return ResponseEntity.ok().body(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(200)
-                        .data(showTimeAdminService.getAllShowTimes(keyword, page, size, sortBy, ascending))
+                        .data(showTimeAdminService.getAllShowTimes(keyword, page, size, sortBy, direction))
                         .build()
         );
     }
@@ -55,8 +55,8 @@ public class ShowTimeController {
         );
     }
 
-    @PutMapping
-    public ResponseEntity<?> handleUpdateShowTime(@RequestParam Long id, @Valid @RequestBody ShowTimeRequest showTimeRequest) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> handleUpdateShowTime(@PathVariable Long id, @Valid @RequestBody ShowTimeRequest showTimeRequest) {
         return ResponseEntity.ok().body(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
@@ -66,8 +66,8 @@ public class ShowTimeController {
         );
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> handleDeleteShowTime(@RequestParam Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> handleDeleteShowTime(@PathVariable Long id) {
         showTimeAdminService.deleteShowTime(id);
         return ResponseEntity.ok().body(
                 ResponseWrapper.builder()

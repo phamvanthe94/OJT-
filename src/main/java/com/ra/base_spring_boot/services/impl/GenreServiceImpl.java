@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,13 +24,10 @@ public class GenreServiceImpl implements IGenreService {
 
         String sortField = (sortBy == null || sortBy.isBlank()) ? "id" : sortBy;
 
-        Sort sort = Sort.by(sortField);
+        Sort sort = "desc".equalsIgnoreCase(direction) ?
+                Sort.by(sortField).descending() :
+                Sort.by(sortField).ascending();
 
-        if ("desc".equalsIgnoreCase(direction)) {
-            sort = sort.descending();
-        } else {
-            sort = sort.ascending();
-        }
 
         Pageable pageable = PageRequest.of(
                 Math.max(page, 0),
@@ -37,13 +35,9 @@ public class GenreServiceImpl implements IGenreService {
                 sort
         );
 
-        Page<Genre> result;
-
-        if (keyword == null || keyword.isBlank()) {
-            result = genreRepository.findAll(pageable);
-        } else {
-            result = genreRepository.findByGenreNameContainingIgnoreCase(keyword.trim(), pageable);
-        }
+        Page<Genre> result = (keyword == null || keyword.isBlank()) ?
+                genreRepository.findAll(pageable) :
+                genreRepository.findByGenreNameContainingIgnoreCase(keyword.trim(), pageable);
 
         return result.map(genre -> GenreResponse.builder()
                 .id(genre.getId())
@@ -52,13 +46,14 @@ public class GenreServiceImpl implements IGenreService {
     }
 
     @Override
-    public GenreResponse createGenre(String genreName) {
-        if (genreRepository.existsByGenreNameIgnoreCase(genreName)) {
+    public GenreResponse createGenre(GenreRequest genreName) {
+        String name = genreName.getGenreName().trim();
+        if (genreRepository.existsByGenreNameIgnoreCase(name)) {
             throw new RuntimeException("Tên thể loại phim đã tồn tại");
         }
 
         Genre genre = Genre.builder()
-                .genreName(genreName)
+                .genreName(name)
                 .build();
 
         Genre savedGenre = genreRepository.save(genre);
@@ -69,6 +64,7 @@ public class GenreServiceImpl implements IGenreService {
                 .build();
     }
 
+    @Transactional
     @Override
     public GenreResponse updateGenre(Long id, GenreRequest genreRequest) {
 
@@ -93,6 +89,7 @@ public class GenreServiceImpl implements IGenreService {
                 .build();
     }
 
+    @Transactional
     @Override
     public void deleteGenre(Long id) {
 

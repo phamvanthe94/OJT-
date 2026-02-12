@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1/admin/payment-providers")
+@RequestMapping("/api/v1/admin/payment-providers")
 @RequiredArgsConstructor
 public class PaymentProviderController {
 
@@ -21,7 +21,7 @@ public class PaymentProviderController {
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
-                        .code(200)
+                        .code(HttpStatus.OK.value())
                         .data(paymentProviderService.findAll())
                         .build()
         );
@@ -32,7 +32,7 @@ public class PaymentProviderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ResponseWrapper.builder()
                         .status(HttpStatus.CREATED)
-                        .code(201)
+                        .code(HttpStatus.CREATED.value())
                         .data(paymentProviderService.create(form))
                         .build()
         );
@@ -44,7 +44,7 @@ public class PaymentProviderController {
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
-                        .code(200)
+                        .code(HttpStatus.OK.value())
                         .data("Xóa nhà cung cấp thanh toán thành công")
                         .build()
         );

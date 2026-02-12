@@ -5,6 +5,7 @@ import com.ra.base_spring_boot.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -190,6 +191,17 @@ public class GlobalHandleException {
                         .data(ex.getMessage())
                         .code(HttpStatus.METHOD_NOT_ALLOWED.value())
                         .status(HttpStatus.METHOD_NOT_ALLOWED)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<?> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(
+                ResponseWrapper.builder()
+                        .data(ex.getMessage())
+                        .code(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value())
+                        .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
                         .build()
         );
     }

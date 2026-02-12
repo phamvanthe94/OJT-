@@ -26,7 +26,7 @@ public class PasswordService implements IPasswordService {
     private final IMailService mailService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.frontend.reset-password-url}")
+    @Value("Http://localhost:8080/api/v1/auth/password/reset-token")
     private String resetPasswordUrl;
 
     @Value("${app.reset-password.expire-minutes:15}")

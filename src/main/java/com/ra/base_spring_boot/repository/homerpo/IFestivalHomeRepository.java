@@ -7,10 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface IFestivalHomeRepository extends JpaRepository<Festival, Long> {
+
     @Query("""
-            SElECT f FROM Festival f
+            SELECT f
+            FROM Festival f
             ORDER BY f.startTime DESC
             """)
     Page<Festival> findAllFestivals(Pageable pageable);
-
 }

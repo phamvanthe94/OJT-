@@ -7,6 +7,7 @@ import com.ra.base_spring_boot.repository.IPaymentProviderRepository;
 import com.ra.base_spring_boot.services.IPaymentProviderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,12 +33,14 @@ public class PaymentProviderServiceImpl implements IPaymentProviderService {
 
     @Override
     public PaymentProviderResponse create(FormCreatePaymentProvider formCreatePaymentProvider) {
+
         String name = formCreatePaymentProvider.getProviderName().trim();
         String code = formCreatePaymentProvider.getProviderCode().trim().toUpperCase();
-        if (paymentProviderRepository.existsByProviderName(name)) {
+
+        if (paymentProviderRepository.existsByProviderCodeIgnoreCase(name)) {
             throw new RuntimeException("Tên nhà cung cấp đã tồn tại");
         }
-        if (paymentProviderRepository.existsByProviderCode(code)) {
+        if (paymentProviderRepository.existsByProviderCodeIgnoreCase(code)) {
             throw new RuntimeException("Mã nhà cung cấp đã tồn tại");
         }
 
@@ -59,6 +62,7 @@ public class PaymentProviderServiceImpl implements IPaymentProviderService {
                 .build();
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         PaymentProvider paymentProvider = paymentProviderRepository.findById(id)

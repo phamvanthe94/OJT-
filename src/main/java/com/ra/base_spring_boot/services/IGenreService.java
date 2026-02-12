@@ -8,7 +8,7 @@ public interface IGenreService {
 
     Page<GenreResponse> getAllGenres(String keyword, int page, int size, String sortBy, String direction);
 
-    GenreResponse createGenre(String genreName);
+    GenreResponse createGenre(GenreRequest genreName);
 
     GenreResponse updateGenre(Long id, GenreRequest genreRequest);
 

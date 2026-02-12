@@ -14,15 +14,15 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PaymentProvider extends BaseObject {
-    @Column(name = "provider_name", nullable = false, unique = true)
+    @Column(name = "provider_name", nullable = false, unique = true, length = 255)
     private String providerName;
 
-    @Column(name = "provider_code", nullable = false, unique = true)
+    @Column(name = "provider_code", nullable = false, unique = true, length = 50)
     private String providerCode;
 
     @Column(name = "status", nullable = false)
     private Boolean status;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 500)
     private String description;
 }

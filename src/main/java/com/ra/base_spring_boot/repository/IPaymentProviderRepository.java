@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IPaymentProviderRepository extends JpaRepository<PaymentProvider, Long> {
 
-    boolean existsByProviderName(String providerName);
+    boolean existsByProviderNameIgnoreCase(String providerName);
 
-    boolean existsByProviderCode(String providerCode);
+    boolean existsByProviderCodeIgnoreCase(String providerCode);
 
 }

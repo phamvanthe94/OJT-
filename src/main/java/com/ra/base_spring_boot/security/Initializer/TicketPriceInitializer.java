@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.security.Initializer;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.constants.SeatType;
 import com.ra.base_spring_boot.model.entity.booking.TicketPrice;
-import com.ra.base_spring_boot.repository.ITicketPriceHomeRepository;
+import com.ra.base_spring_boot.repository.homerpo.ITicketPriceHomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

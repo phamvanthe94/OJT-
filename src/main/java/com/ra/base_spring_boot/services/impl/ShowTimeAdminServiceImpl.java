@@ -34,10 +34,6 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
             throw new RuntimeException("Thời gian bắt đầu và kết thúc không được để trống.");
         }
 
-        if (startTime.isAfter(endTime) || startTime.isEqual(endTime)) {
-            throw new RuntimeException("Thời gian bắt đầu phải trước thời gian kết thúc.");
-        }
-
         if (startTime.isBefore(LocalDateTime.now()))
             throw new RuntimeException("Thời gian bắt đầu phải sau thời gian hiện tại.");
 
@@ -48,7 +44,9 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
 
     @Override
     public Page<ShowTimeListResponse> getAllShowTimes(String keyword, int page, int size, String sortBy, String direction) {
+
         String sortField = (sortBy == null || sortBy.isBlank()) ? "id" : sortBy;
+
         Sort sort = "desc".equalsIgnoreCase(direction) ?
                 Sort.by(sortField).descending() :
                 Sort.by(sortField).ascending();
@@ -72,8 +70,10 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
 
     @Override
     public ShowTimeDetailResponse getDetailShowTime(Long showTimeId) {
+
         ShowTime showTime = showTimeAdminRepository.findById(showTimeId).
                 orElseThrow(() -> new RuntimeException("Không tìm thấy suất chiếu với ID: " + showTimeId));
+
         return ShowTimeDetailResponse.builder()
                 .id(showTime.getId())
                 .theaterId(showTime.getScreen().getTheater().getId())
@@ -112,7 +112,6 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
                 .movie(movie)
                 .startTime(showTimeRequest.getStartTime())
                 .endTime(showTimeRequest.getEndTime())
-                .createdAt(LocalDateTime.now())
                 .build();
 
         ShowTime savedShowTime = showTimeAdminRepository.save(showTime);
@@ -122,7 +121,7 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
                 .id(savedShowTime.getId())
                 .theaterId(savedShowTime.getScreen().getTheater().getId())
                 .theaterName(savedShowTime.getScreen().getTheater().getName())
-                .theaterLocation(savedShowTime.getScreen().getTheater().getName())
+                .theaterLocation(savedShowTime.getScreen().getTheater().getLocation())
                 .screenId(savedShowTime.getScreen().getId())
                 .screenName(savedShowTime.getScreen().getName())
                 .seatCapacity(savedShowTime.getScreen().getSeatCapacity())
@@ -159,7 +158,6 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
         showTime.setMovie(movie);
         showTime.setStartTime(showTimeRequest.getStartTime());
         showTime.setEndTime(showTimeRequest.getEndTime());
-        showTime.setUpdatedAt(LocalDateTime.now());
 
         ShowTime savedShowTime = showTimeAdminRepository.save(showTime);
 
@@ -167,7 +165,7 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
                 .id(savedShowTime.getId())
                 .theaterId(savedShowTime.getScreen().getTheater().getId())
                 .theaterName(savedShowTime.getScreen().getTheater().getName())
-                .theaterLocation(savedShowTime.getScreen().getTheater().getName())
+                .theaterLocation(savedShowTime.getScreen().getTheater().getLocation())
                 .screenId(savedShowTime.getScreen().getId())
                 .screenName(savedShowTime.getScreen().getName())
                 .seatCapacity(savedShowTime.getScreen().getSeatCapacity())

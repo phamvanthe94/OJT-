@@ -28,7 +28,7 @@ public class GenreController {
         return ResponseEntity.ok().body(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
-                        .code(200)
+                        .code(HttpStatus.OK.value())
                         .data(genreService.getAllGenres(keyword, page, size, sortBy, direction))
                         .build()
         );
@@ -40,8 +40,8 @@ public class GenreController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ResponseWrapper.builder()
                         .status(HttpStatus.CREATED)
-                        .code(201)
-                        .data(genreService.createGenre(genreRequest.getGenreName()))
+                        .code(HttpStatus.CREATED.value())
+                        .data(genreService.createGenre(genreRequest))
                         .build()
         );
     }
@@ -53,7 +53,7 @@ public class GenreController {
         return ResponseEntity.ok().body(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
-                        .code(200)
+                        .code(HttpStatus.OK.value())
                         .data(genreService.updateGenre(id, genreRequest))
                         .build()
         );
@@ -65,7 +65,7 @@ public class GenreController {
         return ResponseEntity.ok().body(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
-                        .code(200)
+                        .code(HttpStatus.OK.value())
                         .data("Xoá thể loại phim thành công")
                         .build()
         );

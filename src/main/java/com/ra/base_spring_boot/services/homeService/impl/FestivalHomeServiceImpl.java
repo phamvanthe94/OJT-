@@ -21,24 +21,38 @@ public class FestivalHomeServiceImpl implements IFestivalHomeService {
     @Override
     public Page<FestivalListResponse> getFestivals(int page, int size) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").descending());
+        Pageable pageable = PageRequest.of(
+                Math.max(page, 0),
+                Math.max(size, 1),
+                Sort.by("startTime").descending()
+        );
 
         return festivalHomeRepository.findAllFestivals(pageable)
-                .map(festival -> FestivalListResponse.builder()
-                        .id(festival.getId())
-                        .title(festival.getTitle())
-                        .image(festival.getImage())
-                        .startTime(festival.getStartTime())
-                        .endTime(festival.getEndTime())
-                        .build());
+                .map(this::toListResponse);
     }
 
     @Override
     public FestivalDetailResponse getFestivalDetail(Long id) {
 
-        Festival festival = festivalHomeRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("Không tìm thấy festival !"));
+        Festival festival = festivalHomeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy festival !"));
 
+        return toDetailResponse(festival);
+    }
+
+    // ===================== HELPER =====================
+
+    private FestivalListResponse toListResponse(Festival festival) {
+        return FestivalListResponse.builder()
+                .id(festival.getId())
+                .title(festival.getTitle())
+                .image(festival.getImage())
+                .startTime(festival.getStartTime())
+                .endTime(festival.getEndTime())
+                .build();
+    }
+
+    private FestivalDetailResponse toDetailResponse(Festival festival) {
         return FestivalDetailResponse.builder()
                 .id(festival.getId())
                 .title(festival.getTitle())

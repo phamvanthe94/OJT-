@@ -25,18 +25,11 @@ public class NewsHomeServiceImpl implements INewsHomeService {
                 Math.max(page, 0),
                 Math.max(size, 1),
                 Sort.by("createdAt").descending()
-
         );
 
         Page<News> newsPage = newsHomeRepository.findAllByOrderByCreatedAtDesc(pageable);
 
-        return newsPage.map(news -> NewsListResponse.builder()
-                .id(news.getId())
-                .title(news.getTitle())
-                .excerpt(buildExcerpt(news.getContent()))
-                .festivalId(news.getFestival() != null ? news.getFestival().getId() : null)
-                .createdAt(news.getCreatedAt())
-                .build());
+        return newsPage.map(this::toListResponse);
     }
 
     @Override
@@ -45,6 +38,22 @@ public class NewsHomeServiceImpl implements INewsHomeService {
         News news = newsHomeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy tin tức !"));
 
+        return toDetailResponse(news);
+    }
+
+    // ===================== HELPER =====================
+
+    private NewsListResponse toListResponse(News news) {
+        return NewsListResponse.builder()
+                .id(news.getId())
+                .title(news.getTitle())
+                .excerpt(buildExcerpt(news.getContent()))
+                .festivalId(news.getFestival() != null ? news.getFestival().getId() : null)
+                .createdAt(news.getCreatedAt())
+                .build();
+    }
+
+    private NewsDetailResponse toDetailResponse(News news) {
         return NewsDetailResponse.builder()
                 .id(news.getId())
                 .title(news.getTitle())
@@ -54,15 +63,18 @@ public class NewsHomeServiceImpl implements INewsHomeService {
                 .build();
     }
 
-
     private String buildExcerpt(String content) {
         if (content == null || content.isBlank()) {
             return "";
         }
+
         String clean = content.replaceAll("\\s+", " ").trim();
         int max = 140;
+
+        if (clean.length() <= max) {
+            return clean;
+        }
+
         return clean.substring(0, max) + "...";
-
-
     }
 }

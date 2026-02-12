@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,7 +24,8 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
 
     @Override
     public Page<MovieListResponse> getNowShowingMovies(int page, int size, String sortBy, String direction) {
-        Pageable pageable = buildPageable(page, size, sortBy, direction);
+
+        Pageable pageable = buildPageable(page, size, sortBy, direction, "releaseDate");
 
         Page<Movie> movies = movieHomeRepository.findByStatus(MovieStatus.NOW_SHOWING, pageable);
 
@@ -32,6 +34,7 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
 
     @Override
     public MovieDetailResponse getNowShowingMovieDetail(Long id) {
+
         Movie movie = movieHomeRepository.findNowShowingMovieDetail(id, MovieStatus.NOW_SHOWING)
                 .orElseThrow(() -> new RuntimeException("Phim không tồn tại hoặc không chiếu"));
 
@@ -40,16 +43,18 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
 
     @Override
     public Page<MovieListResponse> getComingSoonMovies(int page, int size, String sortBy, String direction) {
-        Pageable pageable = buildPageable(page, size, sortBy, direction);
 
-        Page<Movie> movies = movieHomeRepository.findByStatus(MovieStatus.COMING_SOON, pageable);
+        Pageable pageable = buildPageable(page, size, sortBy, direction, "releaseDate");
+
+        // ✅ Coming soon phải có releaseDate > hôm nay (đúng logic "sắp chiếu")
+        Page<Movie> movies = movieHomeRepository.findComingSoonMovies(MovieStatus.COMING_SOON, pageable);
 
         return movies.map(this::toListResponse);
     }
 
-    // ✅ NEW: Chi tiết phim chung (mọi status)
     @Override
     public MovieDetailResponse getMovieDetail(Long id) {
+
         Movie movie = movieHomeRepository.findMovieDetail(id)
                 .orElseThrow(() -> new RuntimeException("Phim không tồn tại"));
 
@@ -58,8 +63,9 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
 
     // ===================== HELPER =====================
 
-    private Pageable buildPageable(int page, int size, String sortBy, String direction) {
-        String sortField = (sortBy == null || sortBy.isBlank()) ? "releaseDate" : sortBy;
+    private Pageable buildPageable(int page, int size, String sortBy, String direction, String defaultSortField) {
+
+        String sortField = (sortBy == null || sortBy.isBlank()) ? defaultSortField : sortBy;
 
         Sort sort = Sort.by(sortField);
         sort = "desc".equalsIgnoreCase(direction) ? sort.descending() : sort.ascending();
@@ -78,6 +84,12 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
     }
 
     private MovieDetailResponse toDetailResponse(Movie movie) {
+        Set<String> genres = (movie.getGenres() == null)
+                ? Set.of()
+                : movie.getGenres().stream()
+                .map(g -> g.getGenreName())
+                .collect(Collectors.toSet());
+
         return MovieDetailResponse.builder()
                 .id(movie.getId())
                 .title(movie.getTitle())
@@ -87,12 +99,9 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
                 .trailer(movie.getTrailer())
                 .duration(movie.getDuration())
                 .releaseDate(movie.getReleaseDate())
-                .type(movie.getType() == null ? null : movie.getType().toValue()) // ✅ 2D/3D đẹp
+                .type(movie.getType() == null ? null : movie.getType().toValue())
                 .status(movie.getStatus() == null ? null : movie.getStatus().name())
-                .genres(movie.getGenres() == null ? java.util.Set.of()
-                        : movie.getGenres().stream()
-                        .map(g -> g.getGenreName())
-                        .collect(Collectors.toSet()))
+                .genres(genres)
                 .build();
     }
 }
