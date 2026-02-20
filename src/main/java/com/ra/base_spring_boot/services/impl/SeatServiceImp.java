@@ -61,7 +61,7 @@ public class SeatServiceImp implements SeatService {
     @Override
     public SeatResp createSeat(SeatReq seatReq) {
         Seat seat = Seat.builder()
-                .screen(seatReq.getScreen())
+//                .screen(seatReq.getScreen())
                 .seatNumber(seatReq.getSeatNumber())
                 .isVariable(seatReq.getIsVariable())
                 .type(seatReq.getType())
@@ -87,7 +87,7 @@ public class SeatServiceImp implements SeatService {
                         "Seat not found with id = " + id
                 ));
 
-        seat.setScreen(seatReq.getScreen());
+//        seat.setScreen(seatReq.getScreen());
         seat.setSeatNumber(seatReq.getSeatNumber());
         seat.setIsVariable(seatReq.getIsVariable());
         seat.setType(seatReq.getType());
