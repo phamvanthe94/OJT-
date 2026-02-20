@@ -24,7 +24,7 @@ public class FestivalHomeServiceImpl implements IFestivalHomeService {
         Pageable pageable = PageRequest.of(
                 Math.max(page, 0),
                 Math.max(size, 1),
-                Sort.by("startTime").descending()
+                Sort.by("startTime").ascending()
         );
 
         return festivalHomeRepository.findAllFestivals(pageable)

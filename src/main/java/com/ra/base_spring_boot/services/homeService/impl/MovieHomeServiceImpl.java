@@ -35,7 +35,7 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
     @Override
     public MovieDetailResponse getNowShowingMovieDetail(Long id) {
 
-        Movie movie = movieHomeRepository.findNowShowingMovieDetail(id, MovieStatus.NOW_SHOWING)
+        Movie movie = movieHomeRepository.findMovieDetailByIdAndStatus(id, MovieStatus.NOW_SHOWING)
                 .orElseThrow(() -> new RuntimeException("Phim không tồn tại hoặc không chiếu"));
 
         return toDetailResponse(movie);

@@ -19,7 +19,7 @@ public class GenreHomeServiceImpl implements IGenreHomeService {
     @Override
     public List<GenreResponse> getNowShowingGenres() {
 
-        List<Genre> genres = movieHomeRepository.findNowShowingGenres(MovieStatus.NOW_SHOWING);
+        List<Genre> genres = movieHomeRepository.findGenresByMovieStatus(MovieStatus.NOW_SHOWING);
 
         return genres.stream()
                 .map(genre -> GenreResponse.builder()

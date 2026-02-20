@@ -14,49 +14,44 @@ import java.util.Optional;
 
 public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
 
+    // (1) Hiển thị phim đang chiếu / sắp chiếu (tùy status admin set)
     Page<Movie> findByStatus(MovieStatus status, Pageable pageable);
 
+    // (2) Thể loại đang công chiếu (genres của các phim theo status)
     @Query("""
             SELECT DISTINCT g
             FROM Movie m
             JOIN m.genres g
             WHERE m.status = :status
-            AND (m.releaseDate IS NULL OR m.releaseDate <= CURRENT_DATE)
             """)
-    List<Genre> findNowShowingGenres(@Param("status") MovieStatus status);
+    List<Genre> findGenresByMovieStatus(@Param("status") MovieStatus status);
 
+    // (3) Hiển thị chi tiết phim đang chiếu (theo id + status) + load genres
     @Query("""
             SELECT m
             FROM Movie m
-            LEFT JOIN FETCH m.genres g
+            LEFT JOIN FETCH m.genres
             WHERE m.id = :id
-            AND m.status = :status
-            AND (m.releaseDate IS NULL OR m.releaseDate <= CURRENT_DATE)
+              AND m.status = :status
             """)
-    Optional<Movie> findNowShowingMovieDetail(
+    Optional<Movie> findMovieDetailByIdAndStatus(
             @Param("id") Long id,
             @Param("status") MovieStatus status
     );
 
+    // (Phụ) Tìm theo title để check trùng / search đơn giản
     Optional<Movie> findByTitleIgnoreCase(String title);
 
+    // (4) Hiển thị phim sắp chiếu (về bản chất vẫn là status)
+    default Page<Movie> findComingSoonMovies(MovieStatus status, Pageable pageable) {
+        return findByStatus(status, pageable);
+    }
+
+    // (Phụ) Chi tiết phim (không filter status) + load genres
     @Query("""
             SELECT m
             FROM Movie m
-            WHERE m.status = :status
-            AND m.releaseDate IS NOT NULL
-            AND m.releaseDate > CURRENT_DATE
-            """)
-    Page<Movie> findComingSoonMovies(
-            @Param("status") MovieStatus status,
-            Pageable pageable
-    );
-
-
-    @Query("""
-            SELECT m
-            FROM Movie m
-            LEFT JOIN FETCH m.genres g
+            LEFT JOIN FETCH m.genres
             WHERE m.id = :id
             """)
     Optional<Movie> findMovieDetail(@Param("id") Long id);

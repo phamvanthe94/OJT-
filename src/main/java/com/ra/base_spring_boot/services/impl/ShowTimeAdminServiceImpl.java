@@ -28,7 +28,7 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
     private final ScreenRepository screenRepository;
     private final IMovieRepository movieRepository;
 
-    private void validateTime(java.time.LocalDateTime startTime, java.time.LocalDateTime endTime) {
+    private void validateTime(LocalDateTime startTime, LocalDateTime endTime) {
 
         if (startTime == null || endTime == null) {
             throw new RuntimeException("Thời gian bắt đầu và kết thúc không được để trống.");

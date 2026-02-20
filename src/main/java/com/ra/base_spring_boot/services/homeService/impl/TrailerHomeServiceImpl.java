@@ -18,7 +18,7 @@ public class TrailerHomeServiceImpl implements ITrailerHomeService {
     @Override
     public MovieTrailerResponse getNowShowingMovieTrailer(Long id) {
 
-        Movie movie = movieHomeRepository.findNowShowingMovieDetail(id, MovieStatus.NOW_SHOWING)
+        Movie movie = movieHomeRepository.findMovieDetailByIdAndStatus(id, MovieStatus.NOW_SHOWING)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phim đang chiếu !"));
 
         if (movie.getTrailer() == null || movie.getTrailer().isBlank()) {
@@ -32,7 +32,7 @@ public class TrailerHomeServiceImpl implements ITrailerHomeService {
                 .build();
     }
 
-    
+
     @Override
     public MovieTrailerResponse getMovieTrailer(Long id) {
 

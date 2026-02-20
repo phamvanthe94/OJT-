@@ -96,36 +96,65 @@ public class MovieServiceImpl implements IMovieService {
         if (req == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "MovieReq is null");
         }
-        if (req.getTitle() == null || req.getTitle().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title không được để trống");
-        }
-        if (req.getStatus() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status không được để trống");
-        }
-        if (req.getType() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Type không được để trống");
-        }
-        if (req.getDuration() == null || req.getDuration() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duration phải > 0");
-        }
-        if (req.getReleaseDate() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ReleaseDate không được để trống");
+
+        // ========== PATCH: chỉ set field nào user gửi ==========
+        if (req.getTitle() != null) {
+            String title = req.getTitle().trim();
+            if (title.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title không được để trống");
+            }
+            old.setTitle(title);
         }
 
-        Movie movie = toEntity(req);
-        movie.setId(id);
+        if (req.getDescriptions() != null) {
+            old.setDescriptions(req.getDescriptions());
+        }
 
-        // giữ ảnh cũ nếu không upload ảnh mới
+        if (req.getAuthor() != null) {
+            old.setAuthor(req.getAuthor());
+        }
+
+        if (req.getTrailer() != null) {
+            old.setTrailer(req.getTrailer());
+        }
+
+        if (req.getType() != null) {
+            old.setType(req.getType());
+        }
+
+        if (req.getDuration() != null) {
+            if (req.getDuration() <= 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duration phải > 0");
+            }
+            old.setDuration(req.getDuration());
+        }
+
+        if (req.getReleaseDate() != null) {
+            old.setReleaseDate(req.getReleaseDate());
+        }
+
+        if (req.getStatus() != null) {
+            old.setStatus(req.getStatus());
+        }
+
+        // genres: chỉ update nếu client có gửi genreIds
+        if (req.getGenreIds() != null) {
+            Set<Genre> genres = genreRepository.findAllById(req.getGenreIds())
+                    .stream()
+                    .collect(Collectors.toSet());
+            old.setGenres(genres);
+        }
+
+        // image: có file mới thì upload, không thì giữ cũ
         if (req.getImage() != null && !req.getImage().isEmpty()) {
             String url = cloudinaryService.upload(req.getImage());
-            movie.setImage(url);
-        } else {
-            movie.setImage(old.getImage());
+            old.setImage(url);
         }
 
-        Movie updated = movieRepository.save(movie);
+        Movie updated = movieRepository.save(old);
         return toResp(updated);
     }
+
 
     @Override
     public void delete(Long id) {
