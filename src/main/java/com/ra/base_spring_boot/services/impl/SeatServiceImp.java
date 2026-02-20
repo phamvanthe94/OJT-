@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
-public class SeatSeviceImp implements SeatService {
+public class SeatServiceImp implements SeatService {
     @Autowired
     private SeatRepository seatRepository;
     @Autowired
@@ -31,7 +31,7 @@ public class SeatSeviceImp implements SeatService {
         Page<Seat> seats = seatRepository.findAll(pageable);
 
         return seats.map(seat -> SeatResp.builder()
-                .screen(seat.getScreen())
+//                .screen(seat.getScreen())
                 .seatNumber(seat.getSeatNumber())
                 .isVariable(seat.getIsVariable())
                 .type(seat.getType())
@@ -49,7 +49,7 @@ public class SeatSeviceImp implements SeatService {
                 ));
 
         return SeatResp.builder()
-                .screen(seat.getScreen())
+//                .screen(seat.getScreen())
                 .seatNumber(seat.getSeatNumber())
                 .isVariable(seat.getIsVariable())
                 .type(seat.getType())
@@ -70,7 +70,7 @@ public class SeatSeviceImp implements SeatService {
         seatRepository.save(seat);
 
         return SeatResp.builder()
-                .screen(seat.getScreen())
+//                .screen(seat.getScreen())
                 .seatNumber(seat.getSeatNumber())
                 .isVariable(seat.getIsVariable())
                 .type(seat.getType())
@@ -95,7 +95,7 @@ public class SeatSeviceImp implements SeatService {
         seatRepository.save(seat);
 
         return SeatResp.builder()
-                .screen(seat.getScreen())
+//                .screen(seat.getScreen())
                 .seatNumber(seat.getSeatNumber())
                 .isVariable(seat.getIsVariable())
                 .type(seat.getType())

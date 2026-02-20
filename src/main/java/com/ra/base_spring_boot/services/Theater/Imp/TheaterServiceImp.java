@@ -2,6 +2,7 @@ package com.ra.base_spring_boot.services.Theater.Imp;
 
 import com.ra.base_spring_boot.dto.req.TheaterReq.TheaterReq;
 import com.ra.base_spring_boot.dto.resp.TheaterResp.TheaterResp;
+import com.ra.base_spring_boot.exception.HttpNotFound;
 import com.ra.base_spring_boot.model.entity.theater.Theater;
 import com.ra.base_spring_boot.repository.Theater.TheaterRepo;
 import com.ra.base_spring_boot.services.Theater.TheaterService;
@@ -28,7 +29,9 @@ public class TheaterServiceImp implements TheaterService {
     public Page<TheaterResp> searchTheaterByName(String name, Pageable pageable) {
         Page<Theater> theaters = theaterRepo
                 .findAllByNameContainingIgnoreCase(pageable,name);
-
+        if (theaters.isEmpty()){
+            throw new HttpNotFound("Not found: "+name);
+        }
         return theaters.map(theater ->
                 TheaterResp.builder()
                         .name(theater.getName())
