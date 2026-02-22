@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 @RestController
 @RequestMapping("/api/v1/admin/movies/statistics")
 @RequiredArgsConstructor
@@ -18,24 +16,20 @@ public class MovieStatisticController {
     private final IMovieStatisticService movieStatisticService;
 
     /**
-     * Get Movie Statistics
+     * Dashboard thống kê phim cho admin
+     * phục vụ màn hình Dashboard của Admin
      */
-    @GetMapping
-    public ResponseEntity<?> getMovieStatistics(
-            @RequestParam(required = false) LocalDate fromDate,
-            @RequestParam(required = false) LocalDate toDate
-    ) {
 
-        MovieStatisticRequest request = MovieStatisticRequest.builder()
-                .fromDate(fromDate)
-                .toDate(toDate)
-                .build();
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> dashboard() {
+
+        MovieStatisticRequest request = MovieStatisticRequest.builder().build();
 
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(200)
-                        .data(movieStatisticService.getMovieStatistics(request))
+                        .data(movieStatisticService.getDashboardStatistic(request))
                         .build()
         );
     }

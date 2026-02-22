@@ -2,15 +2,15 @@ package com.ra.base_spring_boot.dto.statistic.req;
 
 import lombok.*;
 
-import java.time.LocalDate;
-
-
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 
 public class MovieStatisticRequest {
-    private LocalDate fromDate; // Từ ngày
-    private LocalDate toDate;   // Đến ngày
+
+    // Hiện tại dashboard chưa cần filter
+    // Sau này có thể mở rộng:
+    // private Long cinemaId;
+    // private MovieType type;
+
 }

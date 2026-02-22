@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 
 public class MovieStatisticResponse {
-    private long released;     // Đã chiếu
-    private long nowShowing;   // Đang chiếu
-    private long upcoming;     // Sắp chiếu
+    private long comingSoon;   // COMING_SOON
+    private long nowShowing;   // NOW_SHOWING
+    private long offline;      // OFFLINE
 }

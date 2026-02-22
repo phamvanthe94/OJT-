@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -27,10 +28,10 @@ public class MovieDataInitializer implements CommandLineRunner {
                     .author("Nam Cao")
                     .descriptions("Chí Phèo là một tác phẩm văn học nổi tiếng của nhà văn Nam Cao, kể về cuộc đời bi kịch của nhân vật Chí Phèo...")
                     .duration(110)
-                    .releaseDate(LocalDate.of(2024, 12, 1))
+                    .releaseDate(LocalDateTime.of(2024, 12, 1, 0,0))
                     .status(MovieStatus.COMING_SOON)
                     .type(MovieType._2D)
-                    .createdAt(LocalDate.now())
+                    .createdAt(LocalDateTime.now())
                     .build(),
             Movie.builder()
                     .title("Tuổi thơ dữ dội")
@@ -39,10 +40,10 @@ public class MovieDataInitializer implements CommandLineRunner {
                     .author("Phùng Quán")
                     .descriptions("Tuổi thơ dữ dội là một tiểu thuyết nổi tiếng của nhà văn Phùng Quán, kể về những năm tháng chiến tranh khốc liệt...")
                     .duration(95)
-                    .releaseDate(LocalDate.of(2024, 11, 15))
+                    .releaseDate(LocalDateTime.of(2024, 11, 15, 0, 0))
                     .status(MovieStatus.COMING_SOON)
                     .type(MovieType._2D)
-                    .createdAt(LocalDate.now())
+                    .createdAt(LocalDateTime.now())
                     .build()
     );
 
@@ -60,10 +61,10 @@ public class MovieDataInitializer implements CommandLineRunner {
                         .author("Nam Cao")
                         .descriptions("Lão Hạc là một truyện ngắn nổi tiếng của nhà văn Nam Cao, kể về cuộc sống và số phận của một người nông dân nghèo tên là Lão Hạc...")
                         .duration(120)
-                        .releaseDate(LocalDate.of(2024, 1, 1))
+                        .releaseDate(LocalDateTime.of(2024, 1, 1, 0,0))
                         .status(MovieStatus.NOW_SHOWING)
                         .type(MovieType._2D)
-                        .createdAt(LocalDate.now())
+                        .createdAt(LocalDateTime.now())
                         .build(),
 
                 Movie.builder()
@@ -73,10 +74,10 @@ public class MovieDataInitializer implements CommandLineRunner {
                         .author("Vũ Trọng Phụng")
                         .descriptions("Số đỏ là một tiểu thuyết châm biếm xã hội Việt Nam trong thập niên 1930.")
                         .duration(90)
-                        .releaseDate(LocalDate.of(2024, 2, 1))
+                        .releaseDate(LocalDateTime.of(2024, 2, 1, 0,0))
                         .status(MovieStatus.NOW_SHOWING)
                         .type(MovieType._2D)
-                        .createdAt(LocalDate.now())
+                        .createdAt(LocalDateTime.now())
                         .build()
         );
         IMovieRepository.saveAll(movies);

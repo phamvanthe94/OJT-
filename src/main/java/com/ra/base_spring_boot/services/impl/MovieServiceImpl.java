@@ -10,6 +10,7 @@ import com.ra.base_spring_boot.repository.IMovieRepository;
 import com.ra.base_spring_boot.repository.homerpo.IGenreRepository;
 import com.ra.base_spring_boot.services.CloudinaryService;
 import com.ra.base_spring_boot.services.IMovieService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -79,6 +80,8 @@ public class MovieServiceImpl implements IMovieService {
                 .type(request.getType())
                 .duration(request.getDuration())
                 .releaseDate(request.getReleaseDate())
+                .releaseStartDate(request.getReleaseStartDate())
+                .releaseEndDate(request.getReleaseEndDate())
                 .status(request.getStatus())
                 .genres(genres)
                 .build();
@@ -88,6 +91,7 @@ public class MovieServiceImpl implements IMovieService {
 
     //Cập nhật
     @Override
+    @Transactional
     public MovieResponse updateMovie(Long id, MovieRequest request) {
 
         Movie movie = IMovieRepository.findById(id)
@@ -100,6 +104,8 @@ public class MovieServiceImpl implements IMovieService {
         movie.setType(request.getType());
         movie.setDuration(request.getDuration());
         movie.setReleaseDate(request.getReleaseDate());
+        movie.setReleaseStartDate(request.getReleaseStartDate());
+        movie.setReleaseEndDate(request.getReleaseEndDate());
         movie.setStatus(request.getStatus());
 
         if (request.getImage() != null && !request.getImage().isEmpty()) {
@@ -132,6 +138,8 @@ public class MovieServiceImpl implements IMovieService {
                 .type(movie.getType())
                 .duration(movie.getDuration())
                 .releaseDate(movie.getReleaseDate())
+                .releaseStartDate(movie.getReleaseStartDate())
+                .releaseEndDate(movie.getReleaseEndDate())
                 .status(movie.getStatus())
                 .genres(
                         movie.getGenres()

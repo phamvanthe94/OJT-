@@ -4,5 +4,5 @@ import com.ra.base_spring_boot.dto.statistic.req.MovieStatisticRequest;
 import com.ra.base_spring_boot.dto.statistic.resp.MovieStatisticResponse;
 
 public interface IMovieStatisticService {
-    MovieStatisticResponse getMovieStatistics(MovieStatisticRequest request);
+    MovieStatisticResponse getDashboardStatistic(MovieStatisticRequest request);
 }

@@ -2,15 +2,19 @@ package com.ra.base_spring_boot.dto.statistic.resp;
 
 import lombok.*;
 
-
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 
 public class RevenueStatisticResponse {
 
-    private String label;      // tên phim / thể loại / ngày-tháng-năm
-    private Double revenue;    // tổng doanh thu
+    private Long groupId;         // id của phim, thể loại, rạp, phòng chiếu
+    private String groupName;     // tên phim, tên thể loại, tên rạp, tên phòng chiếu
+    private Double todayRevenue;
+    private Double weekRevenue;
+    private Double monthRevenue;
+    private Double yearRevenue;
+    private Double totalRevenue;
 }

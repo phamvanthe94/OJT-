@@ -5,6 +5,7 @@ import com.ra.base_spring_boot.model.constants.MovieType;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -22,9 +23,11 @@ public class MovieResponse {
     private String trailer;
     private MovieType type;
     private Integer duration;
-    private LocalDate releaseDate;
+    private LocalDateTime releaseDate;
     private MovieStatus status;
+    private LocalDateTime releaseStartDate;
+    private LocalDateTime releaseEndDate;
     private Set<String> genres;
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

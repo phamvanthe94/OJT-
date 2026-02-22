@@ -6,7 +6,6 @@ import com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse;
 import java.util.List;
 
 public interface IRevenueStatisticService {
-    List<RevenueStatisticResponse> statisticRevenue(
-            RevenueStatisticRequest request
-    );
+
+    List<RevenueStatisticResponse> getRevenue(RevenueStatisticRequest request);
 }

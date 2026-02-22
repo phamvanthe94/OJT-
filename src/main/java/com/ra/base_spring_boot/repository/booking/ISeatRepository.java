@@ -1,7 +1,6 @@
-package com.ra.base_spring_boot.repository;
+package com.ra.base_spring_boot.repository.booking;
 
 import com.ra.base_spring_boot.model.entity.theater.Seat;
-import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SeatRepository extends JpaRepository<Seat,Long> {
+public interface ISeatRepository extends JpaRepository<Seat,Long> {
     @Query(value = """
         SELECT 
             s.id AS seatId,
@@ -31,4 +30,10 @@ public interface SeatRepository extends JpaRepository<Seat,Long> {
             @Param("screenId") Long screenId,
             @Param("showTimeId") Long showTimeId
     );
+    @Query("""
+       SELECT COALESCE(SUM(bs.price),0)
+       FROM BookingSeat bs
+       WHERE bs.booking.paymentStatus = com.ra.base_spring_boot.model.constants.PaymentStatus.COMPLETED
+       """)
+    Double getTotalRevenue();
 }

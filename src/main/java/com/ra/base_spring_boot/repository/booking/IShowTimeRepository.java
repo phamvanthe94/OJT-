@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.repository;
+package com.ra.base_spring_boot.repository.booking;
 
 import com.ra.base_spring_boot.model.entity.theater.ShowTime;
 import org.springframework.data.jpa.repository.JpaRepository;

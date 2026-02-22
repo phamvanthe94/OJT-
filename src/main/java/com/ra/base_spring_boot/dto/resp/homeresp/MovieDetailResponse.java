@@ -3,6 +3,7 @@ package com.ra.base_spring_boot.dto.resp.homeresp;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public class MovieDetailResponse {
     private String image;
     private String trailer;
     private Integer duration;
-    private LocalDate releaseDate;
+    private LocalDateTime releaseDate;
     private String type;
     private String status;
     private Set<String> genres;

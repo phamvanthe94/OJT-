@@ -7,8 +7,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookingSeatItemResDTO {
+public class BookingSeatRequest {
     private Long seatId;
     private String seatName;
     private Integer quantity;
+    private Long ticketPriceId;
 }
