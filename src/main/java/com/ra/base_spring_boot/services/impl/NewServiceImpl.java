@@ -63,8 +63,8 @@ public class NewServiceImpl implements INewService {
                 .title(request.getTitle())
                 .content(request.getContent())
                 .festival(festival)
-                .createdAt(request.getCreatedAt().atStartOfDay())
-                .updatedAt(request.getUpdatedAt().atStartOfDay())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(request.getUpdatedAt())
                 .build();
 
         return toResponse(newRepository.save(news));
@@ -84,7 +84,7 @@ public class NewServiceImpl implements INewService {
         oldNews.setTitle(request.getTitle());
         oldNews.setContent(request.getContent());
         oldNews.setFestival(festival);
-        oldNews.setUpdatedAt(request.getUpdatedAt().atStartOfDay());
+        oldNews.setUpdatedAt(request.getUpdatedAt());
 
         return toResponse(newRepository.save(oldNews));
     }
@@ -102,7 +102,7 @@ public class NewServiceImpl implements INewService {
                 .title(news.getTitle())
                 .content(news.getContent())
                 .festivalTitle(news.getFestival().getTitle())
-                .createdAt(news.getCreatedAt().toLocalDate())
+                .createdAt(news.getCreatedAt())
                 .build();
     }
 }

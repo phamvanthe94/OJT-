@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,8 +22,8 @@ public class NewRequest {
     private Long festivalId;
     @NotNull
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     @NotNull
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 }

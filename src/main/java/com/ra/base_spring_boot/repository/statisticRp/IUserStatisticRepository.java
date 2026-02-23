@@ -5,6 +5,7 @@ import com.ra.base_spring_boot.model.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -20,4 +21,6 @@ public interface IUserStatisticRepository extends JpaRepository<User, Long> {
 
 
     List<User> findByStatus(UserStatus status);
+    List<User> findByCreatedAtBetween(LocalDateTime from, LocalDateTime to);
+
 }

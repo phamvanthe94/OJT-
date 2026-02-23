@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,9 +25,9 @@ public class FestivalRequest {
     @NotNull
     @FutureOrPresent(message = "Thời gian bắt đầu không được nhỏ hơn hiện tại")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate startTime;
+    private LocalDateTime startTime;
 
     @NotNull(message = "End time cannot be null")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate endTime;
+    private LocalDateTime endTime;
 }

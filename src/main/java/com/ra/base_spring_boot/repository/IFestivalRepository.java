@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IFestivalRepository extends JpaRepository<Festival, Long> {
@@ -20,4 +21,6 @@ public interface IFestivalRepository extends JpaRepository<Festival, Long> {
     FROM Festival f
 """)
     List<NewAndFestivalResponse> findAllFestivalTitle();
+    List<Festival> findByStartTimeBetween(LocalDateTime from, LocalDateTime to);
+
 }

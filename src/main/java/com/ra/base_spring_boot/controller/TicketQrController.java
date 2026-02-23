@@ -49,8 +49,9 @@ public class TicketQrController {
                 .distinct()
                 .collect(Collectors.joining(", "));
 
+        String booking = "Booking";
         String qrText =
-                "Booking ID: " + first.getBookingId() + "\n" +
+                booking + " ID: " + first.getBookingId() + "\n" +
                         "Khách hàng: " + first.getFullName() + "\n" +
                         "Phim: " + first.getTitle() + "\n" +
                         "Phòng chiếu: " + first.getScreenName() + "\n" +

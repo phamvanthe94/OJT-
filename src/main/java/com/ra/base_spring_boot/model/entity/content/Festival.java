@@ -23,8 +23,8 @@ public class Festival extends BaseObject {
     private String image;
 
     @Column(name = "start_time")
-    private LocalDate startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "end_time")
-    private LocalDate endTime;
+    private LocalDateTime endTime;
 }

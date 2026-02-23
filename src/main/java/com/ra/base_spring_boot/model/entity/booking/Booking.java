@@ -46,4 +46,5 @@ public class Booking extends BaseObject {
     @OneToMany(mappedBy = "booking", fetch = FetchType.LAZY)
     private List<Payment> payments;
 
+
 }

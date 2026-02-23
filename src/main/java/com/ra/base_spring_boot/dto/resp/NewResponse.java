@@ -3,6 +3,7 @@ package com.ra.base_spring_boot.dto.resp;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,5 +15,5 @@ public class NewResponse {
     private String title;
     private String content;
     private String festivalTitle;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }

@@ -1,12 +1,14 @@
 package com.ra.base_spring_boot.repository.statisticRp;
 
 import com.ra.base_spring_boot.model.constants.MovieStatus;
+import com.ra.base_spring_boot.model.entity.content.News;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IMovieStatisticRepository extends JpaRepository<Movie, Long> {
@@ -40,5 +42,7 @@ public interface IMovieStatisticRepository extends JpaRepository<Movie, Long> {
             GROUP BY m.title
             """)
     List<Object[]> statisticMovieRevenue();
+    List<Movie> findByReleaseDateBetween(LocalDateTime from, LocalDateTime to);
+
 
 }

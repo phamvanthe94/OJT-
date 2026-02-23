@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,11 +31,11 @@ public class MovieDTO {
     private Integer duration;
     @NotNull
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate releaseDate;
+    private LocalDateTime releaseDate;
     @NotNull
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 }

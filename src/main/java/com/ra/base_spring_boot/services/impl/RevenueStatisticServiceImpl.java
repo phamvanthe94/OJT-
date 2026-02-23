@@ -2,6 +2,7 @@ package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.req.RevenueStatisticRequest;
 import com.ra.base_spring_boot.dto.resp.RevenueStatisticResponse;
+import com.ra.base_spring_boot.model.constants.PaymentStatus;
 import com.ra.base_spring_boot.repository.IRevenueStatisticRepository;
 import com.ra.base_spring_boot.services.IRevenueStatisticService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class RevenueStatisticServiceImpl implements IRevenueStatisticService {
 
         switch (request.getGroupBy()) {
             case "MOVIE":
-                rawData = repository.revenueByMovie(from, to);
+                rawData = repository.revenueByMovie(PaymentStatus.COMPLETED, from, to);
                 break;
             case "GENRE":
                 rawData = repository.revenueByGenre(from, to);
