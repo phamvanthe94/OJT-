@@ -31,7 +31,7 @@ public class BookingDetailResDTO {
     private String transactionId;
 
     // seats
-    private List<BookingSeatItemResDTO> seats;
+    private List<BookingSeatRequest> seats;
 
     private LocalDateTime createdAt;
 }

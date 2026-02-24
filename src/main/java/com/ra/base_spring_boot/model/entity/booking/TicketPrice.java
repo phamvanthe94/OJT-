@@ -3,9 +3,9 @@ package com.ra.base_spring_boot.model.entity.booking;
 import com.ra.base_spring_boot.model.base.BaseObject;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.constants.SeatType;
+import com.ra.base_spring_boot.model.entity.theater.ShowTime;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalTime;
 
 @Entity
@@ -24,6 +24,10 @@ public class TicketPrice extends BaseObject {
     @Enumerated(EnumType.STRING)
     @Column(name = "type_movie")
     private MovieType typeMovie;
+
+   // @ManyToOne
+   // @JoinColumn(name = "showtime_id")
+   // private ShowTime showTime;
 
     @Column(name = "price")
     private Double price;
