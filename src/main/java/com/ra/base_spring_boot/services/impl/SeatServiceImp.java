@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
-public class SeatSeviceImp implements SeatService {
+public class SeatServiceImp implements SeatService {
     @Autowired
     private ISeatRepository ISeatRepository;
     @Autowired
@@ -31,7 +31,7 @@ public class SeatSeviceImp implements SeatService {
         Page<Seat> seats = ISeatRepository.findAll(pageable);
 
         return seats.map(seat -> SeatResp.builder()
-                .screen(seat.getScreen())
+//                .screen(seat.getScreen())
                 .seatNumber(seat.getSeatNumber())
                 .isVariable(seat.getIsVariable())
                 .type(seat.getType())
@@ -49,7 +49,7 @@ public class SeatSeviceImp implements SeatService {
                 ));
 
         return SeatResp.builder()
-                .screen(seat.getScreen())
+//                .screen(seat.getScreen())
                 .seatNumber(seat.getSeatNumber())
                 .isVariable(seat.getIsVariable())
                 .type(seat.getType())
@@ -61,7 +61,7 @@ public class SeatSeviceImp implements SeatService {
     @Override
     public SeatResp createSeat(SeatReq seatReq) {
         Seat seat = Seat.builder()
-                .screen(seatReq.getScreen())
+//                .screen(seatReq.getScreen())
                 .seatNumber(seatReq.getSeatNumber())
                 .isVariable(seatReq.getIsVariable())
                 .type(seatReq.getType())
@@ -70,7 +70,7 @@ public class SeatSeviceImp implements SeatService {
         ISeatRepository.save(seat);
 
         return SeatResp.builder()
-                .screen(seat.getScreen())
+//                .screen(seat.getScreen())
                 .seatNumber(seat.getSeatNumber())
                 .isVariable(seat.getIsVariable())
                 .type(seat.getType())
@@ -87,7 +87,7 @@ public class SeatSeviceImp implements SeatService {
                         "Seat not found with id = " + id
                 ));
 
-        seat.setScreen(seatReq.getScreen());
+//        seat.setScreen(seatReq.getScreen());
         seat.setSeatNumber(seatReq.getSeatNumber());
         seat.setIsVariable(seatReq.getIsVariable());
         seat.setType(seatReq.getType());
@@ -95,7 +95,7 @@ public class SeatSeviceImp implements SeatService {
         ISeatRepository.save(seat);
 
         return SeatResp.builder()
-                .screen(seat.getScreen())
+//                .screen(seat.getScreen())
                 .seatNumber(seat.getSeatNumber())
                 .isVariable(seat.getIsVariable())
                 .type(seat.getType())
