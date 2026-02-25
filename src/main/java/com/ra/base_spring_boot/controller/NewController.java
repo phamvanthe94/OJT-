@@ -1,58 +1,82 @@
 package com.ra.base_spring_boot.controller;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
-import com.ra.base_spring_boot.dto.req.NewDTO;
-import com.ra.base_spring_boot.model.entity.content.News;
-import com.ra.base_spring_boot.services.NewService;
+import com.ra.base_spring_boot.dto.req.NewRequest;
+import com.ra.base_spring_boot.services.INewService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/news")
+@RequestMapping("/api/v1/admin/news")
+@RequiredArgsConstructor
 public class NewController {
-    @Autowired
-    private NewService newService;
+
+    private final INewService newService;
+
     @GetMapping
-    public ResponseEntity<ResponseWrapper<Page<News>>> getAllNew(@RequestParam(name="title", required = false) String title,
-                                                                 @RequestParam(name="content", required = false) String content,
-                                                                 @RequestParam(name="festivalId", required = false) Long festivalId,
-                                                                 @RequestParam(name="page", defaultValue = "0") int page,
-                                                                 @RequestParam(name="size", defaultValue = "5") int size,
-                                                                 @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
-                                                                 @RequestParam(name = "direction", defaultValue = "desc") String direction){
-        Sort sort = direction.equalsIgnoreCase("asc")
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-        return newService.getAllAndSearchNew(title, content, festivalId, pageRequest);
+    public ResponseEntity<?> getAllNews(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String content,
+            @RequestParam(required = false) Long festivalId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(
+                                newService.getAllNews(
+                                        title, content, festivalId,
+                                        page, size, sortBy, direction
+                                )
+                        )
+                        .build()
+        );
     }
-    @PostMapping("/add")
-    public ResponseEntity<ResponseWrapper<?>> addNew(@RequestBody @Valid NewDTO newDTO, BindingResult bindingResult){
-        ResponseEntity<ResponseWrapper<?>> responseEntity = newService.createNew(newDTO, bindingResult);
-        if(bindingResult.hasErrors()){
-            return ResponseEntity.badRequest().body(
-                    ResponseWrapper
-                            .<Object>builder()
-                            .data(bindingResult.getAllErrors())
-                            .code(400)
-                            .status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                            .build()
-            );
-        }
-        return responseEntity;
+
+    @PostMapping
+    public ResponseEntity<?> createNews(
+            @Valid @RequestBody NewRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.CREATED)
+                        .code(201)
+                        .data(newService.createNews(request))
+                        .build()
+        );
     }
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<ResponseWrapper<?>> updateNew(@PathVariable Long id, @RequestBody @Valid NewDTO newDTO) {
-        return newService.updateNew(id, newDTO);
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateNews(
+            @PathVariable Long id,
+            @Valid @RequestBody NewRequest request
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(newService.updateNews(id, request))
+                        .build()
+        );
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<ResponseWrapper<String>> deleteNew(@PathVariable Long id) {
-        return newService.deleteNew(id);
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteNews(@PathVariable Long id) {
+        newService.deleteNews(id);
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data("Xoá tin tức thành công")
+                        .build()
+        );
     }
 }
+

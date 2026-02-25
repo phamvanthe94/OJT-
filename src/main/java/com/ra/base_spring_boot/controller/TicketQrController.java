@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ra.base_spring_boot.dto.resp.TicketQrData;
 import com.ra.base_spring_boot.services.Theater.QrCodeService;
-import com.ra.base_spring_boot.services.TicketQrService;
+import com.ra.base_spring_boot.services.more.TicketQrService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -49,8 +49,9 @@ public class TicketQrController {
                 .distinct()
                 .collect(Collectors.joining(", "));
 
+        String booking = "Booking";
         String qrText =
-                "Booking ID: " + first.getBookingId() + "\n" +
+                booking + " ID: " + first.getBookingId() + "\n" +
                         "Khách hàng: " + first.getFullName() + "\n" +
                         "Phim: " + first.getTitle() + "\n" +
                         "Phòng chiếu: " + first.getScreenName() + "\n" +

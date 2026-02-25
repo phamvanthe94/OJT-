@@ -1,33 +1,29 @@
 package com.ra.base_spring_boot.services;
 
-import com.ra.base_spring_boot.dto.ResponseWrapper;
-import com.ra.base_spring_boot.dto.req.MovieDTO;
-import com.ra.base_spring_boot.model.entity.movie.Movie;
+import com.ra.base_spring_boot.dto.req.MovieRequest;
+import com.ra.base_spring_boot.dto.resp.MovieResponse;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-
-import java.util.List;
 
 public interface IMovieService {
 
-    ResponseEntity<ResponseWrapper<Page<Movie>>> getAllMovie(
+    // get all (search + sort + page)
+    Page<MovieResponse> getAllMovies(
             String title,
             String author,
             String type,
-            Pageable pageable
+            String status,
+            int page,
+            int size,
+            String sortBy,
+            String direction
     );
 
-    ResponseEntity<ResponseWrapper<?>> createMovie(MovieDTO movieDTO, BindingResult bindingResult);
+    //  create
+    MovieResponse createMovie(MovieRequest request);
 
-    ResponseEntity<ResponseWrapper<?>> updateMovie(Long id, MovieDTO movieDTO);
+    // update
+    MovieResponse updateMovie(Long id, MovieRequest request);
 
-    ResponseEntity<ResponseWrapper<String>> deleteMovie(Long id);
-
-    Movie convertMovieDTOToMovie(MovieDTO movieDTO);
-
-    ResponseEntity<ResponseWrapper<List<Movie>>> getNowShowing();
-
-
+    // delete
+    void deleteMovie(Long id);
 }

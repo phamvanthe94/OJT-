@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "screens")
@@ -22,7 +23,7 @@ public class Screen extends BaseObject {
     private String name;
 
     @Column(name = "seat_capacity")
-    private Integer seatCapacity;
+    private Integer seatCapacity; // so luong ghe trong 1 rap
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,5 +37,11 @@ public class Screen extends BaseObject {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "screen")
+    private List<Seat> seats;
+
+    @OneToMany(mappedBy = "screen")
+    private List<ShowTime> showTimes;
 }
 

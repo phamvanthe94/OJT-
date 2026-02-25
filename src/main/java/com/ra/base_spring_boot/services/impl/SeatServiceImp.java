@@ -6,8 +6,8 @@ import com.ra.base_spring_boot.dto.resp.SeatSelectResp;
 import com.ra.base_spring_boot.model.constants.SeatType;
 import com.ra.base_spring_boot.model.entity.theater.Seat;
 import com.ra.base_spring_boot.model.entity.theater.ShowTime;
-import com.ra.base_spring_boot.repository.IShowTimeRepository;
-import com.ra.base_spring_boot.repository.SeatRepository;
+import com.ra.base_spring_boot.repository.booking.IShowTimeRepository;
+import com.ra.base_spring_boot.repository.booking.ISeatRepository;
 import com.ra.base_spring_boot.services.SeatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,14 +21,14 @@ import java.util.List;
 @Service
 public class SeatServiceImp implements SeatService {
     @Autowired
-    private SeatRepository seatRepository;
+    private ISeatRepository ISeatRepository;
     @Autowired
     private IShowTimeRepository showTimeRepository;
 
 
     @Override
     public Page<SeatResp> findAll(Pageable pageable) {
-        Page<Seat> seats = seatRepository.findAll(pageable);
+        Page<Seat> seats = ISeatRepository.findAll(pageable);
 
         return seats.map(seat -> SeatResp.builder()
 //                .screen(seat.getScreen())
@@ -42,7 +42,7 @@ public class SeatServiceImp implements SeatService {
 
     @Override
     public SeatResp findById(Long id) {
-        Seat seat = seatRepository.findById(id)
+        Seat seat = ISeatRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Seat not found with id = " + id
@@ -67,7 +67,7 @@ public class SeatServiceImp implements SeatService {
                 .type(seatReq.getType())
                 .build();
 
-        seatRepository.save(seat);
+        ISeatRepository.save(seat);
 
         return SeatResp.builder()
 //                .screen(seat.getScreen())
@@ -81,7 +81,7 @@ public class SeatServiceImp implements SeatService {
 
     @Override
     public SeatResp updateSeat(Long id, SeatReq seatReq) {
-        Seat seat = seatRepository.findById(id)
+        Seat seat = ISeatRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Seat not found with id = " + id
@@ -92,7 +92,7 @@ public class SeatServiceImp implements SeatService {
         seat.setIsVariable(seatReq.getIsVariable());
         seat.setType(seatReq.getType());
 
-        seatRepository.save(seat);
+        ISeatRepository.save(seat);
 
         return SeatResp.builder()
 //                .screen(seat.getScreen())
@@ -106,13 +106,13 @@ public class SeatServiceImp implements SeatService {
 
     @Override
     public void deleteSeat(Long id) {
-        Seat seat = seatRepository.findById(id)
+        Seat seat = ISeatRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Seat not found with id = " + id
                 ));
 
-        seatRepository.delete(seat);
+        ISeatRepository.delete(seat);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class SeatServiceImp implements SeatService {
 
         Long screenId = showTime.getScreen().getId();
 
-        return seatRepository.findSeatsWithBookingStatus(screenId, showTimeId)
+        return ISeatRepository.findSeatsWithBookingStatus(screenId, showTimeId)
                 .stream()
                 .map(obj -> SeatSelectResp.builder()
                         .seatId(((Number) obj[0]).longValue())

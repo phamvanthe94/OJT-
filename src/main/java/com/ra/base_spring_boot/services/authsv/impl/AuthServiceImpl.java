@@ -11,7 +11,7 @@ import com.ra.base_spring_boot.model.entity.user.User;
 import com.ra.base_spring_boot.repository.authrp.IUserRepository;
 import com.ra.base_spring_boot.security.jwt.JwtProvider;
 import com.ra.base_spring_boot.security.principle.MyUserDetails;
-import com.ra.base_spring_boot.services.CloudinaryService;
+import com.ra.base_spring_boot.services.more.CloudinaryService;
 import com.ra.base_spring_boot.services.authsv.IAuthService;
 import com.ra.base_spring_boot.services.authsv.IRoleService;
 import lombok.RequiredArgsConstructor;
