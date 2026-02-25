@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "booking_seat")
@@ -37,4 +38,20 @@ public class BookingSeat extends BaseObject {
     private LocalDateTime updatedAt;
     @ManyToOne
     private TicketPrice ticketPrice;
+
+    // 👉 LƯU GIÁ CỐ ĐỊNH TẠI THỜI ĐIỂM ĐẶT snapshot giá
+    @Column(name = "price")
+    private Double price;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+
 }

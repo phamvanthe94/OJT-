@@ -1,7 +1,7 @@
 package com.ra.base_spring_boot.controller;
 
 
-import com.ra.base_spring_boot.services.statisticService.INewAndFestivalStatisticService;
+import com.ra.base_spring_boot.services.statistic.INewAndFestivalStatisticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

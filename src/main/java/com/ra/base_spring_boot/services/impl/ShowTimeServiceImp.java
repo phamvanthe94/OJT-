@@ -1,7 +1,7 @@
 package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.resp.ShowTimeListResponse;
-import com.ra.base_spring_boot.repository.IShowTimeRepository;
+import com.ra.base_spring_boot.repository.booking.IShowTimeRepository;
 import com.ra.base_spring_boot.services.IShowTimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

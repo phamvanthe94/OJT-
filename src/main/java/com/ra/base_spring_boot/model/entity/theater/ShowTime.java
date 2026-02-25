@@ -2,6 +2,7 @@ package com.ra.base_spring_boot.model.entity.theater;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ra.base_spring_boot.model.base.BaseObject;
+import com.ra.base_spring_boot.model.entity.booking.Booking;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "show_times")
@@ -28,6 +30,13 @@ public class ShowTime extends BaseObject {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
+
+    @OneToMany(mappedBy = "showTime")
+    private List<Booking> bookings;
+
+    @ManyToOne
+    @JoinColumn(name = "theater_id")
+    private Theater theater;
 
     @Column(name = "start_time")
     private LocalDateTime startTime;

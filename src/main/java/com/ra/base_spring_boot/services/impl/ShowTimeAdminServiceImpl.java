@@ -7,7 +7,7 @@ import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.model.entity.theater.Screen;
 import com.ra.base_spring_boot.model.entity.theater.ShowTime;
 import com.ra.base_spring_boot.repository.IShowTimeAdminRepository;
-import com.ra.base_spring_boot.repository.MovieRepository;
+import com.ra.base_spring_boot.repository.IMovieRepository;
 import com.ra.base_spring_boot.repository.ScreenRepository;
 import com.ra.base_spring_boot.services.IShowTimeAdminService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
 
     private final IShowTimeAdminRepository showTimeAdminRepository;
     private final ScreenRepository screenRepository;
-    private final MovieRepository movieRepository;
+    private final IMovieRepository IMovieRepository;
 
     private void validateTime(java.time.LocalDateTime startTime, java.time.LocalDateTime endTime) {
 
@@ -100,7 +100,7 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
         Screen screen = screenRepository.findById(showTimeRequest.getScreenId())
                 .orElseThrow(() -> new RuntimeException("Không tìm tấy phòng chiếu với ID: " + showTimeRequest.getScreenId()));
 
-        Movie movie = movieRepository.findById(showTimeRequest.getMovieId())
+        Movie movie = IMovieRepository.findById(showTimeRequest.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phim với ID: " + showTimeRequest.getMovieId()));
 
         if (showTimeAdminRepository.existsOverlapping(screen.getId(), null, showTimeRequest.getStartTime(), showTimeRequest.getEndTime())) {
@@ -147,7 +147,7 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
         Screen screen = screenRepository.findById(showTimeRequest.getScreenId())
                 .orElseThrow(() -> new RuntimeException("Không tìm tấy phòng chiếu với ID: " + showTimeRequest.getScreenId()));
 
-        Movie movie = movieRepository.findById(showTimeRequest.getMovieId())
+        Movie movie = IMovieRepository.findById(showTimeRequest.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phim với ID: "
                         + showTimeRequest.getMovieId()));
 

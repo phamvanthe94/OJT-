@@ -5,7 +5,7 @@ import com.ra.base_spring_boot.dto.resp.TicketPriceResponse;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.constants.SeatType;
 import com.ra.base_spring_boot.model.entity.booking.TicketPrice;
-import com.ra.base_spring_boot.repository.ITicketPriceRepository;
+import com.ra.base_spring_boot.repository.booking.ITicketPriceRepository;
 import com.ra.base_spring_boot.services.ITicketPriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -3,7 +3,8 @@ package com.ra.base_spring_boot.controller;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByMovieStatisticResponse;
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByScreenStatisticResponse;
-import com.ra.base_spring_boot.services.statisticService.impl.TicketStatisticServiceImpl;
+
+import com.ra.base_spring_boot.services.statistic.impl.TicketStatisticServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

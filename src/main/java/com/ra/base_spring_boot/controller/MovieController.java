@@ -1,86 +1,81 @@
 package com.ra.base_spring_boot.controller;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
-import com.ra.base_spring_boot.dto.req.MovieDTO;
-import com.ra.base_spring_boot.model.entity.movie.Movie;
-import com.ra.base_spring_boot.services.more.CloudinaryService;
-import com.ra.base_spring_boot.services.impl.MovieServiceImpl;
+import com.ra.base_spring_boot.dto.req.MovieRequest;
+import com.ra.base_spring_boot.services.IMovieService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("api/v1/movies")
+@RequestMapping("/api/v1/admin/movies")
+@RequiredArgsConstructor
 public class MovieController {
-    @Autowired
-    private MovieServiceImpl movieService;
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    private final IMovieService movieService;
 
+    /*  GET ALL */
     @GetMapping
-    public ResponseEntity<ResponseWrapper<Page<Movie>>> getAllMovie(@RequestParam(name = "title", required = false) String title,
-                                                                    @RequestParam(name = "author", required = false) String author,
-                                                                    @RequestParam(name = "type", required = false) String type,
-                                                                    @RequestParam(name = "page", defaultValue = "0") int page,
-                                                                    @RequestParam(name = "size", defaultValue = "5") int size,
-                                                                    @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
-                                                                    @RequestParam(name = "direction", defaultValue = "desc") String direction) {
-        Sort sort = direction.equalsIgnoreCase("asc")
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
-
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-        return movieService.getAllMovie(title, author, type, pageRequest);
+    public ResponseEntity<?> getAllMovies(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(movieService.getAllMovies(
+                                title, author, type, status, page, size, sortBy, direction))
+                        .build()
+        );
     }
 
-    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseWrapper<?>> addMovie(@Valid @ModelAttribute MovieDTO movieDTO, BindingResult bindingResult) {
-        ResponseEntity<ResponseWrapper<?>> responseEntity = movieService.createMovie(movieDTO, bindingResult);
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(
-                    ResponseWrapper
-                            .<Object>builder()
-                            .data(bindingResult.getAllErrors())
-                            .code(400)
-                            .status(HttpStatus.BAD_REQUEST)
-                            .build()
-            );
-        }
-        return responseEntity;
+    /*  CREATE */
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createMovie(
+            @Valid @ModelAttribute MovieRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.CREATED)
+                        .code(201)
+                        .data(movieService.createMovie(request))
+                        .build()
+        );
     }
 
-    @PutMapping(value = "/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseWrapper<?>> updateMovie(@PathVariable Long id, @Valid @ModelAttribute MovieDTO movieDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(
-                    ResponseWrapper
-                            .<Object>builder()
-                            .data(bindingResult.getAllErrors())
-                            .code(400)
-                            .status(HttpStatus.BAD_REQUEST)
-                            .build()
-            );
-        }
-        return movieService.updateMovie(id, movieDTO);
+    /*  UPDATE */
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateMovie(
+            @PathVariable Long id,
+            @Valid @ModelAttribute MovieRequest request) {
+
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(movieService.updateMovie(id, request))
+                        .build()
+        );
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<ResponseWrapper<String>> deleteMovie(@PathVariable Long id) {
-        return movieService.deleteMovie(id);
+    /* DELETE */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteMovie(@PathVariable Long id) {
+        movieService.deleteMovie(id);
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data("Xoá movie thành công")
+                        .build()
+        );
     }
-    
-    @GetMapping("/now-showing")
-    public ResponseEntity<ResponseWrapper<List<Movie>>> getNowShowing() {
-        return movieService.getNowShowing();
-    }
-
 }
