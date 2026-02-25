@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @ValidFestivalTime
-public class FestivalDTO {
+public class FestivalRequest {
     @NotBlank(message = "Title cannot be blank")
     private String title;
     private MultipartFile image;
@@ -25,9 +25,9 @@ public class FestivalDTO {
     @NotNull
     @FutureOrPresent(message = "Thời gian bắt đầu không được nhỏ hơn hiện tại")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate startTime;
+    private LocalDateTime startTime;
 
     @NotNull(message = "End time cannot be null")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate endTime;
+    private LocalDateTime endTime;
 }

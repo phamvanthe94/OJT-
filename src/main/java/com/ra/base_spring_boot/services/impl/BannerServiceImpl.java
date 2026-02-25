@@ -1,0 +1,82 @@
+package com.ra.base_spring_boot.services.impl;
+
+import com.ra.base_spring_boot.dto.req.BannerDTO;
+import com.ra.base_spring_boot.model.constants.BannerType;
+import com.ra.base_spring_boot.model.entity.content.Banner;
+import com.ra.base_spring_boot.repository.IBannerRepository;
+import com.ra.base_spring_boot.services.more.CloudinaryService;
+import com.ra.base_spring_boot.services.IBannerService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class BannerServiceImpl implements IBannerService {
+
+    private final IBannerRepository bannerRepository;
+    private final CloudinaryService cloudinaryService;
+
+    @Override
+    public Page<Banner> getAllBanners(
+            String search,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    ) {
+
+        String sortField = (sortBy == null || sortBy.isBlank()) ? "id" : sortBy;
+
+        Sort sort = "asc".equalsIgnoreCase(direction)
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+
+        Pageable pageable = PageRequest.of(
+                Math.max(page, 0),
+                Math.max(size, 1),
+                sort
+        );
+
+        if (search == null || search.isBlank()) {
+            return bannerRepository.findAll(pageable);
+        }
+
+        return bannerRepository
+                .findByPositionContainingIgnoreCaseOrUrlContainingIgnoreCase(
+                        search.trim(),
+                        search.trim(),
+                        pageable
+                );
+    }
+
+    @Override
+    public Banner createBanner(BannerDTO bannerDTO) {
+
+        if (bannerDTO.getUrl() == null || bannerDTO.getUrl().isEmpty()) {
+            throw new RuntimeException("URL cannot be null or empty");
+        }
+
+        BannerType type = null;
+        if (bannerDTO.getType() != null && !bannerDTO.getType().isBlank()) {
+            type = BannerType.valueOf(bannerDTO.getType());
+        }
+
+        String uploadedUrl = cloudinaryService.upload(bannerDTO.getUrl());
+
+        Banner banner = Banner.builder()
+                .url(uploadedUrl)
+                .type(type)
+                .position(bannerDTO.getPosition())
+                .build();
+
+        return bannerRepository.save(banner);
+    }
+
+    @Override
+    public void deleteBanner(Long id) {
+        Banner banner = bannerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Banner không tồn tại"));
+        bannerRepository.delete(banner);
+    }
+}

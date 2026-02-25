@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services;
+package com.ra.base_spring_boot.services.more;
 
 import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Autowired;

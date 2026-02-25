@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class IdTitleDTO {
+public class NewAndFestivalResponse {
     private Long id;
     private String title;
 }

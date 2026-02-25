@@ -1,6 +1,5 @@
 package com.ra.base_spring_boot.dto.req;
 
-import com.ra.base_spring_boot.validation.ValidFestivalTime;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class NewDTO {
+public class NewRequest {
     @NotBlank(message = "Title not be blank")
     private String title;
     @NotBlank(message = "Content not be blank")
@@ -23,8 +22,8 @@ public class NewDTO {
     private Long festivalId;
     @NotNull
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     @NotNull
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 }

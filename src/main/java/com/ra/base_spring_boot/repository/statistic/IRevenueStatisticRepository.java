@@ -2,6 +2,7 @@ package com.ra.base_spring_boot.repository.statistic;
 
 import com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse;
 import com.ra.base_spring_boot.model.constants.BookingStatus;
+import com.ra.base_spring_boot.model.constants.PaymentStatus;
 import com.ra.base_spring_boot.model.entity.booking.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,10 +17,10 @@ public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long
     @Query("""
         SELECT NEW com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse(
             m.id, m.title,
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startToday AND :endToday THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startWeek AND :now THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startMonth AND :now THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startYear AND :now THEN bs.price ELSE 0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startToday AND :endToday THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startWeek AND :now THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startMonth AND :now THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startYear AND :now THEN bs.price ELSE 0.0 END),
             SUM(bs.price)
         )
         FROM BookingSeat bs
@@ -44,10 +45,10 @@ public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long
     @Query("""
         SELECT NEW com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse(
             g.id, g.genreName,
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startToday AND :endToday THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startWeek AND :now THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startMonth AND :now THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startYear AND :now THEN bs.price ELSE 0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startToday AND :endToday THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startWeek AND :now THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startMonth AND :now THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startYear AND :now THEN bs.price ELSE 0.0 END),
             SUM(bs.price)
         )
         FROM BookingSeat bs
@@ -73,10 +74,10 @@ public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long
     @Query("""
         SELECT NEW com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse(
             t.id, t.name,
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startToday AND :endToday THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startWeek AND :now THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startMonth AND :now THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startYear AND :now THEN bs.price ELSE 0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startToday AND :endToday THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startWeek AND :now THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startMonth AND :now THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startYear AND :now THEN bs.price ELSE 0.0 END),
             SUM(bs.price)
         )
         FROM BookingSeat bs
@@ -102,10 +103,10 @@ public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long
     @Query("""
         SELECT NEW com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse(
             s.id, s.name,
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startToday AND :endToday THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startWeek AND :now THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startMonth AND :now THEN bs.price ELSE 0 END),
-            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startYear AND :now THEN bs.price ELSE 0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startToday AND :endToday THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startWeek AND :now THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startMonth AND :now THEN bs.price ELSE 0.0 END),
+            SUM(CASE WHEN bs.booking.createdAt BETWEEN :startYear AND :now THEN bs.price ELSE 0.0 END),
             SUM(bs.price)
         )
         FROM BookingSeat bs
@@ -125,4 +126,24 @@ public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long
             @Param("startYear") LocalDateTime startYear,
             @Param("now") LocalDateTime now
     );
+    @Query("""
+        SELECT m.title,
+               SUM(bs.quantity * tp.price)
+        FROM BookingSeat bs
+            JOIN bs.booking b
+            JOIN Payment p ON p.booking = b
+            JOIN b.showTime st
+            JOIN st.movie m
+            JOIN bs.ticketPrice tp
+        WHERE p.paymentStatus = :status
+          AND p.paymentTime BETWEEN :from AND :to
+        GROUP BY m.title
+        ORDER BY m.title
+    """)
+    List<Object[]> revenueByMovieExportExcel(
+            @Param("status") PaymentStatus status,
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to
+    );
+
 }
