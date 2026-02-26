@@ -10,7 +10,7 @@ import lombok.*;
 @Setter
 @Builder
 public class SeatReq {
-    private Screen screen;
+//    private Screen screen;
 
     private String seatNumber;
 

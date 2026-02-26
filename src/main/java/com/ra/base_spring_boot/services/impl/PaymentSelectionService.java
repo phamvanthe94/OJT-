@@ -9,16 +9,19 @@ import com.ra.base_spring_boot.model.entity.booking.Booking;
 import com.ra.base_spring_boot.model.entity.booking.BookingSeat;
 import com.ra.base_spring_boot.model.entity.booking.Payment;
 import com.ra.base_spring_boot.model.entity.booking.PaymentProvider;
-import com.ra.base_spring_boot.repository.BookingRepository;
 import com.ra.base_spring_boot.repository.IPaymentProviderRepository;
 import com.ra.base_spring_boot.repository.PaymentRepository;
+import com.ra.base_spring_boot.repository.booking.IBookingRepository;
+import com.ra.base_spring_boot.repository.booking.IBookingSeatRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.ra.base_spring_boot.repository.BookingSeatRepository;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -26,17 +29,17 @@ import java.util.*;
 public class PaymentSelectionService {
     private final EmailService emailService;
 
-    private final BookingRepository bookingRepository;
+    private final IBookingRepository bookingRepository;
     private final PaymentRepository paymentRepository;
     private final IPaymentProviderRepository paymentProviderRepository;
-    private final BookingSeatRepository bookingSeatRepository;
+    private final IBookingSeatRepository IBookingSeatRepository;
 
     public ResponseEntity<?> getBookingDetail(Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking không tồn tại: " + bookingId));
 
-        List<BookingSeat> seats = bookingSeatRepository.findByBooking_Id(bookingId);
+        List<BookingSeat> seats = IBookingSeatRepository.findByBooking_Id(bookingId);
         Payment payment = paymentRepository.findByBooking_Id(bookingId).orElse(null);
 
         // ✅ Map booking -> plain data (tránh Hibernate proxy)

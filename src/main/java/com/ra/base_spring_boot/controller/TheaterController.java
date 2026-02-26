@@ -57,9 +57,9 @@ public class TheaterController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTheater(@PathVariable long id) {
         theaterService.deleteTheater(id);
-        return ResponseEntity.status(200).body(ResponseWrapper.builder()
+        return ResponseEntity.status(204).body(ResponseWrapper.builder()
                 .status(HttpStatus.NO_CONTENT)
-                .code(200)
+                .code(204)
                 .data(null)
                 .build());
     }
@@ -75,8 +75,10 @@ public class TheaterController {
     @GetMapping("/search")
     public ResponseEntity<?> search(
             @RequestParam String name,
-            Pageable pageable
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
     ) {
+        Pageable pageable= PageRequest.of(page, size);
         Page<TheaterResp> result =
                 theaterService.searchTheaterByName(name, pageable);
 

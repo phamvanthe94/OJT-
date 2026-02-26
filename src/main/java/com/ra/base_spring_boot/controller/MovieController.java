@@ -29,7 +29,7 @@ public class MovieController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(200)
-                        .data(movieService.findAll(pageable, title, author, type))
+                        .data(movieService.getAllMovies(title,author,type,null,pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().toString(), "asc"))
                         .build()
         );
     }
@@ -40,7 +40,7 @@ public class MovieController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(200)
-                        .data(movieService.findById(id))
+                        .data(movieService.(id))
                         .build()
         );
     }

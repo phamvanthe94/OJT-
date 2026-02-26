@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -24,26 +25,26 @@ public class FestivalInitializer implements CommandLineRunner {
                 Festival.builder()
                         .title("Spring Festival")
                         .image("spring_festival.jpg")
-                        .startTime(java.time.LocalDate.of(2024, 3, 20))
-                        .endTime(java.time.LocalDate.of(2024, 3, 30))
+                        .startTime(LocalDateTime.of(2024, 3, 20, 0, 0))
+                        .endTime(LocalDateTime.of(2024, 3, 30, 23, 59))
                         .build(),
                 Festival.builder()
                         .title("Summer Festival")
                         .image("summer_festival.jpg")
-                        .startTime(java.time.LocalDate.of(2024, 6, 15))
-                        .endTime(java.time.LocalDate.of(2024, 6, 25))
+                        .startTime(LocalDateTime.of(2024, 6, 15, 0, 0))
+                        .endTime(LocalDateTime.of(2024, 6, 25, 23, 59))
                         .build(),
                 Festival.builder()
                         .title("Autumn Festival")
                         .image("autumn_festival.jpg")
-                        .startTime(java.time.LocalDate.of(2024, 9, 10))
-                        .endTime(java.time.LocalDate.of(2024, 9, 20))
+                        .startTime(LocalDateTime.of(2024, 9, 10, 0, 0))
+                        .endTime(LocalDateTime.of(2024, 9, 20, 23, 59))
                         .build(),
                 Festival.builder()
                         .title("Winter Festival")
                         .image("winter_festival.jpg")
-                        .startTime(java.time.LocalDate.of(2024, 12, 5))
-                        .endTime(java.time.LocalDate.of(2024, 12, 15))
+                        .startTime(LocalDateTime.of(2024, 12, 5, 0, 0))
+                        .endTime(LocalDateTime.of(2024, 12, 15, 23, 59))
                         .build()
         );
         festivalHomeRepository.saveAll(festivals);

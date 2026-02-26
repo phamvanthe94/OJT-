@@ -2,59 +2,65 @@ package com.ra.base_spring_boot.controller;
 
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.BannerDTO;
-import com.ra.base_spring_boot.model.entity.content.Banner;
-import com.ra.base_spring_boot.services.impl.BannerService;
+import com.ra.base_spring_boot.services.IBannerService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/banners")
+@RequestMapping("/api/v1/admin/banners")
+@RequiredArgsConstructor
 public class BannerController {
-    @Autowired
-    private BannerService bannerService;
+
+    private final IBannerService bannerService;
 
     @GetMapping
-    public ResponseEntity<ResponseWrapper<Page<Banner>>> getAllBanner(@RequestParam(name = "search", required = false) String search,
-                                                                      @RequestParam(name = "page", defaultValue = "0") int page,
-                                                                      @RequestParam(name = "size", defaultValue = "5") int size,
-                                                                      @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
-                                                                      @RequestParam(name = "direction", defaultValue = "desc") String direction) {
-        Sort sort = direction.equalsIgnoreCase("asc")
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
-
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return bannerService.getAllAndSearch(search, pageable);
+    public ResponseEntity<?> getAllBanners(
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(
+                                bannerService.getAllBanners(
+                                        search, page, size, sortBy, direction
+                                )
+                        )
+                        .build()
+        );
     }
 
-    @PostMapping(value = "add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseWrapper<?>> addBanner(@Valid @ModelAttribute BannerDTO bannerDTO, BindingResult bindingResult) {
-        ResponseEntity<ResponseWrapper<?>> responseEntity = bannerService.createBanner(bannerDTO, bindingResult);
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(
-                    ResponseWrapper
-                            .<Object>builder()
-                            .data(bindingResult.getAllErrors())
-                            .code(400)
-                            .status(HttpStatus.BAD_REQUEST)
-                            .build()
-            );
-        }
-        return responseEntity;
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createBanner(
+            @Valid @ModelAttribute BannerDTO bannerDTO
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.CREATED)
+                        .code(201)
+                        .data(bannerService.createBanner(bannerDTO))
+                        .build()
+        );
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<ResponseWrapper<String>> deleteBanner(@PathVariable Long id) {
-        return bannerService.deleteBanner(id);
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBanner(@PathVariable Long id) {
+        bannerService.deleteBanner(id);
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data("Xoá banner thành công")
+                        .build()
+        );
     }
 }

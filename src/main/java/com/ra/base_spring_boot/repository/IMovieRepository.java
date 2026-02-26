@@ -1,5 +1,6 @@
 package com.ra.base_spring_boot.repository;
 
+import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import org.springframework.data.domain.Page;
@@ -8,30 +9,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-
 public interface IMovieRepository extends JpaRepository<Movie, Long> {
-
     @Query("""
-                select m from Movie m
-                where (:title is null or :title = '' or lower(m.title) like lower(concat('%', :title, '%')))
-                  and (:author is null or :author = '' or lower(m.author) like lower(concat('%', :author, '%')))
-                  and (:type is null or m.type = :type)
-            """)
-    Page<Movie> search(@Param("title") String title,
-                       @Param("author") String author,
-                       @Param("type") MovieType type,
-                       Pageable pageable);
-
-    @Query("""
-                select m from Movie m
-                where m.releaseDate <= CURRENT_DATE
-            """)
-    List<Movie> findNowShowing();
-
-    @Query("""
-                select m from Movie m
-                where m.releaseDate > CURRENT_DATE
-            """)
-    List<Movie> findComingSoon();
+        SELECT m FROM Movie m
+        WHERE (:title IS NULL OR m.title LIKE %:title%)
+          AND (:author IS NULL OR m.author LIKE %:author%)
+          AND (:type IS NULL OR m.type = :type)
+          AND (:status IS NULL OR m.status = :status)
+    """)
+    Page<Movie> search(
+            @Param("title") String title,
+            @Param("author") String author,
+            @Param("type") MovieType type,
+            @Param("status") MovieStatus status,
+            Pageable pageable
+    );
 }
+
