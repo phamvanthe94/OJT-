@@ -88,12 +88,6 @@ public class BookingServiceImpl implements IBookingService {
             throw new RuntimeException("ShowTime already started");
         }
 
-        // 2️⃣ Kiểm tra phòng thuộc đúng rạp
-        if (!showTime.getScreen().getTheater().getId()
-                .equals(showTime.getTheater().getId())) {
-            throw new RuntimeException("Dữ liệu phòng chiếu và rạp không hợp lệ");
-        }
-
         // 3️⃣ Kiểm tra seatIds trùng trong request
         Set<Long> uniqueSeatIds = new HashSet<>(request.getSeatIds());
         if (uniqueSeatIds.size() != request.getSeatIds().size()) {
@@ -152,7 +146,6 @@ public class BookingServiceImpl implements IBookingService {
             if (seatBooked) {
                 throw new RuntimeException("Ghế đã có người đặt trước rồi");
             }
-
 
 
             // 7️⃣ Lấy giá

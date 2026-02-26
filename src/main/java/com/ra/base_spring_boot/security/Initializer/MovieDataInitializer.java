@@ -10,7 +10,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +18,7 @@ import java.util.List;
 @Order(1)
 public class MovieDataInitializer implements CommandLineRunner {
 
-    private final IMovieRepository IMovieRepository;
+    private final IMovieRepository movieRepository;
     List<Movie> comSoonMovies = List.of(
             Movie.builder()
                     .title("Chí Phèo")
@@ -28,10 +27,9 @@ public class MovieDataInitializer implements CommandLineRunner {
                     .author("Nam Cao")
                     .descriptions("Chí Phèo là một tác phẩm văn học nổi tiếng của nhà văn Nam Cao, kể về cuộc đời bi kịch của nhân vật Chí Phèo...")
                     .duration(110)
-                    .releaseDate(LocalDateTime.of(2024, 12, 1, 0,0))
+                    .releaseDate(LocalDateTime.of(2024, 10, 1, 0, 0))
                     .status(MovieStatus.COMING_SOON)
                     .type(MovieType._2D)
-                    .createdAt(LocalDateTime.now())
                     .build(),
             Movie.builder()
                     .title("Tuổi thơ dữ dội")
@@ -40,17 +38,16 @@ public class MovieDataInitializer implements CommandLineRunner {
                     .author("Phùng Quán")
                     .descriptions("Tuổi thơ dữ dội là một tiểu thuyết nổi tiếng của nhà văn Phùng Quán, kể về những năm tháng chiến tranh khốc liệt...")
                     .duration(95)
-                    .releaseDate(LocalDateTime.of(2024, 11, 15, 0, 0))
+                    .releaseDate(LocalDateTime.of(2024, 11, 1, 0, 0))
                     .status(MovieStatus.COMING_SOON)
                     .type(MovieType._2D)
-                    .createdAt(LocalDateTime.now())
                     .build()
     );
 
     @Transactional
     @Override
     public void run(String... args) {
-        if (IMovieRepository.count() > 0)
+        if (movieRepository.count() > 0)
             return;
 
         List<Movie> movies = List.of(
@@ -61,10 +58,10 @@ public class MovieDataInitializer implements CommandLineRunner {
                         .author("Nam Cao")
                         .descriptions("Lão Hạc là một truyện ngắn nổi tiếng của nhà văn Nam Cao, kể về cuộc sống và số phận của một người nông dân nghèo tên là Lão Hạc...")
                         .duration(120)
-                        .releaseDate(LocalDateTime.of(2024, 1, 1, 0,0))
+                        .releaseDate(LocalDateTime.of(2024, 1, 1, 0, 0))
                         .status(MovieStatus.NOW_SHOWING)
                         .type(MovieType._2D)
-                        .createdAt(LocalDateTime.now())
+
                         .build(),
 
                 Movie.builder()
@@ -74,14 +71,14 @@ public class MovieDataInitializer implements CommandLineRunner {
                         .author("Vũ Trọng Phụng")
                         .descriptions("Số đỏ là một tiểu thuyết châm biếm xã hội Việt Nam trong thập niên 1930.")
                         .duration(90)
-                        .releaseDate(LocalDateTime.of(2024, 2, 1, 0,0))
+                        .releaseDate(LocalDateTime.of(2024, 2, 1, 0, 0))
                         .status(MovieStatus.NOW_SHOWING)
                         .type(MovieType._2D)
-                        .createdAt(LocalDateTime.now())
+
                         .build()
         );
-        IMovieRepository.saveAll(movies);
-        IMovieRepository.saveAll(comSoonMovies);
+        movieRepository.saveAll(movies);
+        movieRepository.saveAll(comSoonMovies);
 
     }
 }

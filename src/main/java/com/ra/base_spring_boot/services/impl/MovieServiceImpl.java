@@ -9,7 +9,6 @@ import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.repository.IGenreRepository;
 import com.ra.base_spring_boot.repository.IMovieRepository;
 import com.ra.base_spring_boot.services.IMovieService;
-import com.ra.base_spring_boot.services.more.CloudinaryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

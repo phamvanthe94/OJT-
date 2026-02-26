@@ -8,10 +8,12 @@ import com.ra.base_spring_boot.model.entity.booking.BookingSeat;
 import com.ra.base_spring_boot.model.entity.booking.Payment;
 import com.ra.base_spring_boot.repository.booking.IBookingRepository;
 import com.ra.base_spring_boot.repository.booking.IBookingSeatRepository;
-import com.ra.base_spring_boot.repository.PaymentRepository;
+import com.ra.base_spring_boot.repository.payment.PaymentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
-import org.springframework.http.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
