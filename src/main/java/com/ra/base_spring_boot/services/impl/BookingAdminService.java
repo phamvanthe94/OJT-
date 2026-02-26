@@ -6,12 +6,14 @@ import com.ra.base_spring_boot.model.constants.PaymentStatus;
 import com.ra.base_spring_boot.model.entity.booking.Booking;
 import com.ra.base_spring_boot.model.entity.booking.BookingSeat;
 import com.ra.base_spring_boot.model.entity.booking.Payment;
-import com.ra.base_spring_boot.repository.BookingRepository;
-import com.ra.base_spring_boot.repository.BookingSeatRepository;
-import com.ra.base_spring_boot.repository.PaymentRepository;
+import com.ra.base_spring_boot.repository.booking.IBookingRepository;
+import com.ra.base_spring_boot.repository.booking.IBookingSeatRepository;
+import com.ra.base_spring_boot.repository.payment.PaymentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
-import org.springframework.http.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -22,8 +24,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BookingAdminService {
 
-    private final BookingRepository bookingRepository;
-    private final BookingSeatRepository bookingSeatRepository;
+    private final IBookingRepository bookingRepository;
+    private final IBookingSeatRepository IBookingSeatRepository;
     private final PaymentRepository paymentRepository;
 
     // ✅ 1) LIST + SEARCH + PAGING
@@ -46,7 +48,7 @@ public class BookingAdminService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found with id: " + bookingId));
 
-        List<BookingSeat> seats = bookingSeatRepository.findByBooking_Id(bookingId);
+        List<BookingSeat> seats = IBookingSeatRepository.findByBooking_Id(bookingId);
         Payment payment = paymentRepository.findByBooking_Id(bookingId).orElse(null);
 
         Map<String, Object> result = new HashMap<>();

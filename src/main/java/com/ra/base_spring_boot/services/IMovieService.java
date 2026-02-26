@@ -1,25 +1,29 @@
 package com.ra.base_spring_boot.services;
 
-import com.ra.base_spring_boot.dto.req.MovieReq;
-import com.ra.base_spring_boot.dto.resp.MovieResp;
+import com.ra.base_spring_boot.dto.req.MovieRequest;
+import com.ra.base_spring_boot.dto.resp.MovieResponse;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface IMovieService {
 
-    Page<MovieResp> findAll(Pageable pageable, String title, String author, String type);
+    // get all (search + sort + page)
+    Page<MovieResponse> getAllMovies(
+            String title,
+            String author,
+            String type,
+            String status,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    );
 
-    MovieResp findById(Long id);
+    //  create
+    MovieResponse createMovie(MovieRequest request);
 
-    MovieResp create(MovieReq req);
+    // update
+    MovieResponse updateMovie(Long id, MovieRequest request);
 
-    MovieResp update(Long id, MovieReq req);
-
-    void delete(Long id);
-
-    List<MovieResp> getNowShowing();
-
-    List<MovieResp> getComingSoon();
+    // delete
+    void deleteMovie(Long id);
 }

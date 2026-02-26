@@ -1,246 +1,154 @@
 package com.ra.base_spring_boot.services.impl;
 
-import com.ra.base_spring_boot.dto.req.MovieReq;
-import com.ra.base_spring_boot.dto.resp.MovieResp;
+import com.ra.base_spring_boot.dto.req.MovieRequest;
+import com.ra.base_spring_boot.dto.resp.MovieResponse;
+import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.entity.movie.Genre;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.repository.IGenreRepository;
 import com.ra.base_spring_boot.repository.IMovieRepository;
 import com.ra.base_spring_boot.services.IMovieService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class MovieServiceImpl implements IMovieService {
 
-    @Autowired
-    private IMovieRepository movieRepository;
+    private final IMovieRepository IMovieRepository;
+    private final IGenreRepository IGenreRepository;
+    private final CloudinaryService cloudinaryService;
 
-    @Autowired
-    private IGenreRepository genreRepository;
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
-
+    // get all (search + sort + page)
     @Override
-    public Page<MovieResp> findAll(Pageable pageable, String title, String author, String type) {
-        // type ở query param là String -> convert sang enum để search
-        MovieType movieType = parseMovieTypeQuery(type);
+    public Page<MovieResponse> getAllMovies(
+            String title,
+            String author,
+            String type,
+            String status,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    ) {
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
-        Page<Movie> movies = movieRepository.search(title, author, movieType, pageable);
-        return movies.map(this::toResp);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        MovieType movieType = type != null ? MovieType.from(type) : null;
+        MovieStatus movieStatus = status != null
+                ? MovieStatus.valueOf(status.toUpperCase())
+                : null;
+
+        return IMovieRepository
+                .search(title, author, movieType, movieStatus, pageable)
+                .map(this::toResponse);
     }
 
+    // Thêm mới
     @Override
-    public MovieResp findById(Long id) {
-        Movie movie = movieRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Movie not found with id = " + id
-                ));
-        return toResp(movie);
-    }
+    public MovieResponse createMovie(MovieRequest request) {
 
-    @Override
-    public MovieResp create(MovieReq req) {
-        if (req == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "MovieReq is null");
-        }
-        if (req.getTitle() == null || req.getTitle().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title không được để trống");
-        }
-        if (req.getStatus() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status không được để trống");
-        }
-        if (req.getType() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Type không được để trống");
-        }
-        if (req.getDuration() == null || req.getDuration() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duration phải > 0");
-        }
-        if (req.getReleaseDate() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ReleaseDate không được để trống");
+        String imageUrl = null;
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            imageUrl = cloudinaryService.upload(request.getImage());
         }
 
+        Set<Genre> genres = request.getGenreIds() == null
+                ? Set.of()
+                : new HashSet<>(IGenreRepository.findAllById(request.getGenreIds()));
 
-        Movie movie = toEntity(req);
-
-        // upload ảnh nếu có
-        if (req.getImage() != null && !req.getImage().isEmpty()) {
-            String url = cloudinaryService.upload(req.getImage());
-            movie.setImage(url);
-        }
-
-        Movie saved = movieRepository.save(movie);
-        return toResp(saved);
-    }
-
-    @Override
-    public MovieResp update(Long id, MovieReq req) {
-        Movie old = movieRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Movie not found with id = " + id
-                ));
-
-        if (req == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "MovieReq is null");
-        }
-
-        // ========== PATCH: chỉ set field nào user gửi ==========
-        if (req.getTitle() != null) {
-            String title = req.getTitle().trim();
-            if (title.isBlank()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title không được để trống");
-            }
-            old.setTitle(title);
-        }
-
-        if (req.getDescriptions() != null) {
-            old.setDescriptions(req.getDescriptions());
-        }
-
-        if (req.getAuthor() != null) {
-            old.setAuthor(req.getAuthor());
-        }
-
-        if (req.getTrailer() != null) {
-            old.setTrailer(req.getTrailer());
-        }
-
-        if (req.getType() != null) {
-            old.setType(req.getType());
-        }
-
-        if (req.getDuration() != null) {
-            if (req.getDuration() <= 0) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duration phải > 0");
-            }
-            old.setDuration(req.getDuration());
-        }
-
-        if (req.getReleaseDate() != null) {
-            old.setReleaseDate(req.getReleaseDate());
-        }
-
-        if (req.getStatus() != null) {
-            old.setStatus(req.getStatus());
-        }
-
-        // genres: chỉ update nếu client có gửi genreIds
-        if (req.getGenreIds() != null) {
-            Set<Genre> genres = genreRepository.findAllById(req.getGenreIds())
-                    .stream()
-                    .collect(Collectors.toSet());
-            old.setGenres(genres);
-        }
-
-        // image: có file mới thì upload, không thì giữ cũ
-        if (req.getImage() != null && !req.getImage().isEmpty()) {
-            String url = cloudinaryService.upload(req.getImage());
-            old.setImage(url);
-        }
-
-        Movie updated = movieRepository.save(old);
-        return toResp(updated);
-    }
-
-
-    @Override
-    public void delete(Long id) {
-        Movie movie = movieRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Movie not found with id = " + id
-                ));
-        movieRepository.delete(movie);
-    }
-
-    @Override
-    public List<MovieResp> getNowShowing() {
-        return movieRepository.findNowShowing()
-                .stream()
-                .map(this::toResp)
-                .toList();
-    }
-
-    @Override
-    public List<MovieResp> getComingSoon() {
-        return movieRepository.findComingSoon()
-                .stream()
-                .map(this::toResp)
-                .toList();
-    }
-
-    // ================== HELPER ==================
-
-    private Movie toEntity(MovieReq req) {
-
-        Set<Genre> genres = new HashSet<>();
-        if (req.getGenreIds() != null && !req.getGenreIds().isEmpty()) {
-            genres = genreRepository.findAllById(req.getGenreIds())
-                    .stream()
-                    .collect(Collectors.toSet());
-        }
-
-        return Movie.builder()
-                .title(req.getTitle())
-                .descriptions(req.getDescriptions())
-                .author(req.getAuthor())
-                .trailer(req.getTrailer())
-                .type(req.getType())          // ✅ enum
-                .duration(req.getDuration())
-                .releaseDate(req.getReleaseDate())
-                .status(req.getStatus())      // ✅ enum
+        Movie movie = Movie.builder()
+                .title(request.getTitle())
+                .descriptions(request.getDescriptions())
+                .author(request.getAuthor())
+                .image(imageUrl)
+                .trailer(request.getTrailer())
+                .type(request.getType())
+                .duration(request.getDuration())
+                .releaseDate(request.getReleaseDate())
+                .releaseStartDate(request.getReleaseStartDate())
+                .releaseEndDate(request.getReleaseEndDate())
+                .status(request.getStatus())
                 .genres(genres)
                 .build();
+
+        return toResponse(IMovieRepository.save(movie));
     }
 
-    private MovieResp toResp(Movie movie) {
-        return MovieResp.builder()
+    //Cập nhật
+    @Override
+    @Transactional
+    public MovieResponse updateMovie(Long id, MovieRequest request) {
+
+        Movie movie = IMovieRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+
+        movie.setTitle(request.getTitle());
+        movie.setDescriptions(request.getDescriptions());
+        movie.setAuthor(request.getAuthor());
+        movie.setTrailer(request.getTrailer());
+        movie.setType(request.getType());
+        movie.setDuration(request.getDuration());
+        movie.setReleaseDate(request.getReleaseDate());
+        movie.setReleaseStartDate(request.getReleaseStartDate());
+        movie.setReleaseEndDate(request.getReleaseEndDate());
+        movie.setStatus(request.getStatus());
+
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            movie.setImage(cloudinaryService.upload(request.getImage()));
+        }
+
+        if (request.getGenreIds() != null) {
+            movie.setGenres(new HashSet<>(
+                    IGenreRepository.findAllById(request.getGenreIds())
+            ));
+        }
+
+        return toResponse(IMovieRepository.save(movie));
+    }
+
+    // Xoá
+    @Override
+    public void deleteMovie(Long id) {
+        IMovieRepository.deleteById(id);
+    }
+
+    private MovieResponse toResponse(Movie movie) {
+        return MovieResponse.builder()
                 .id(movie.getId())
                 .title(movie.getTitle())
                 .descriptions(movie.getDescriptions())
                 .author(movie.getAuthor())
                 .image(movie.getImage())
                 .trailer(movie.getTrailer())
-                .type(movie.getType() == null ? null : movie.getType().toValue()) // 2D/3D đẹp
+                .type(movie.getType())
                 .duration(movie.getDuration())
                 .releaseDate(movie.getReleaseDate())
-                .status(movie.getStatus() == null ? null : movie.getStatus().name())
-                .genres(movie.getGenres() == null ? Set.of()
-                        : movie.getGenres().stream()
-                        .map(Genre::getGenreName)
-                        .collect(Collectors.toSet()))
+                .releaseStartDate(movie.getReleaseStartDate())
+                .releaseEndDate(movie.getReleaseEndDate())
+                .status(movie.getStatus())
+                .genres(
+                        movie.getGenres()
+                                .stream()
+                                .map(Genre::getGenreName)
+                                .collect(Collectors.toSet())
+                )
                 .createdAt(movie.getCreatedAt())
                 .updatedAt(movie.getUpdatedAt())
                 .build();
-    }
-
-    // type query param đang là String -> convert sang enum để search
-    // chấp nhận: "2D", "3D", "_2D", "_3D"
-    private MovieType parseMovieTypeQuery(String type) {
-        if (type == null || type.isBlank()) return null;
-
-        String t = type.trim();
-        try {
-            if (t.startsWith("_")) {
-                return MovieType.valueOf(t);
-            }
-            // MovieType.from("2D") -> _2D
-            return MovieType.from(t);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid MovieType: " + type);
-        }
     }
 }

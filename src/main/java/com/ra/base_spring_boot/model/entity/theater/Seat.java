@@ -3,6 +3,7 @@ package com.ra.base_spring_boot.model.entity.theater;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ra.base_spring_boot.model.base.BaseObject;
 import com.ra.base_spring_boot.model.constants.SeatType;
+import com.ra.base_spring_boot.model.entity.booking.BookingSeat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "seats")
@@ -29,11 +31,14 @@ public class Seat extends BaseObject {
     private String seatNumber;
 
     @Column(name = "is_variable")
+    @Builder.Default
+    //vì @Builder bỏ qua giá trị khởi tạo
+    // nen Dùng @Builder.Default để Lombok biết rằng đây là giá trị mặc định khi dùng builder:
     private Boolean isVariable = false;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private SeatType type;
+    private SeatType type; // STANDARD, VIP, SWEETBOX
 
     @CreatedDate
     @Column(name = "created_at")

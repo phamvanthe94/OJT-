@@ -3,7 +3,7 @@ package com.ra.base_spring_boot.services.impl;
 import com.ra.base_spring_boot.dto.req.FormCreatePaymentProvider;
 import com.ra.base_spring_boot.dto.resp.PaymentProviderResponse;
 import com.ra.base_spring_boot.model.entity.booking.PaymentProvider;
-import com.ra.base_spring_boot.repository.IPaymentProviderRepository;
+import com.ra.base_spring_boot.repository.payment.IPaymentProviderRepository;
 import com.ra.base_spring_boot.services.IPaymentProviderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

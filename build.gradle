@@ -48,6 +48,10 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
     // Source: https://mvnrepository.com/artifact/com.google.zxing/javase
     implementation("com.google.zxing:javase:3.5.3")
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    }
 }
 
 tasks.named('test') {

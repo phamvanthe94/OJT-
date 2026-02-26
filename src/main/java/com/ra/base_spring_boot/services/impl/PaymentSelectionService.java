@@ -9,27 +9,33 @@ import com.ra.base_spring_boot.model.entity.booking.Booking;
 import com.ra.base_spring_boot.model.entity.booking.BookingSeat;
 import com.ra.base_spring_boot.model.entity.booking.Payment;
 import com.ra.base_spring_boot.model.entity.booking.PaymentProvider;
-import com.ra.base_spring_boot.repository.BookingRepository;
-import com.ra.base_spring_boot.repository.IPaymentProviderRepository;
-import com.ra.base_spring_boot.repository.PaymentRepository;
+import com.ra.base_spring_boot.repository.booking.IBookingRepository;
+import com.ra.base_spring_boot.repository.booking.IBookingSeatRepository;
+import com.ra.base_spring_boot.repository.payment.IPaymentProviderRepository;
+import com.ra.base_spring_boot.repository.payment.PaymentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.ra.base_spring_boot.repository.BookingSeatRepository;
-
-import java.util.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-
 public class PaymentSelectionService {
+
+    // Nếu EmailService nằm package khác, bạn nhớ import đúng class EmailService của bạn
     private final EmailService emailService;
 
-    private final BookingRepository bookingRepository;
+    private final IBookingRepository bookingRepository;
     private final PaymentRepository paymentRepository;
     private final IPaymentProviderRepository paymentProviderRepository;
-    private final BookingSeatRepository bookingSeatRepository;
+    private final IBookingSeatRepository bookingSeatRepository;
 
     public ResponseEntity<?> getBookingDetail(Long bookingId) {
 
@@ -55,7 +61,6 @@ public class PaymentSelectionService {
             s.put("id", bs.getId());
             s.put("seatId", bs.getSeat() != null ? bs.getSeat().getId() : null);
 
-            // SeatName có thể khác tuỳ entity Seat, nên dùng reflection để không lỗi compile
             Object seatObj = bs.getSeat();
             s.put("seatName", seatObj != null ? resolveSeatName(seatObj) : null);
 
@@ -69,7 +74,6 @@ public class PaymentSelectionService {
             paymentData = new HashMap<>();
             paymentData.put("id", payment.getId());
 
-            // provider (lazy) -> chỉ lấy field đơn giản
             PaymentProvider provider = payment.getProvider();
             paymentData.put("providerId", provider != null ? provider.getId() : null);
             paymentData.put("providerCode", provider != null ? provider.getProviderCode() : null);
@@ -95,7 +99,6 @@ public class PaymentSelectionService {
                         .build()
         );
     }
-
 
     public ResponseEntity<?> choose(Long bookingId, ChoosePaymentSelectionDTO dto) {
 
@@ -128,23 +131,24 @@ public class PaymentSelectionService {
         // 5) 1 booking chỉ có 1 payment -> tạo mới hoặc update
         Payment payment = paymentRepository.findByBooking_Id(bookingId).orElse(null);
 
+        BigDecimal amount = toMoney(booking.getTotalPriceMovie());
+
         if (payment == null) {
             payment = Payment.builder()
                     .booking(booking)
-                    .provider(provider)                 // ✅ bắt buộc
+                    .provider(provider)
                     .paymentMethod(method)
                     .paymentStatus(PaymentStatus.PENDING)
-                    .amount(booking.getTotalPriceMovie())
+                    .amount(amount)
                     .build();
         } else {
-            payment.setProvider(provider);            // ✅ bắt buộc
+            payment.setProvider(provider);
             payment.setPaymentMethod(method);
             if (payment.getPaymentStatus() == null) payment.setPaymentStatus(PaymentStatus.PENDING);
-            if (payment.getAmount() == null) payment.setAmount(booking.getTotalPriceMovie());
+            if (payment.getAmount() == null) payment.setAmount(amount);
         }
 
         paymentRepository.save(payment);
-
 
         Map<String, Object> data = new HashMap<>();
         data.put("bookingId", bookingId);
@@ -161,37 +165,45 @@ public class PaymentSelectionService {
         );
     }
 
-    /**
-     * Resolve seat name safely without compile-time dependency on a specific getter name.
-     */
-    private String resolveSeatName(Object seatObj) {
-        // Try common getter names
-        String[] candidates = {"getSeatName", "getName", "getCode", "getSeatCode", "getLabel"};
+    public ResponseEntity<?> complete(Long bookingId, CompleteBookingDTO dto) {
 
-        for (String m : candidates) {
-            try {
-                Object v = seatObj.getClass().getMethod(m).invoke(seatObj);
-                if (v != null) return String.valueOf(v);
-            } catch (Exception ignored) {
-                // try next
-            }
+        Payment payment = paymentRepository.findByBooking_Id(bookingId)
+                .orElseThrow(() -> new RuntimeException("Payment not found for booking: " + bookingId));
+
+        // chưa chọn paymentMethod thì không cho complete
+        if (payment.getPaymentMethod() == null || payment.getProvider() == null) {
+            return badRequest("Bạn phải chọn phương thức thanh toán trước khi hoàn tất.");
         }
 
-        // Fallback: try public fields
-        String[] fieldCandidates = {"seatName", "name", "code", "seatCode", "label"};
-        for (String f : fieldCandidates) {
-            try {
-                java.lang.reflect.Field field = seatObj.getClass().getDeclaredField(f);
-                field.setAccessible(true);
-                Object v = field.get(seatObj);
-                if (v != null) return String.valueOf(v);
-            } catch (Exception ignored) {
-                // try next
-            }
+        PaymentStatus successStatus = resolveSuccessStatus();
+        payment.setPaymentStatus(successStatus);
+        payment.setPaymentTime(LocalDateTime.now());
+
+        if (dto != null && dto.getTransactionId() != null && !dto.getTransactionId().isBlank()) {
+            payment.setTransactionId(dto.getTransactionId());
         }
 
-        // Last resort
-        return seatObj.toString();
+        paymentRepository.save(payment);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("bookingId", bookingId);
+        data.put("paymentStatus", payment.getPaymentStatus().name());
+        data.put("paymentTime", payment.getPaymentTime());
+        data.put("transactionId", payment.getTransactionId());
+
+        return ResponseEntity.ok(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(data)
+                        .build()
+        );
+    }
+
+    // ===== Helpers =====
+
+    private BigDecimal toMoney(Double value) {
+        return value == null ? BigDecimal.ZERO : BigDecimal.valueOf(value);
     }
 
     private ResponseEntity<?> badRequest(String msg) {
@@ -207,102 +219,40 @@ public class PaymentSelectionService {
         );
     }
 
-    public ResponseEntity<?> complete(Long bookingId, CompleteBookingDTO dto) {
-
-        Payment payment = paymentRepository.findByBooking_Id(bookingId)
-                .orElseThrow(() -> new RuntimeException("Payment not found for booking: " + bookingId));
-
-        // chưa chọn paymentMethod thì không cho complete
-        if (payment.getPaymentMethod() == null || payment.getProvider() == null) {
-            return badRequest("Bạn phải chọn phương thức thanh toán trước khi hoàn tất.");
+    private String resolveSeatName(Object seatObj) {
+        String[] candidates = {"getSeatName", "getName", "getCode", "getSeatCode", "getLabel"};
+        for (String m : candidates) {
+            try {
+                Object v = seatObj.getClass().getMethod(m).invoke(seatObj);
+                if (v != null) return String.valueOf(v);
+            } catch (Exception ignored) {
+            }
         }
 
-        // ✅ Set trạng thái thành công (enum của nhóm có thể không tên SUCCESS)
-        PaymentStatus successStatus = resolveSuccessStatus();
-        payment.setPaymentStatus(successStatus);
-        payment.setPaymentTime(java.time.LocalDateTime.now());
-
-        if (dto != null && dto.getTransactionId() != null && !dto.getTransactionId().isBlank()) {
-            payment.setTransactionId(dto.getTransactionId());
+        String[] fieldCandidates = {"seatName", "name", "code", "seatCode", "label"};
+        for (String f : fieldCandidates) {
+            try {
+                java.lang.reflect.Field field = seatObj.getClass().getDeclaredField(f);
+                field.setAccessible(true);
+                Object v = field.get(seatObj);
+                if (v != null) return String.valueOf(v);
+            } catch (Exception ignored) {
+            }
         }
-        paymentRepository.save(payment);
 
-//          // ===== GỬI MAIL XÁC NHẬN (SAU KHI HOÀN TẤT) =====
-//        try {
-//            Booking booking = payment.getBooking();
-//            if (booking != null && booking.getUser() != null) {
-//
-//                // Nếu User của cậu không có getEmail() thì đổi sang field đúng:
-//                // Ví dụ: getUsername(), getMail(), getGmail()... tùy entity User nhóm cậu.
-//                String to = booking.getUser().getEmail();
-//
-//                if (to != null && !to.isBlank()) {
-//                    emailService.sendBookingSuccessMail(
-//                            to,
-//                            booking.getId(),
-//                            booking.getTotalPriceMovie(),
-//                            payment.getPaymentMethod() != null ? payment.getPaymentMethod().name() : null
-//                    );
-//                }
-//            }
-//        } catch (Exception e) {
-//            // Không cho crash luồng complete
-//            System.out.println("Send mail failed: " + e.getMessage());
-//        }
-
-//        paymentRepository.save(payment);
-//        // ===== GỬI MAIL XÁC NHẬN (an toàn, không phụ thuộc getEmail) =====
-//        try {
-//            Booking b = payment.getBooking();
-//            Object userObj = (b != null) ? b.getUser() : null;
-//            String email = (userObj != null) ? resolveUserEmail(userObj) : null;
-//
-//            if (email != null && !email.isBlank()) {
-//                Long amount = (b != null && b.getTotalPriceMovie() != null) ? b.getTotalPriceMovie().longValue() : null;
-//
-//                emailService.sendBookingSuccessMail(
-//                        email,
-//                        (b != null ? b.getId() : bookingId),
-//                        amount,
-//                        (payment.getPaymentMethod() != null ? payment.getPaymentMethod().name() : "")
-//                );
-//            }
-//        } catch (Exception ignored) {
-//            // Không để lỗi mail làm crash flow complete
-//        }
-
-        java.util.Map<String, Object> data = new java.util.HashMap<>();
-        data.put("bookingId", bookingId);
-        data.put("paymentStatus", payment.getPaymentStatus().name());
-        data.put("paymentTime", payment.getPaymentTime());
-        data.put("transactionId", payment.getTransactionId());
-
-        return ResponseEntity.ok(
-                ResponseWrapper.builder()
-                        .status(HttpStatus.OK)
-                        .code(200)
-                        .data(data)
-                        .build()
-        );
+        return seatObj.toString();
     }
 
-    /**
-     * Resolve trạng thái "thành công" cho PaymentStatus.
-     * Vì enum PaymentStatus của từng nhóm có thể đặt tên khác nhau (SUCCESS/PAID/COMPLETED/DONE...).
-     */
     private PaymentStatus resolveSuccessStatus() {
-        // Ưu tiên các tên thường gặp
         String[] candidates = {"SUCCESS", "PAID", "COMPLETED", "DONE", "SUCCESSFUL"};
 
         for (String c : candidates) {
             try {
                 return PaymentStatus.valueOf(c);
             } catch (IllegalArgumentException ignored) {
-                // tiếp tục thử
             }
         }
 
-        // Fallback: tìm theo keyword trong tên enum
         for (PaymentStatus st : PaymentStatus.values()) {
             String name = st.name().toUpperCase();
             if (name.contains("SUCCESS") || name.contains("PAID") || name.contains("COMPLETE") || name.contains("DONE")) {
@@ -310,41 +260,6 @@ public class PaymentSelectionService {
             }
         }
 
-        // Nếu enum không có trạng thái thành công rõ ràng, dùng giá trị đầu tiên để tránh crash
         return PaymentStatus.values()[0];
-    }
-
-    /**
-     * Resolve user email safely without compile-time dependency on a specific getter name.
-     */
-    private String resolveUserEmail(Object userObj) {
-        String[] candidates = {"getEmail", "getMail", "getGmail", "getEmailAddress", "getUsername"};
-
-        for (String m : candidates) {
-            try {
-                Object v = userObj.getClass().getMethod(m).invoke(userObj);
-                if (v != null) {
-                    String s = String.valueOf(v);
-                    if (s.contains("@")) return s; // chỉ nhận nếu giống email
-                }
-            } catch (Exception ignored) {
-            }
-        }
-
-        String[] fieldCandidates = {"email", "mail", "gmail", "emailAddress", "username"};
-        for (String f : fieldCandidates) {
-            try {
-                java.lang.reflect.Field field = userObj.getClass().getDeclaredField(f);
-                field.setAccessible(true);
-                Object v = field.get(userObj);
-                if (v != null) {
-                    String s = String.valueOf(v);
-                    if (s.contains("@")) return s;
-                }
-            } catch (Exception ignored) {
-            }
-        }
-
-        return null;
     }
 }

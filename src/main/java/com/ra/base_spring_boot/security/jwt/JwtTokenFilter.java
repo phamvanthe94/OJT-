@@ -35,7 +35,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 if (jti != null && blacklistTokenRepository.existsById(jti)) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
-                    response.getWriter().write("{\"error\":401 \"Token has been blacklisted\"}");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.getWriter().write("{\"status\":401,\"message\":\"Bạn đã đăng xuất, vui lòng đăng nhập lại !\"}");
                     return;
                 }
 
