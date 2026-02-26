@@ -7,7 +7,7 @@ import com.ra.base_spring_boot.exception.HttpBadRequest;
 import com.ra.base_spring_boot.model.entity.user.User;
 import com.ra.base_spring_boot.repository.authrp.IUserRepository;
 import com.ra.base_spring_boot.services.authsv.IUserService;
-import com.ra.base_spring_boot.services.impl.CloudinaryService;
+import com.ra.base_spring_boot.services.more.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -16,7 +16,7 @@ import com.ra.base_spring_boot.security.jwt.JwtProvider;
 import com.ra.base_spring_boot.security.principle.MyUserDetails;
 import com.ra.base_spring_boot.services.authsv.IAuthService;
 import com.ra.base_spring_boot.services.authsv.IRoleService;
-import com.ra.base_spring_boot.services.impl.CloudinaryService;
+import com.ra.base_spring_boot.services.more.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

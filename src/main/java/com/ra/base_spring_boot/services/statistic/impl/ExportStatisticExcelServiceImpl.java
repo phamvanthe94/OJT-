@@ -7,14 +7,17 @@ import com.ra.base_spring_boot.model.entity.content.News;
 import com.ra.base_spring_boot.model.entity.movie.Genre;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.model.entity.user.User;
-import com.ra.base_spring_boot.repository.*;
+import com.ra.base_spring_boot.repository.IFestivalRepository;
+import com.ra.base_spring_boot.repository.INewRepository;
 import com.ra.base_spring_boot.repository.statistic.IMovieStatisticRepository;
 import com.ra.base_spring_boot.repository.statistic.IRevenueStatisticRepository;
 import com.ra.base_spring_boot.repository.statistic.ITicketStatisticRepository;
 import com.ra.base_spring_boot.repository.statistic.IUserStatisticRepository;
 import com.ra.base_spring_boot.services.statistic.IExportStatisticExcelService;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +43,7 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
-            createMovieSheet(workbook,from, to);
+            createMovieSheet(workbook, from, to);
             createUserSheet(workbook, from, to);
             createTicketSheet(workbook, from, to);
             createRevenueSheet(workbook, from, to);
@@ -163,6 +166,7 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
             r.createCell(5).setCellValue(d.getTotalAmount());
         }
     }
+
     // ================= REVENUE =================
     private void createRevenueSheet(
             Workbook workbook,

@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.services.impl;
+package com.ra.base_spring_boot.services.statistic.impl;
 
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByMovieResponse;
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByMovieStatisticResponse;

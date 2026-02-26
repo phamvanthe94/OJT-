@@ -13,7 +13,7 @@ public class PaymentSelectionController {
 
     private final PaymentSelectionService paymentSelectionService;
     // ✅ Xem lại đơn đặt vé (booking + seats + payment)
-
+ 
     @GetMapping("/{bookingId}")
     public ResponseEntity<?> getBookingDetail(@PathVariable Long bookingId) {
         return paymentSelectionService.getBookingDetail(bookingId);
