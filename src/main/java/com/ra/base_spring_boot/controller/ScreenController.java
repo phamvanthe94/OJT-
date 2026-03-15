@@ -4,7 +4,7 @@ import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.ScreenReq;
 import com.ra.base_spring_boot.dto.resp.ScreenResp;
 import com.ra.base_spring_boot.services.ScreenService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,10 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1/screen")
+@RequestMapping("/api/v1/admin/screens")
+@RequiredArgsConstructor
 public class ScreenController {
-    @Autowired
-    ScreenService screenService;
+    private final ScreenService screenService;
 
     @GetMapping
     public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page,

@@ -2,6 +2,8 @@ package com.ra.base_spring_boot.services.authsv.impl;
 
 import com.ra.base_spring_boot.dto.req.authreq.ForgotPasswordRequest;
 import com.ra.base_spring_boot.dto.req.authreq.ResetPasswordRequest;
+import com.ra.base_spring_boot.exception.HttpBadRequest;
+import com.ra.base_spring_boot.exception.HttpNotFound;
 import com.ra.base_spring_boot.model.entity.user.PasswordResetToken;
 import com.ra.base_spring_boot.model.entity.user.User;
 import com.ra.base_spring_boot.repository.authrp.IPasswordResetTokenRepository;
@@ -26,17 +28,16 @@ public class PasswordService implements IPasswordService {
     private final IMailService mailService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("Http://localhost:8080/api/v1/auth/password/reset-token")
+    @Value("${frontend.reset-password-url}")
     private String resetPasswordUrl;
 
-    @Value("${app.reset-password.expire-minutes:15}")
+    @Value("${reset-password.expire-minutes:15}")
     private Long expireMinutes;
-
 
     @Override
     public void forgotPassword(ForgotPasswordRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Khong tìm thấy người dùng với email đã cho"));
+                .orElseThrow(() -> new HttpNotFound("User not found for the provided email"));
 
         String tokenRaw = UUID.randomUUID().toString();
         String tokenHash = HashUtil.sha256(tokenRaw);
@@ -49,28 +50,24 @@ public class PasswordService implements IPasswordService {
                 .build();
 
         passwordResetTokenRepository.save(tokenEntity);
-        String resetLink = resetPasswordUrl + "?token=" + tokenRaw;
-        mailService.sendResetPasswordLink(user.getEmail(), resetLink);
-
+        mailService.sendResetPasswordLink(user.getEmail(), resetPasswordUrl + "?token=" + tokenRaw);
     }
 
     @Override
     public void resetPassword(ResetPasswordRequest request) {
-
         if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
-            throw new RuntimeException("Mật khẩu và xác nhận mật khẩu không khớp");
+            throw new HttpBadRequest("Password confirmation does not match");
         }
 
         String tokenHash = HashUtil.sha256(request.getToken());
-
         PasswordResetToken tokenEntity = passwordResetTokenRepository.findByTokenHash(tokenHash)
-                .orElseThrow(() -> new RuntimeException("Token không hợp lệ"));
+                .orElseThrow(() -> new HttpBadRequest("Invalid reset token"));
 
         if (tokenEntity.getUsedAt() != null) {
-            throw new RuntimeException("Token đã được sử dụng");
+            throw new HttpBadRequest("Reset token has already been used");
         }
         if (tokenEntity.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token đã hết hạn");
+            throw new HttpBadRequest("Reset token has expired");
         }
 
         User user = tokenEntity.getUser();

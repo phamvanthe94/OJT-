@@ -23,14 +23,12 @@ public class BookingDetailResDTO {
     private Integer totalSeat;
     private Double totalPriceMovie;
 
-    // payment
     private String paymentStatus;
     private Double amount;
     private String paymentMethod;
     private LocalDateTime paymentTime;
     private String transactionId;
 
-    // seats
     private List<BookingSeatRequest> seats;
 
     private LocalDateTime createdAt;

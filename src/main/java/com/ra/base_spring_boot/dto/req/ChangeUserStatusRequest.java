@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ChangeUserStatusRequest {
 
-    @NotNull(message = "Status không được để trống")
-    private UserStatus status; // ACTIVE / BLOCKED
+    @NotNull(message = "Status must not be null")
+    private UserStatus status;
 }
+

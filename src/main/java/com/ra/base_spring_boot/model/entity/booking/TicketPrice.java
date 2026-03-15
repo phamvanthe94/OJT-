@@ -25,15 +25,12 @@ public class TicketPrice extends BaseObject {
     @Column(name = "type_movie")
     private MovieType typeMovie;
 
-   // @ManyToOne
-   // @JoinColumn(name = "showtime_id")
-   // private ShowTime showTime;
 
     @Column(name = "price")
     private Double price;
 
     @Column(name = "day_type")
-    private Boolean dayType; // false: T2-5, true: T6-7-CN-Lễ
+    private Boolean dayType;
 
     @Column(name = "start_time")
     private LocalTime startTime;

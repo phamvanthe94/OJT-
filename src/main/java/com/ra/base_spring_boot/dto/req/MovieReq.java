@@ -17,41 +17,35 @@ import java.util.Set;
 @Builder
 public class MovieReq {
 
-    @NotBlank(message = "Title không được để trống")
-    @Size(max = 255, message = "Title tối đa 255 ký tự")
+    @NotBlank(message = "Title is required")
+    @Size(max = 255, message = "Title must be at most 255 characters")
     private String title;
 
-    @Size(max = 5000, message = "Descriptions tối đa 5000 ký tự")
+    @Size(max = 5000, message = "Descriptions must be at most 5000 characters")
     private String descriptions;
 
-    @Size(max = 100, message = "Author tối đa 100 ký tự")
+    @Size(max = 100, message = "Author must be at most 100 characters")
     private String author;
 
-    @Size(max = 255, message = "Trailer tối đa 255 ký tự")
+    @Size(max = 255, message = "Trailer must be at most 255 characters")
     private String trailer;
 
-    // ✅ enum -> swagger dropdown
-    // Với enum MovieType của bạn: swagger có thể hiện _2D/_3D,
-    // nhưng client nên gửi "2D"/"3D" (nhờ @JsonCreator/@JsonValue).
-    @NotNull(message = "Type không được để trống")
+    @NotNull(message = "Type is required")
     private MovieType type;
 
-    @NotNull(message = "Duration không được để trống")
-    @Min(value = 1, message = "Duration phải >= 1 phút")
-    @Max(value = 500, message = "Duration tối đa 500 phút")
+    @NotNull(message = "Duration is required")
+    @Min(value = 1, message = "Duration must be at least 1 minute")
+    @Max(value = 500, message = "Duration must be at most 500 minutes")
     private Integer duration;
 
-    @NotNull(message = "ReleaseDate không được để trống")
-    @DateTimeFormat(pattern = "yyyy-MM-dd") // ✅ bind form-data
+    @NotNull(message = "ReleaseDate is required")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
 
-    // ✅ enum -> swagger dropdown
-    @NotNull(message = "Status không được để trống")
+    @NotNull(message = "Status is required")
     private MovieStatus status;
 
-    // danh sách genre id (không thể dropdown trong swagger vì là DB data)
-    private Set<@NotNull(message = "GenreId không hợp lệ") Long> genreIds;
+    private Set<@NotNull(message = "GenreId is invalid") Long> genreIds;
 
-    // create bắt buộc/ update optional -> check trong service
     private MultipartFile image;
 }

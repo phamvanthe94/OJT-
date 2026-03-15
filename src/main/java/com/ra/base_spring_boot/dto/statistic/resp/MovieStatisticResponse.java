@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 
 public class MovieStatisticResponse {
-    private long comingSoon;   // COMING_SOON
-    private long nowShowing;   // NOW_SHOWING
-    private long offline;      // OFFLINE
+    private long comingSoon;
+    private long nowShowing;
+    private long offline;
 }

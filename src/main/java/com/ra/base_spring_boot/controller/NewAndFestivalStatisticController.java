@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/statistic/news-festival")
+@RequestMapping("/api/v1/admin/statistics/news-festival")
 @RequiredArgsConstructor
 public class NewAndFestivalStatisticController {
 

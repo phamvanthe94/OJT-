@@ -12,7 +12,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = FestivalTimeValidator.class)
 public @interface ValidFestivalTime {
-    String message() default "Thời gian kết thúc không được nhỏ hơn thời gian bắt đầu";
+    String message() default "End time must be greater than or equal to start time";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
+

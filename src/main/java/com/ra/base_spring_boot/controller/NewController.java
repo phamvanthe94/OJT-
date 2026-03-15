@@ -74,7 +74,7 @@ public class NewController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(200)
-                        .data("Xoá tin tức thành công")
+                .data("News deleted successfully")
                         .build()
         );
     }

@@ -36,12 +36,11 @@ public class NewsHomeServiceImpl implements INewsHomeService {
     public NewsDetailResponse getHomeNewDetail(Long id) {
 
         News news = newsHomeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy tin tức !"));
+                .orElseThrow(() -> new RuntimeException("News not found"));
 
         return toDetailResponse(news);
     }
 
-    // ===================== HELPER =====================
 
     private NewsListResponse toListResponse(News news) {
         return NewsListResponse.builder()
@@ -78,3 +77,4 @@ public class NewsHomeServiceImpl implements INewsHomeService {
         return clean.substring(0, max) + "...";
     }
 }
+

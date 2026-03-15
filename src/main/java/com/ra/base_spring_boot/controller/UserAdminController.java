@@ -16,9 +16,6 @@ public class UserAdminController {
 
     private final IUserAdminService userAdminService;
 
-    /**
-     * GET /api/v1/admin/users?keyword=...&page=0&size=10&sortBy=id&direction=desc
-     */
     @GetMapping
     public ResponseEntity<?> handleGetAllUsers(
             @RequestParam(required = false) String keyword,
@@ -36,10 +33,6 @@ public class UserAdminController {
         );
     }
 
-    /**
-     * PATCH /api/v1/admin/users/{id}/status
-     * Body: { "status": true } or { "status": false }
-     */
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> handleChangeUserStatus(
             @PathVariable Long id,

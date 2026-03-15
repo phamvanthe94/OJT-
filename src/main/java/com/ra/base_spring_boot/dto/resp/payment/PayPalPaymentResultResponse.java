@@ -12,10 +12,10 @@ public class PayPalPaymentResultResponse {
     private Long paymentId;
     private Long bookingId;
 
-    private String paymentStatus;     // COMPLETED / FAILED / CANCELLED / PENDING
-    private String transactionId;     // captureId
+    private String paymentStatus;
+    private String transactionId;
     private Double amount;
     private String currency;
 
-    private String message;           // thông báo cho FE
+    private String message;
 }

@@ -10,7 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -18,10 +23,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final IAuthService authService;
 
-    /**
-     * @param formLogin FormLogin
-     * @apiNote handle login with { email, password }
-     */
     @PostMapping("/login")
     public ResponseEntity<?> handleLogin(@Valid @RequestBody FormLogin formLogin) {
         return ResponseEntity.ok(
@@ -33,10 +34,6 @@ public class AuthController {
         );
     }
 
-    /**
-     * @param formRegister FormRegister
-     * @apiNote handle register with { firstName, lastName, email, password, phone, address, avatar }
-     */
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> handleRegister(@Valid @ModelAttribute FormRegister formRegister) {
         authService.register(formRegister);
@@ -44,29 +41,25 @@ public class AuthController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.CREATED)
                         .code(HttpStatus.CREATED.value())
-                        .data("Tạo tài khoản thành công")
+                        .data("Account created successfully")
                         .build()
         );
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> handleLogout(
-            @RequestHeader(
-                    value = "Authorization",
-                    required = false)
-            String authorizationHeader) {
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader
+    ) {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
-            authService.logout(token);
+            authService.logout(authorizationHeader.substring(7));
         }
 
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
-                        .data("Đăng xuất thành công")
+                        .data("Logged out successfully")
                         .build()
         );
     }
-
 }

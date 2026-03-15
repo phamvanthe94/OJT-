@@ -66,7 +66,7 @@ public class GenreController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
-                        .data("Xoá thể loại phim thành công")
+                .data("Genre deleted successfully")
                         .build()
         );
     }

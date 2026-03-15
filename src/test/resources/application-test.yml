@@ -1,0 +1,50 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:movie_ticket_test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+        show_sql: false
+
+  mail:
+    host: localhost
+    port: 2525
+    username:
+    password:
+
+cloudinary:
+  cloud_name: test
+  api_key: test
+  api_secret: test
+
+jwt:
+  secret:
+    key: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+  expired:
+    access: 864000
+
+paypal:
+  base-url: http://localhost
+  client-id: test
+  client-secret: test
+  webhook-id: test
+  return-url: http://localhost:8080/api/v1/paypal/return
+  cancel-url: http://localhost:8080/api/v1/paypal/cancel
+  webhook-verify-enabled: false
+
+frontend:
+  reset-password-url: http://localhost:8080/api/v1/auth/password/reset-token
+
+reset-password:
+  expire-minutes: 15

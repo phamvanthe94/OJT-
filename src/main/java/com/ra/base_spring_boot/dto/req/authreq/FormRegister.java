@@ -15,20 +15,21 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @Builder
 public class FormRegister {
-    @NotBlank(message = "Không được để trống")
+    @NotBlank(message = "First name must not be blank")
     private String firstName;
-    @NotBlank(message = "Không được để trống")
+
+    @NotBlank(message = "Last name must not be blank")
     private String lastName;
 
-    @NotBlank(message = "Không được để trống")
-    @Email(message = "Email không đúng định dạng")
+    @NotBlank(message = "Email must not be blank")
+    @Email(message = "Email format is invalid")
     private String email;
 
-    @NotBlank(message = "Không được để trống")
-    @Size(min = 8, message = "Mật khẩu phải có ít nhất 8 ký tự")
+    @NotBlank(message = "Password must not be blank")
+    @Size(min = 8, message = "Password must contain at least 8 characters")
     @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-            message = "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt"
+            message = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     )
     private String password;
 

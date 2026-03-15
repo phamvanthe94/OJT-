@@ -10,5 +10,5 @@ import lombok.*;
 public class PaymentInitRequest {
     private Long bookingId;
     private Long amount;
-    private PaymentMethod method; // PAYPAL / VNPAY / STRIPE
+    private PaymentMethod method;
 }

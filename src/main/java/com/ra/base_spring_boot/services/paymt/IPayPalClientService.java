@@ -17,6 +17,7 @@ public interface IPayPalClientService {
 
     Map<String, Object> captureOrder(String accessToken, String orderId);
 
-    Map<String, Object> verifyWebhookSignature(String accessToken, Map<String, Object> verifyPayload);
+    Map<String, Object> getOrder(String accessToken, String orderId);
 
+    Map<String, Object> verifyWebhookSignature(String accessToken, Map<String, Object> verifyPayload);
 }

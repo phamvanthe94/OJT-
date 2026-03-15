@@ -3,7 +3,11 @@ package com.ra.base_spring_boot.dto.req.authreq;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -12,17 +16,17 @@ import lombok.*;
 @Builder
 public class ResetPasswordRequest {
 
-    @NotBlank
+    @NotBlank(message = "Token must not be blank")
     private String token;
 
-    @NotBlank(message = "Mật khẩu không được để trống")
-    @Size(min = 8, message = "Mật khẩu phải có ít nhất 8 ký tự")
+    @NotBlank(message = "Password must not be blank")
+    @Size(min = 8, message = "Password must contain at least 8 characters")
     @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-            message = "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt"
+            message = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     )
     private String newPassword;
 
-    @NotBlank
+    @NotBlank(message = "Confirm password must not be blank")
     private String confirmNewPassword;
 }

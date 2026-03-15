@@ -17,10 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserStatisticController {
     private final IUserStatisticService userStatisticService;
 
-    /**
-     * Dashboard thống kê user cho admin
-     * phục vụ màn hình Dashboard của Admin
-     */
     @GetMapping("/dashboard")
     public ResponseEntity<?> dashboard() {
 

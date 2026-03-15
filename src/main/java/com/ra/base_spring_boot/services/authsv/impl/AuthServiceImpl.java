@@ -5,6 +5,7 @@ import com.ra.base_spring_boot.dto.req.authreq.FormRegister;
 import com.ra.base_spring_boot.dto.resp.authresp.JwtResponse;
 import com.ra.base_spring_boot.dto.resp.authresp.UserInfoResponse;
 import com.ra.base_spring_boot.exception.HttpBadRequest;
+import com.ra.base_spring_boot.exception.HttpUnAuthorized;
 import com.ra.base_spring_boot.model.constants.RoleName;
 import com.ra.base_spring_boot.model.constants.UserStatus;
 import com.ra.base_spring_boot.model.entity.user.BlacklistedToken;
@@ -44,9 +45,10 @@ public class AuthServiceImpl implements IAuthService {
 
     @Override
     public void register(FormRegister formRegister) {
-        if (userRepository.existsByEmail((formRegister.getEmail()))) {
-            throw new HttpBadRequest("Email đã được sử dụng");
+        if (userRepository.existsByEmail(formRegister.getEmail())) {
+            throw new HttpBadRequest("Email is already in use");
         }
+
         Set<Role> roles = new HashSet<>();
         roles.add(roleService.findByRoleName(RoleName.ROLE_USER));
 
@@ -54,6 +56,7 @@ public class AuthServiceImpl implements IAuthService {
         if (formRegister.getAvatar() != null && !formRegister.getAvatar().isEmpty()) {
             avatarUrl = cloudinaryService.upload(formRegister.getAvatar());
         }
+
         User user = User.builder()
                 .firstName(formRegister.getFirstName())
                 .lastName(formRegister.getLastName())
@@ -74,48 +77,47 @@ public class AuthServiceImpl implements IAuthService {
         try {
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     formLogin.getEmail(),
-                    formLogin.getPassword())
-            );
+                    formLogin.getPassword()
+            ));
         } catch (AuthenticationException e) {
-            throw new HttpBadRequest("Email hoặc mật khẩu không đúng !");
+            throw new HttpUnAuthorized("Invalid email or password");
         }
 
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
-
         User user = userDetails.getUser();
         if (user.getStatus() == UserStatus.BLOCKED) {
-            throw new HttpBadRequest("Tài khoản của bạn đã bị khóa !");
+            throw new HttpUnAuthorized("User account is blocked");
         }
-
 
         return JwtResponse.builder()
                 .accessToken(jwtProvider.generateToken(userDetails.getUsername()))
                 .user(UserInfoResponse.fromEntity(user))
-                .roles(userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
+                .roles(userDetails.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toSet()))
                 .build();
     }
 
     @Override
     public void logout(String token) {
-        if (token == null || token.isBlank())
+        if (token == null || token.isBlank() || !jwtProvider.validateToken(token)) {
             return;
-        if (!jwtProvider.validateToken(token))
-            return;
+        }
+
         String jti = jwtProvider.extractJti(token);
-
         Date expiration = jwtProvider.extractExpiration(token);
-
         Date now = new Date();
-        if (expiration.before(now))
+        if (expiration.before(now)) {
             return;
+        }
+
         if (!blacklistTokenRepository.existsById(jti)) {
-            blacklistTokenRepository.save(
-                    BlacklistedToken.builder()
-                            .jti(jti)
-                            .expiredAt(expiration)
-                            .blacklistedAt(now)
-                            .build()
-            );
+            blacklistTokenRepository.save(BlacklistedToken.builder()
+                    .jti(jti)
+                    .expiredAt(expiration)
+                    .blacklistedAt(now)
+                    .build());
         }
     }
 }

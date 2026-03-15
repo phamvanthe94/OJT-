@@ -10,8 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class GenreRequest {
-    @NotBlank(message = "Tên thể loại không được để trống")
-    @Size(max = 255, message = "Tên thể loại không được vượt quá 255 ký tự")
+    @NotBlank(message = "Genre name must not be blank")
+    @Size(max = 255, message = "Genre name must not exceed 255 characters")
     private String genreName;
 }
+
 

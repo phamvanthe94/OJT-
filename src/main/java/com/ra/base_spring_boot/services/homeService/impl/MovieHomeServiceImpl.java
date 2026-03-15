@@ -36,7 +36,7 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
     public MovieDetailResponse getNowShowingMovieDetail(Long id) {
 
         Movie movie = movieHomeRepository.findMovieDetailByIdAndStatus(id, MovieStatus.NOW_SHOWING)
-                .orElseThrow(() -> new RuntimeException("Phim không tồn tại hoặc không chiếu"));
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         return toDetailResponse(movie);
     }
@@ -46,7 +46,6 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
 
         Pageable pageable = buildPageable(page, size, sortBy, direction, "releaseDate");
 
-        // ✅ Coming soon phải có releaseDate > hôm nay (đúng logic "sắp chiếu")
         Page<Movie> movies = movieHomeRepository.findComingSoonMovies(MovieStatus.COMING_SOON, pageable);
 
         return movies.map(this::toListResponse);
@@ -56,12 +55,11 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
     public MovieDetailResponse getMovieDetail(Long id) {
 
         Movie movie = movieHomeRepository.findMovieDetail(id)
-                .orElseThrow(() -> new RuntimeException("Phim không tồn tại"));
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         return toDetailResponse(movie);
     }
 
-    // ===================== HELPER =====================
 
     private Pageable buildPageable(int page, int size, String sortBy, String direction, String defaultSortField) {
 
@@ -105,3 +103,4 @@ public class MovieHomeServiceImpl implements IMovieHomeService {
                 .build();
     }
 }
+

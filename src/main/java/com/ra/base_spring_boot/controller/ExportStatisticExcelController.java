@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/statistics/export")
+@RequestMapping("/api/v1/admin/statistics/export")
 public class ExportStatisticExcelController {
 
     private final IExportStatisticExcelService exportService;

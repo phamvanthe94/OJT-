@@ -15,10 +15,6 @@ public class MovieStatisticController {
 
     private final IMovieStatisticService movieStatisticService;
 
-    /**
-     * Dashboard thống kê phim cho admin
-     * phục vụ màn hình Dashboard của Admin
-     */
 
     @GetMapping("/dashboard")
     public ResponseEntity<?> dashboard() {

@@ -1,6 +1,7 @@
 package com.ra.base_spring_boot.dto.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -19,11 +20,11 @@ public class ShowTimeRequest {
     private Long movieId;
 
 
-    @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @Schema(example = "2026-03-10 10:00")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm[:ss]")
     private LocalDateTime startTime;
 
-    @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @Schema(example = "2026-03-10 12:00")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm[:ss]")
     private LocalDateTime endTime;
 }

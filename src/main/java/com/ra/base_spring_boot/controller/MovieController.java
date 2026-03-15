@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 public class MovieController {
     private final IMovieService movieService;
 
-    /*  GET ALL */
     @GetMapping
     public ResponseEntity<?> getAllMovies(
             @RequestParam(required = false) String title,
@@ -38,7 +37,6 @@ public class MovieController {
         );
     }
 
-    /*  CREATE */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createMovie(
             @Valid @ModelAttribute MovieRequest request) {
@@ -51,7 +49,6 @@ public class MovieController {
         );
     }
 
-    /*  UPDATE */
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMovie(
             @PathVariable Long id,
@@ -66,7 +63,6 @@ public class MovieController {
         );
     }
 
-    /* DELETE */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
@@ -74,7 +70,7 @@ public class MovieController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(200)
-                        .data("Xoá movie thành công")
+                .data("Movie deleted successfully")
                         .build()
         );
     }

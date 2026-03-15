@@ -13,14 +13,6 @@ import java.util.Optional;
 
 public interface IShowTimeAdminRepository extends JpaRepository<ShowTime, Long> {
 
-    /**
-     * Searches for ShowTime entities based on a keyword that matches the movie title, screen name,
-     * or theater name.
-     *
-     * @param keyword
-     * @param pageable
-     * @return
-     */
     @Query("""
             SELECT st
             FROM ShowTime st
@@ -36,12 +28,6 @@ public interface IShowTimeAdminRepository extends JpaRepository<ShowTime, Long> 
     Page<ShowTime> searchShowTime(@Param("keyword") String keyword, Pageable pageable);
 
 
-    /**
-     * Fetches detailed information of a ShowTime by its ID, including associated Movie, Screen, and Theater entities.
-     *
-     * @param id the ID of the ShowTime
-     * @return an Optional containing the ShowTime with its details if found, otherwise empty
-     */
     @Query("""
             SELECT st
             FROM ShowTime st
@@ -53,15 +39,6 @@ public interface IShowTimeAdminRepository extends JpaRepository<ShowTime, Long> 
     Optional<ShowTime> findDetailById(@Param("id") Long id);
 
 
-    /**
-     * Checks if there are any overlapping showtimes for a given screen within a specified time range.
-     *
-     * @param screenId
-     * @param excludeId
-     * @param startTime
-     * @param endTime
-     * @return
-     */
     @Query("""
             SELECT COUNT(st)> 0
             FROM ShowTime st

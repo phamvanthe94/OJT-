@@ -4,12 +4,14 @@ import com.ra.base_spring_boot.model.entity.content.News;
 import com.ra.base_spring_boot.repository.homerpo.INewsHomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 public class NewsDataInitializer implements CommandLineRunner {
 
@@ -24,21 +26,21 @@ public class NewsDataInitializer implements CommandLineRunner {
 
         List<News> newsList = List.of(
                 News.builder()
-                        .title("Ra mắt phim bom tấn tháng này ")
+                        .title("New blockbuster movie released this month")
                         .content("""
-                                Bom tấn hành động mới nhất đã chính thức ra mắt.
-                                Phim quy tụ dàn diễn viên nổi tiếng và kỹ xảo hoành tráng.
-                                Dự kiến sẽ dẫn đầu phòng vé trong nhiều tuần tới.
+                                The newest action blockbuster has officially been released.
+                                The movie features a strong cast and impressive visual effects.
+                                It is expected to lead the box office for several weeks.
                                 """)
                         .createdAt(LocalDateTime.now().minusDays(1))
                         .updatedAt(LocalDateTime.now().minusDays(1))
                         .build(),
                 News.builder()
-                        .title("Lễ hội phim quốc tế sắp diễn ra")
+                        .title("International film festival coming soon")
                         .content("""
-                                Lễ hội phim quốc tế sẽ diễn ra vào cuối tháng này.
-                                Sự kiện quy tụ nhiều bộ phim xuất sắc từ khắp nơi trên thế giới.
-                                Đây là cơ hội tuyệt vời để thưởng thức nghệ thuật điện ảnh đa dạng.
+                                The international film festival will take place at the end of this month.
+                                The event will feature outstanding movies from many countries.
+                                It is a great opportunity for audiences to enjoy diverse cinema.
                                 """)
                         .createdAt(LocalDateTime.now().minusDays(2))
                         .updatedAt(LocalDateTime.now().minusDays(2))

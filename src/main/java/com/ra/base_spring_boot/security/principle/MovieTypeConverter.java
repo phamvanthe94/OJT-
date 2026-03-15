@@ -15,11 +15,9 @@ public class MovieTypeConverter implements Converter<String, MovieType> {
         if (s.isEmpty()) return null;
 
         try {
-            // cho phép nhận "_2D"
             if (s.startsWith("_")) {
                 return MovieType.valueOf(s);
             }
-            // cho phép nhận "2D"
             return MovieType.from(s);
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid MovieType: " + source);

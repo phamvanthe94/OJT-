@@ -6,12 +6,14 @@ import com.ra.base_spring_boot.model.entity.booking.TicketPrice;
 import com.ra.base_spring_boot.repository.homerpo.ITicketPriceHomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
 import java.util.List;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 public class TicketPriceInitializer implements CommandLineRunner {
 

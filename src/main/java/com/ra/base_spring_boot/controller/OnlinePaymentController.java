@@ -16,11 +16,6 @@ public class OnlinePaymentController {
 
     private final OnlinePaymentService onlinePaymentService;
 
-    /**
-     * 1) INIT thanh toán
-     * FE gửi bookingId, amount và method (PAYPAL/VNPAY/STRIPE)
-     * Trả về link thanh toán + transactionId
-     */
     @PostMapping("/init")
     public ResponseEntity<PaymentInitResponse> initPayment(
             @RequestBody PaymentInitRequest request
@@ -33,11 +28,6 @@ public class OnlinePaymentController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 2) VERIFY thanh toán
-     * FE gửi transactionId + method
-     * Trả về status của thanh toán
-     */
     @PostMapping("/verify")
     public ResponseEntity<PaymentVerifyResponse> verifyPayment(
             @RequestBody PaymentVerifyRequest request

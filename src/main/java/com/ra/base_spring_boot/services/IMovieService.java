@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 
 public interface IMovieService {
 
-    // get all (search + sort + page)
     Page<MovieResponse> getAllMovies(
             String title,
             String author,
@@ -18,12 +17,9 @@ public interface IMovieService {
             String direction
     );
 
-    //  create
     MovieResponse createMovie(MovieRequest request);
 
-    // update
     MovieResponse updateMovie(Long id, MovieRequest request);
 
-    // delete
     void deleteMovie(Long id);
 }

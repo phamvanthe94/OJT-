@@ -12,6 +12,5 @@ public interface IMovieHomeService {
 
     Page<MovieListResponse> getComingSoonMovies(int page, int size, String sortBy, String direction);
 
-    // ✅ NEW: Chi tiết phim chung
     MovieDetailResponse getMovieDetail(Long id);
 }

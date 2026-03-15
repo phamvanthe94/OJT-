@@ -59,7 +59,7 @@ public class BannerController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(200)
-                        .data("Xoá banner thành công")
+                .data("Banner deleted successfully")
                         .build()
         );
     }

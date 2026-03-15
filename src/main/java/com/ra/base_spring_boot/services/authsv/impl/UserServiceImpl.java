@@ -24,7 +24,7 @@ public class UserServiceImpl implements IUserService {
     private User getCurrentUserEntity() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng hiện tại"));
+                .orElseThrow(() -> new RuntimeException("Current user not found"));
     }
 
     @Override
@@ -69,11 +69,11 @@ public class UserServiceImpl implements IUserService {
         User user = getCurrentUserEntity();
 
         if (!passwordEncoder.matches(formChangePassword.getOldPassword(), user.getPassword())) {
-            throw new HttpBadRequest("Mật khẩu cũ không đúng");
+            throw new HttpBadRequest("Old password is incorrect");
         }
 
         if (!formChangePassword.getNewPassword().equals(formChangePassword.getConfirmPassword())) {
-            throw new HttpBadRequest("Xác nhận mật khẩu không khớp");
+            throw new HttpBadRequest("Password confirmation does not match");
         }
 
         user.setPassword(passwordEncoder.encode(formChangePassword.getNewPassword()));
@@ -82,3 +82,4 @@ public class UserServiceImpl implements IUserService {
 
 
 }
+

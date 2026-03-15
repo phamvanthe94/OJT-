@@ -45,7 +45,7 @@ public class PaymentProviderController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
-                        .data("Xóa nhà cung cấp thanh toán thành công")
+                .data("Payment provider deleted successfully")
                         .build()
         );
     }

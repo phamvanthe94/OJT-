@@ -11,7 +11,10 @@ import org.springframework.http.HttpStatus;
 @Data
 @Builder
 public class ResponseWrapper<T> {
+    @Builder.Default
+    private boolean success = true;
     private HttpStatus status;
     private int code;
+    private String message;
     private T data;
 }

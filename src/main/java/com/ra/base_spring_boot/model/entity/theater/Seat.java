@@ -32,13 +32,11 @@ public class Seat extends BaseObject {
 
     @Column(name = "is_variable")
     @Builder.Default
-    //vì @Builder bỏ qua giá trị khởi tạo
-    // nen Dùng @Builder.Default để Lombok biết rằng đây là giá trị mặc định khi dùng builder:
     private Boolean isVariable = false;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private SeatType type; // STANDARD, VIP, SWEETBOX
+    private SeatType type;
 
     @CreatedDate
     @Column(name = "created_at")

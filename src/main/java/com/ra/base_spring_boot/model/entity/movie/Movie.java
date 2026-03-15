@@ -5,18 +5,27 @@ import com.ra.base_spring_boot.model.base.BaseObject;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.entity.theater.ShowTime;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
-import lombok.experimental.PackagePrivate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +59,6 @@ public class Movie extends BaseObject {
     @Column(name = "type")
     private MovieType type;
 
-
     @Column(name = "duration")
     private Integer duration;
 
@@ -70,20 +78,18 @@ public class Movie extends BaseObject {
     @Column(name = "status", nullable = false)
     private MovieStatus status;
 
-    //  Thời gian bắt đầu công chiếu (>= ngày hiện tại)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") // Lưu ý: khoảng trắng giữa ngày và giờ
-    @NotNull(message = "Ngày bắt đầu công chiếu không được để trống")
-    @FutureOrPresent(message = "Ngày bắt đầu công chiếu phải >= ngày hiện tại")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @NotNull(message = "Release start date must not be null")
+    @FutureOrPresent(message = "Release start date must be today or a future date")
     @Column(name = "release_start_date", nullable = false)
     private LocalDateTime releaseStartDate;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @NotNull(message = "Ngày kết thúc công chiếu không được để trống")
+    @NotNull(message = "Release end date must not be null")
     @Column(name = "release_end_date", nullable = false)
     private LocalDateTime releaseEndDate;
 
-    //  Validate: end >= start
-    @AssertTrue(message = "Ngày kết thúc phải >= ngày bắt đầu công chiếu")
+    @AssertTrue(message = "Release end date must be greater than or equal to release start date")
     public boolean isValidReleasePeriod() {
         if (releaseStartDate == null || releaseEndDate == null) {
             return true;
@@ -93,7 +99,6 @@ public class Movie extends BaseObject {
 
     @OneToMany(mappedBy = "movie")
     private List<ShowTime> showTimes;
-
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

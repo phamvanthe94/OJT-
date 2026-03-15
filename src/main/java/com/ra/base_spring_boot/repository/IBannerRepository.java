@@ -13,3 +13,4 @@ public interface IBannerRepository extends JpaRepository<Banner, Long> {
             Pageable pageable
     );
 }
+

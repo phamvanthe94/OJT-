@@ -18,10 +18,10 @@ public class MovieResp {
     private String author;
     private String image;
     private String trailer;
-    private String type;      // trả string cho FE dễ dùng
+    private String type;
     private Integer duration;
     private LocalDate releaseDate;
-    private String status;    // trả string
+    private String status;
     private Set<String> genres;
 
     private LocalDateTime createdAt;

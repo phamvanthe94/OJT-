@@ -36,7 +36,7 @@ public class Booking extends BaseObject {
     private Integer totalSeat;
 
     @Column(name = "total_price_movie")
-    private Double totalPriceMovie; //co thaatj su can thiet?
+    private Double totalPriceMovie;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -60,14 +60,12 @@ public class Booking extends BaseObject {
     @Column(name = "status")
     private BookingStatus status;
 
-    // Quan hệ để lấy danh sách ghế đã đặt
     @OneToMany(mappedBy = "booking",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
     @Builder.Default
     private List<BookingSeat> bookingSeats = new ArrayList<>();
 
-    // Method tính tổng tiền từ bookingSeats
     public Double calculateTotalAmount() {
         if (bookingSeats == null || bookingSeats.isEmpty()) return 0.0;
         return bookingSeats.stream()
@@ -75,7 +73,6 @@ public class Booking extends BaseObject {
                 .sum();
     }
 
-    // Tuỳ chọn: tính tổng số ghế
     public Integer calculateTotalSeat() {
         if (bookingSeats == null || bookingSeats.isEmpty()) return 0;
         return bookingSeats.stream()

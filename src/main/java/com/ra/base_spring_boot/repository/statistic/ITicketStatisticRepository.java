@@ -23,7 +23,6 @@ public interface ITicketStatisticRepository extends JpaRepository<BookingSeat, L
             """)
     Long statisticTotalTicketSold(@Param("status") PaymentStatus status);
 
-    // THỐNG KÊ THEO PHIM
     @Query("""
                 SELECT new com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByMovieResponse(
                     m.id,
@@ -40,7 +39,6 @@ public interface ITicketStatisticRepository extends JpaRepository<BookingSeat, L
             """)
     List<TicketByMovieResponse> statisticTicketByMovie(@Param("status") PaymentStatus status);
 
-    // THỐNG KÊ THEO PHÒNG CHIẾU
     @Query("""
                 SELECT new com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByScreenResponse(
                     s.id,
@@ -57,9 +55,6 @@ public interface ITicketStatisticRepository extends JpaRepository<BookingSeat, L
             """)
     List<TicketByScreenResponse> statisticTicketByScreen(@Param("status") PaymentStatus status);
 
-    // Method test - không có điều kiện thời gian (để test dữ liệu)
-    // Object[] theo thứ tự:
-    //  [0] movieTitle, [1] seatType(SeatType), [2] price, [3] quantity, [4] totalAmount
     @Query("""
                 SELECT
                     m.title,
@@ -77,7 +72,6 @@ public interface ITicketStatisticRepository extends JpaRepository<BookingSeat, L
             """)
     List<Object[]> statisticTicketAll();
 
-    // Query chính có điều kiện thời gian + theo trạng thái thanh toán
     @Query("""
                 SELECT
                     m.title,
@@ -101,7 +95,6 @@ public interface ITicketStatisticRepository extends JpaRepository<BookingSeat, L
             @Param("to") LocalDateTime to
     );
 
-    // Xuất Excel bằng Projection
     @Query("""
                 SELECT
                     m.title AS movieTitle,

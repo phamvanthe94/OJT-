@@ -4,8 +4,6 @@ import com.ra.base_spring_boot.model.constants.MovieType;
 import com.ra.base_spring_boot.model.constants.SeatType;
 import lombok.*;
 
-import java.time.LocalTime;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,6 +15,5 @@ public class TicketPriceResponse {
     private MovieType movieType;
     private Double price;
     private Boolean dayType;
-    private LocalTime startTime;
-    private LocalTime endTime;
+
 }

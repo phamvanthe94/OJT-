@@ -25,7 +25,7 @@ public class Payment extends BaseObject {
     private Booking booking;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "provider_id", nullable = false)
+    @JoinColumn(name = "provider_id")
     private PaymentProvider provider;
 
     @Enumerated(EnumType.STRING)
@@ -39,7 +39,7 @@ public class Payment extends BaseObject {
     @Column(name = "payment_time")
     private LocalDateTime paymentTime;
 
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(precision = 19, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "transaction_id", length = 255)

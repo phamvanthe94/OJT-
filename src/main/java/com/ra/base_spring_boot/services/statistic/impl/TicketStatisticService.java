@@ -7,7 +7,6 @@ import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByScreenStatisti
 import com.ra.base_spring_boot.model.constants.PaymentStatus;
 import com.ra.base_spring_boot.repository.booking.IBookingSeatRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +15,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TicketStatisticService {
-    @Autowired
-    private IBookingSeatRepository IBookingSeatRepository;
+    private final IBookingSeatRepository bookingSeatRepository;
 
 
     public TicketByMovieStatisticResponse statisticByMovie() {
-        List<TicketByMovieResponse> ticketByMovieResponses = IBookingSeatRepository.statisticTicketByMovie(PaymentStatus.COMPLETED);
+        List<TicketByMovieResponse> ticketByMovieResponses = bookingSeatRepository.statisticTicketByMovie(PaymentStatus.COMPLETED);
         Long totalTickets = ticketByMovieResponses.stream()
                 .mapToLong(TicketByMovieResponse::getTotalTicket)
                 .sum();
@@ -33,7 +31,7 @@ public class TicketStatisticService {
     }
 
     public TicketByScreenStatisticResponse statisticByScreen() {
-        List<TicketByScreenResponse> ticketByScreenResponses = IBookingSeatRepository.statisticTicketByScreen(PaymentStatus.COMPLETED);
+        List<TicketByScreenResponse> ticketByScreenResponses = bookingSeatRepository.statisticTicketByScreen(PaymentStatus.COMPLETED);
         Long totalTickets = ticketByScreenResponses.stream()
                 .mapToLong(TicketByScreenResponse::getTotalTicket)
                 .sum();

@@ -1,4 +1,4 @@
-package com.ra.base_spring_boot.dto.resp;
+package com.ra.base_spring_boot.dto.resp.payment;
 
 import lombok.*;
 
@@ -9,13 +9,13 @@ import lombok.*;
 @Builder
 public class PayPalCreateOrderResponse {
 
-    private Long paymentId;       // id payment trong DB
-    private Long bookingId;       // booking liên quan
+    private Long paymentId;
+    private Long bookingId;
 
-    private String orderId;       // paypalOrderId (token)
-    private String approveUrl;    // link PayPal để user approve
+    private String orderId;
+    private String approveUrl;
 
-    private String status;        // PENDING / CREATED ...
-    private Double amount;        // số tiền
-    private String currency;      // "USD" (hoặc bạn dùng VND thì đổi)
+    private String status;
+    private Double amount;
+    private String currency;
 }

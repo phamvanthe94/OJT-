@@ -11,6 +11,6 @@ import lombok.*;
 public class ChangePaymentStatusDTO {
 
     @NotBlank(message = "newStatus cannot be blank")
-    private String newStatus; // ví dụ: SUCCESS, FAILED, PENDING...
+    private String newStatus;
 }
 

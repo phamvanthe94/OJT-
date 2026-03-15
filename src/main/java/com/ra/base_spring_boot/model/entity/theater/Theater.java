@@ -22,7 +22,7 @@ public class Theater extends BaseObject {
     private String name;
 
     @Column(name = "location", nullable = false, length = 255)
-    private String location; //vi tri rap chieu
+    private String location;
 
     @Column(name = "phone", length = 11)
     private String phone;

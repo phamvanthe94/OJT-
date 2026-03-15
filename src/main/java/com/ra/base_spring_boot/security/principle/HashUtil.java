@@ -1,5 +1,7 @@
 package com.ra.base_spring_boot.security.principle;
 
+import com.ra.base_spring_boot.exception.TechnicalException;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
@@ -12,11 +14,12 @@ public class HashUtil {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = messageDigest.digest(input.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder();
-            for (byte b : hashBytes) hexString.append(String.format("%02x", b));
+            for (byte hashByte : hashBytes) {
+                hexString.append(String.format("%02x", hashByte));
+            }
             return hexString.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Hash SHA-256 failed");
+            throw new TechnicalException("Hash SHA-256 failed", e);
         }
-
     }
 }

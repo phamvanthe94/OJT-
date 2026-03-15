@@ -44,7 +44,7 @@ public class MovieServiceImpl implements IMovieService {
     ) {
         Pageable pageable = buildPageable(page, size, sortBy, direction);
 
-        MovieType movieType = parseMovieType(type);       // query param String -> enum
+        MovieType movieType = parseMovieType(type);
         MovieStatus movieStatus = parseMovieStatus(status);
 
         Page<Movie> movies = movieRepository.search(
@@ -64,7 +64,6 @@ public class MovieServiceImpl implements IMovieService {
 
         Movie movie = toEntity(request);
 
-        // upload ảnh nếu có
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             String url = cloudinaryService.upload(request.getImage());
             movie.setImage(url);
@@ -86,7 +85,6 @@ public class MovieServiceImpl implements IMovieService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "MovieRequest is null");
         }
 
-        // PATCH: client gửi field nào thì update field đó
         if (request.getTitle() != null) {
             String t = request.getTitle().trim();
             if (t.isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title cannot be blank");
@@ -138,7 +136,6 @@ public class MovieServiceImpl implements IMovieService {
             old.setStatus(request.getStatus());
         }
 
-        // genres: chỉ update nếu client có gửi genreIds
         if (request.getGenreIds() != null) {
             Set<Genre> genres = genreRepository.findAllById(request.getGenreIds())
                     .stream()
@@ -146,7 +143,6 @@ public class MovieServiceImpl implements IMovieService {
             old.setGenres(genres);
         }
 
-        // image: có file mới thì upload, không thì giữ cũ
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             String url = cloudinaryService.upload(request.getImage());
             old.setImage(url);
@@ -166,7 +162,6 @@ public class MovieServiceImpl implements IMovieService {
         movieRepository.delete(movie);
     }
 
-    // ================= Helpers =================
 
     private Pageable buildPageable(int page, int size, String sortBy, String direction) {
         int safePage = Math.max(page, 0);
@@ -187,7 +182,6 @@ public class MovieServiceImpl implements IMovieService {
     private void validateCreate(MovieRequest req) {
         if (req == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "MovieRequest is null");
 
-        // MovieRequest đã có @NotBlank/@NotNull, nhưng service vẫn check để an toàn khi gọi internal
         if (req.getTitle() == null || req.getTitle().isBlank())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title cannot be blank");
 
@@ -272,10 +266,9 @@ public class MovieServiceImpl implements IMovieService {
         if (type == null || type.isBlank()) return null;
         String t = type.trim();
 
-        // chấp nhận "2D", "3D", "_2D", "_3D" (tùy enum bạn define)
         try {
             if (t.startsWith("_")) return MovieType.valueOf(t);
-            return MovieType.from(t); // nếu enum MovieType có from("2D") -> _2D
+            return MovieType.from(t);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid MovieType: " + type);
         }

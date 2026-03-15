@@ -1,6 +1,7 @@
 package com.ra.base_spring_boot.services.statistic.impl;
 
 import com.ra.base_spring_boot.dto.resp.statisticResponse.TicketStatisticExcelView;
+import com.ra.base_spring_boot.exception.TechnicalException;
 import com.ra.base_spring_boot.model.constants.PaymentStatus;
 import com.ra.base_spring_boot.model.entity.content.Festival;
 import com.ra.base_spring_boot.model.entity.content.News;
@@ -53,11 +54,10 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         } catch (Exception e) {
-            throw new RuntimeException("Export Excel failed", e);
+            throw new TechnicalException("Export Excel failed", e);
         }
     }
 
-    // ================= MOVIE =================
     private void createMovieSheet(Workbook workbook,
                                   LocalDateTime from,
                                   LocalDateTime to) {
@@ -66,12 +66,13 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
 
         Row h = sheet.createRow(0);
         String[] headers = {
-                "No", "ID", "Tên", "Thể loại",
-                "Đạo diễn", "Ngày chiếu", "Trạng thái"
+                "No", "ID", "Title", "Genres",
+                "Director", "Release Date", "Status"
         };
 
-        for (int i = 0; i < headers.length; i++)
+        for (int i = 0; i < headers.length; i++) {
             h.createCell(i).setCellValue(headers[i]);
+        }
 
         List<Movie> movies =
                 movieRepo.findByReleaseDateBetween(from, to);
@@ -94,8 +95,6 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
         }
     }
 
-
-    // ================= USER =================
     private void createUserSheet(Workbook workbook,
                                  LocalDateTime from,
                                  LocalDateTime to) {
@@ -105,11 +104,12 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
         Row h = sheet.createRow(0);
         String[] headers = {
                 "No", "ID", "First Name", "Last Name",
-                "Email", "Số điện thoại", "Trạng thái"
+                "Email", "Phone", "Status"
         };
 
-        for (int i = 0; i < headers.length; i++)
+        for (int i = 0; i < headers.length; i++) {
             h.createCell(i).setCellValue(headers[i]);
+        }
 
         List<User> users =
                 userRepo.findByCreatedAtBetween(from, to);
@@ -128,8 +128,6 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
         }
     }
 
-
-    // ================= TICKET =================
     private void createTicketSheet(
             Workbook workbook,
             LocalDateTime from,
@@ -139,13 +137,12 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
 
         Row header = sheet.createRow(0);
         String[] headers = {
-                "No", "Tên phim", "Loại ghế", "Giá", "Số lượng", "Tổng tiền"
+                "No", "Movie Title", "Seat Type", "Price", "Quantity", "Total Amount"
         };
         for (int i = 0; i < headers.length; i++) {
             header.createCell(i).setCellValue(headers[i]);
         }
 
-        // 👉 LẤY DỮ LIỆU ĐÚNG
         List<TicketStatisticExcelView> data =
                 ticketRepo.statisticTicketForExcel(
                         PaymentStatus.COMPLETED,
@@ -167,7 +164,6 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
         }
     }
 
-    // ================= REVENUE =================
     private void createRevenueSheet(
             Workbook workbook,
             LocalDateTime from,
@@ -177,7 +173,7 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
 
         Row header = sheet.createRow(0);
         String[] headers = {
-                "No", "Tên phim", "From", "To", "Tổng doanh thu"
+                "No", "Movie Title", "From", "To", "Total Revenue"
         };
 
         for (int i = 0; i < headers.length; i++) {
@@ -206,7 +202,6 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
         }
     }
 
-    // ================= NEWS =================
     private void createNewsSheet(Workbook workbook,
                                  LocalDateTime from,
                                  LocalDateTime to) {
@@ -214,10 +209,11 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
         Sheet sheet = workbook.createSheet("News");
 
         Row h = sheet.createRow(0);
-        String[] headers = {"No", "ID", "Tên", "Ngày tạo"};
+        String[] headers = {"No", "ID", "Title", "Created At"};
 
-        for (int i = 0; i < headers.length; i++)
+        for (int i = 0; i < headers.length; i++) {
             h.createCell(i).setCellValue(headers[i]);
+        }
 
         List<News> news =
                 newRepo.findByCreatedAtBetween(from, to);
@@ -233,8 +229,6 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
         }
     }
 
-
-    // ================= FESTIVAL =================
     private void createFestivalSheet(Workbook workbook,
                                      LocalDateTime from,
                                      LocalDateTime to) {
@@ -242,10 +236,11 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
         Sheet sheet = workbook.createSheet("Festival");
 
         Row h = sheet.createRow(0);
-        String[] headers = {"No", "ID", "Tên", "Ngày bắt đầu"};
+        String[] headers = {"No", "ID", "Title", "Start Time"};
 
-        for (int i = 0; i < headers.length; i++)
+        for (int i = 0; i < headers.length; i++) {
             h.createCell(i).setCellValue(headers[i]);
+        }
 
         List<Festival> festivals =
                 festivalRepo.findByStartTimeBetween(from, to);
@@ -260,5 +255,4 @@ public class ExportStatisticExcelServiceImpl implements IExportStatisticExcelSer
             r.createCell(3).setCellValue(String.valueOf(f.getStartTime()));
         }
     }
-
 }

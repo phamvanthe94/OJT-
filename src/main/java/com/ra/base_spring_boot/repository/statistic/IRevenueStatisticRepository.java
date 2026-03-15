@@ -13,7 +13,6 @@ import java.util.List;
 
 public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long> {
 
-    // Thống kê theo phim
     @Query("""
                 SELECT NEW com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse(
                     m.id, m.title,
@@ -41,7 +40,6 @@ public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long
             @Param("now") LocalDateTime now
     );
 
-    // Thống kê theo thể loại (join nhiều-nhiều)
     @Query("""
                 SELECT NEW com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse(
                     g.id, g.genreName,
@@ -70,7 +68,6 @@ public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long
             @Param("now") LocalDateTime now
     );
 
-    // Thống kê theo rạp
     @Query("""
                 SELECT NEW com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse(
                     t.id, t.name,
@@ -99,7 +96,6 @@ public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long
             @Param("now") LocalDateTime now
     );
 
-    // Thống kê theo phòng chiếu
     @Query("""
                 SELECT NEW com.ra.base_spring_boot.dto.statistic.resp.RevenueStatisticResponse(
                     s.id, s.name,
@@ -127,7 +123,6 @@ public interface IRevenueStatisticRepository extends JpaRepository<Booking, Long
             @Param("now") LocalDateTime now
     );
 
-    // Export excel: doanh thu theo phim theo khoảng thời gian thanh toán
     @Query("""
                 SELECT m.title,
                        COALESCE(SUM(bs.quantity * bs.price), 0)

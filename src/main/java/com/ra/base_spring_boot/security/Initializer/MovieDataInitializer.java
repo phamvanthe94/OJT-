@@ -6,6 +6,7 @@ import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.repository.IMovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,71 +15,52 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 @Order(1)
 public class MovieDataInitializer implements CommandLineRunner {
 
     private final IMovieRepository movieRepository;
-    List<Movie> comSoonMovies = List.of(
-            Movie.builder()
-                    .title("Chí Phèo")
-                    .image("image3.jpg")
-                    .trailer("example_trailer_link")
-                    .author("Nam Cao")
-                    .descriptions("Chí Phèo là một tác phẩm văn học nổi tiếng của nhà văn Nam Cao, kể về cuộc đời bi kịch của nhân vật Chí Phèo...")
-                    .duration(110)
-                    .releaseDate(LocalDateTime.of(2024, 10, 1, 0, 0))
-                    .status(MovieStatus.COMING_SOON)
-                    .type(MovieType._2D)
-                    .build(),
-            Movie.builder()
-                    .title("Tuổi thơ dữ dội")
-                    .image("image4.jpg")
-                    .trailer("example_trailer_link")
-                    .author("Phùng Quán")
-                    .descriptions("Tuổi thơ dữ dội là một tiểu thuyết nổi tiếng của nhà văn Phùng Quán, kể về những năm tháng chiến tranh khốc liệt...")
-                    .duration(95)
-                    .releaseDate(LocalDateTime.of(2024, 11, 1, 0, 0))
-                    .status(MovieStatus.COMING_SOON)
-                    .type(MovieType._2D)
-                    .build()
-    );
 
     @Transactional
     @Override
     public void run(String... args) {
-        if (movieRepository.count() > 0)
+        if (movieRepository.count() > 0) {
             return;
+        }
 
         List<Movie> movies = List.of(
-                Movie.builder()
-                        .title("Lão Hạc")
-                        .image("image1.jpg")
-                        .trailer("example_trailer_link")
-                        .author("Nam Cao")
-                        .descriptions("Lão Hạc là một truyện ngắn nổi tiếng của nhà văn Nam Cao, kể về cuộc sống và số phận của một người nông dân nghèo tên là Lão Hạc...")
-                        .duration(120)
-                        .releaseDate(LocalDateTime.of(2024, 1, 1, 0, 0))
-                        .status(MovieStatus.NOW_SHOWING)
-                        .type(MovieType._2D)
-
-                        .build(),
-
-                Movie.builder()
-                        .title("Số đỏ")
-                        .image("image2.jpg")
-                        .trailer("example_trailer_link")
-                        .author("Vũ Trọng Phụng")
-                        .descriptions("Số đỏ là một tiểu thuyết châm biếm xã hội Việt Nam trong thập niên 1930.")
-                        .duration(90)
-                        .releaseDate(LocalDateTime.of(2024, 2, 1, 0, 0))
-                        .status(MovieStatus.NOW_SHOWING)
-                        .type(MovieType._2D)
-
-                        .build()
+                movie("Classic Drama", "Demo Author A", MovieStatus.NOW_SHOWING, MovieType._2D, 120, 1, 30),
+                movie("Red City", "Demo Author B", MovieStatus.NOW_SHOWING, MovieType._2D, 90, 1, 30),
+                movie("Village Story", "Demo Author C", MovieStatus.COMING_SOON, MovieType._2D, 110, 31, 60),
+                movie("Youth Journey", "Demo Author D", MovieStatus.COMING_SOON, MovieType._2D, 95, 31, 60)
         );
-        movieRepository.saveAll(movies);
-        movieRepository.saveAll(comSoonMovies);
 
+        movieRepository.saveAll(movies);
+    }
+
+    private Movie movie(
+            String title,
+            String author,
+            MovieStatus status,
+            MovieType type,
+            int duration,
+            int startAfterDays,
+            int endAfterDays
+    ) {
+        LocalDateTime startDate = LocalDateTime.now().plusDays(startAfterDays);
+        return Movie.builder()
+                .title(title)
+                .image("image-" + title.toLowerCase().replace(" ", "-") + ".jpg")
+                .trailer("example_trailer_link")
+                .author(author)
+                .descriptions("Seed movie for local testing")
+                .duration(duration)
+                .releaseDate(startDate)
+                .releaseStartDate(startDate)
+                .releaseEndDate(LocalDateTime.now().plusDays(endAfterDays))
+                .status(status)
+                .type(type)
+                .build();
     }
 }

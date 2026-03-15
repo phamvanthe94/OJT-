@@ -1,65 +1,79 @@
 package com.ra.base_spring_boot.services.paymt.impl;
 
+import com.ra.base_spring_boot.model.constants.BookingStatus;
 import com.ra.base_spring_boot.model.constants.PaymentStatus;
+import com.ra.base_spring_boot.model.entity.booking.Booking;
 import com.ra.base_spring_boot.model.entity.booking.Payment;
+import com.ra.base_spring_boot.repository.booking.IBookingRepository;
 import com.ra.base_spring_boot.repository.payment.PaymentRepository;
 import com.ra.base_spring_boot.services.paymt.IPayPalClientService;
 import com.ra.base_spring_boot.services.paymt.IPayPalWebhookService;
+import com.ra.base_spring_boot.services.paymt.ITicketIssuanceService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PayPalWebhookServiceImpl implements IPayPalWebhookService {
 
     private final IPayPalClientService payPalClientService;
     private final PaymentRepository paymentRepository;
+    private final IBookingRepository bookingRepository;
+    private final ITicketIssuanceService ticketIssuanceService;
 
     @Value("${paypal.webhook-id}")
     private String webhookId;
 
-    @Override
-    public void handleWebhook(Map<String, String> headers, Map<String, Object> body) {
-        // 1) Verify signature (FAIL -> throw)
-        verifySignature(headers, body);
+    @Value("${paypal.webhook-verify-enabled}")
+    private boolean verifyEnabled;
 
-        // 2) Route theo event_type
+    @Override
+    @Transactional
+    public void handleWebhook(Map<String, String> headers, Map<String, Object> body) {
+        if (verifyEnabled) {
+            verifySignature(headers, body);
+        } else {
+            log.info("PayPal webhook signature verification is disabled");
+        }
+
         String eventType = str(body.get("event_type"));
-        if (eventType == null) {
+        if (eventType == null || eventType.isBlank()) {
             throw new IllegalArgumentException("Missing event_type");
         }
 
         switch (eventType) {
             case "PAYMENT.CAPTURE.COMPLETED" -> onCaptureCompleted(body);
             case "PAYMENT.CAPTURE.DENIED" -> onCaptureDenied(body);
-            // (optional) Nếu bạn muốn xử lý thêm:
-            // case "CHECKOUT.ORDER.APPROVED" -> onOrderApproved(body);
-            default -> {
-                // Không xử lý vẫn OK: trả 200 để PayPal khỏi retry vì event không liên quan
-                System.out.println("[PayPalWebhook] Ignore event_type=" + eventType);
-            }
+            default -> log.info("Ignoring PayPal webhook event type {}", eventType);
         }
     }
 
     private void verifySignature(Map<String, String> headers, Map<String, Object> body) {
-        String transmissionId = headerIgnoreCaseOrNull(headers, "PAYPAL-TRANSMISSION-ID");
-        String transmissionTime = headerIgnoreCaseOrNull(headers, "PAYPAL-TRANSMISSION-TIME");
-        String certUrl = headerIgnoreCaseOrNull(headers, "PAYPAL-CERT-URL");
-        String authAlgo = headerIgnoreCaseOrNull(headers, "PAYPAL-AUTH-ALGO");
-        String transmissionSig = headerIgnoreCaseOrNull(headers, "PAYPAL-TRANSMISSION-SIG");
+        String transmissionId = headerAny(headers,
+                "PayPal-Transmission-Id", "PAYPAL-TRANSMISSION-ID", "paypal-transmission-id");
+        String transmissionTime = headerAny(headers,
+                "PayPal-Transmission-Time", "PAYPAL-TRANSMISSION-TIME", "paypal-transmission-time");
+        String certUrl = headerAny(headers,
+                "PayPal-Cert-Url", "PAYPAL-CERT-URL", "paypal-cert-url");
+        String authAlgo = headerAny(headers,
+                "PayPal-Auth-Algo", "PAYPAL-AUTH-ALGO", "paypal-auth-algo");
+        String transmissionSig = headerAny(headers,
+                "PayPal-Transmission-Sig", "PAYPAL-TRANSMISSION-SIG", "paypal-transmission-sig");
 
-        // Thiếu header => webhook không hợp lệ (trả 400 ở controller)
         if (transmissionId == null || transmissionTime == null || certUrl == null
                 || authAlgo == null || transmissionSig == null) {
+            log.warn("Missing PayPal signature headers. keys={}", headers != null ? headers.keySet() : null);
             throw new IllegalArgumentException("Missing PayPal signature headers");
         }
 
         String token = payPalClientService.getAccessToken();
-
         Map<String, Object> verifyPayload = Map.of(
                 "transmission_id", transmissionId,
                 "transmission_time", transmissionTime,
@@ -70,11 +84,13 @@ public class PayPalWebhookServiceImpl implements IPayPalWebhookService {
                 "webhook_event", body
         );
 
-        Map<String, Object> resp = payPalClientService.verifyWebhookSignature(token, verifyPayload);
-        String status = resp == null ? null : str(resp.get("verification_status"));
+        Map<String, Object> response = payPalClientService.verifyWebhookSignature(token, verifyPayload);
+        String status = response == null ? null : str(response.get("verification_status"));
+        log.info("PayPal webhook verification status={}", status);
 
         if (!"SUCCESS".equalsIgnoreCase(status)) {
-            throw new IllegalArgumentException("Invalid PayPal webhook signature. verification_status=" + status);
+            log.warn("PayPal webhook signature verification failed. response={}", response);
+            throw new IllegalArgumentException("Invalid PayPal webhook signature. status=" + status);
         }
     }
 
@@ -82,79 +98,119 @@ public class PayPalWebhookServiceImpl implements IPayPalWebhookService {
     private void onCaptureCompleted(Map<String, Object> body) {
         Map<String, Object> resource = (Map<String, Object>) body.get("resource");
         if (resource == null) {
-            System.out.println("[PayPalWebhook] resource is null");
+            log.warn("PayPal capture completed webhook is missing resource");
             return;
         }
 
         String captureId = str(resource.get("id"));
         String captureStatus = str(resource.get("status"));
         String orderId = extractOrderId(resource);
+        log.info("PayPal capture completed. orderId={}, captureId={}, status={}", orderId, captureId, captureStatus);
 
-        System.out.println("[PayPalWebhook] CAPTURE.COMPLETED orderId=" + orderId
-                + " captureId=" + captureId + " status=" + captureStatus);
-
-        if (orderId == null) return;
-
-        Payment payment = paymentRepository.findByPaypalOrderId(orderId).orElse(null);
-        if (payment == null) {
-            System.out.println("[PayPalWebhook] Payment not found by paypalOrderId=" + orderId);
+        if (orderId == null || orderId.isBlank()) {
             return;
         }
 
-        // idempotent: đã COMPLETED thì bỏ qua
-        if (payment.getPaymentStatus() == PaymentStatus.COMPLETED) return;
+        Payment payment = paymentRepository.findByPaypalOrderId(orderId).orElse(null);
+        if (payment == null) {
+            log.warn("Payment not found for PayPal orderId={}", orderId);
+            return;
+        }
 
-        // Chỉ set COMPLETED khi PayPal báo COMPLETED
+        if (payment.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            return;
+        }
+
         if ("COMPLETED".equalsIgnoreCase(captureStatus)) {
             payment.setPaymentStatus(PaymentStatus.COMPLETED);
             payment.setPaymentTime(LocalDateTime.now());
             payment.setPaypalCaptureId(captureId);
             payment.setTransactionId(captureId);
+            syncBookingStatus(payment.getBooking(), BookingStatus.COMPLETED, PaymentStatus.COMPLETED);
             paymentRepository.save(payment);
+            ticketIssuanceService.issueTicketAfterPaymentCompleted(payment);
         }
     }
 
     @SuppressWarnings("unchecked")
     private void onCaptureDenied(Map<String, Object> body) {
         Map<String, Object> resource = (Map<String, Object>) body.get("resource");
-        if (resource == null) return;
+        if (resource == null) {
+            return;
+        }
 
         String orderId = extractOrderId(resource);
-        System.out.println("[PayPalWebhook] CAPTURE.DENIED orderId=" + orderId);
+        log.info("PayPal capture denied. orderId={}", orderId);
 
-        if (orderId == null) return;
+        if (orderId == null || orderId.isBlank()) {
+            return;
+        }
 
         Payment payment = paymentRepository.findByPaypalOrderId(orderId).orElse(null);
-        if (payment == null) return;
-
-        if (payment.getPaymentStatus() == PaymentStatus.COMPLETED) return;
+        if (payment == null || payment.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            return;
+        }
 
         payment.setPaymentStatus(PaymentStatus.FAILED);
+        syncBookingStatus(payment.getBooking(), BookingStatus.FAILED, PaymentStatus.FAILED);
         paymentRepository.save(payment);
+    }
+
+    private void syncBookingStatus(Booking booking, BookingStatus bookingStatus, PaymentStatus paymentStatus) {
+        if (booking == null) {
+            return;
+        }
+        booking.setStatus(bookingStatus);
+        booking.setPaymentStatus(paymentStatus);
+        bookingRepository.save(booking);
     }
 
     @SuppressWarnings("unchecked")
     private String extractOrderId(Map<String, Object> resource) {
-        // PayPal capture event thường có: supplementary_data.related_ids.order_id
         try {
             Map<String, Object> supplementary = (Map<String, Object>) resource.get("supplementary_data");
             Map<String, Object> related = (Map<String, Object>) supplementary.get("related_ids");
             return str(related.get("order_id"));
         } catch (Exception e) {
+            log.debug("Unable to extract PayPal order id from webhook resource", e);
             return null;
         }
     }
 
-    private String headerIgnoreCaseOrNull(Map<String, String> headers, String key) {
-        for (var e : headers.entrySet()) {
-            if (e.getKey() != null && e.getKey().equalsIgnoreCase(key)) {
-                return e.getValue();
+    private String headerAny(Map<String, String> headers, String... keys) {
+        if (headers == null || headers.isEmpty()) {
+            return null;
+        }
+
+        for (String key : keys) {
+            String value = headers.get(key);
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+
+            value = headers.get(key.toLowerCase());
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            if (entry.getKey() == null) {
+                continue;
+            }
+            for (String key : keys) {
+                if (entry.getKey().equalsIgnoreCase(key)) {
+                    String value = entry.getValue();
+                    if (value != null && !value.isBlank()) {
+                        return value;
+                    }
+                }
             }
         }
         return null;
     }
 
-    private String str(Object o) {
-        return o == null ? null : String.valueOf(o);
+    private String str(Object value) {
+        return value == null ? null : String.valueOf(value);
     }
 }

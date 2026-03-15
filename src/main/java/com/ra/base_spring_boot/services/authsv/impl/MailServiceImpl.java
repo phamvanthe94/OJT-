@@ -1,5 +1,6 @@
 package com.ra.base_spring_boot.services.authsv.impl;
 
+import com.ra.base_spring_boot.exception.TechnicalException;
 import com.ra.base_spring_boot.services.authsv.IMailService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -25,19 +26,19 @@ public class MailServiceImpl implements IMailService {
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("Đặt lại mật khẩu");
-
-            String content = "<p>Bạn đã yêu cầu đặt lại mật khẩu.</p>"
-                    + "<p>Vui lòng nhấp vào liên kết bên dưới để đặt lại mật khẩu của bạn:</p>"
-                    + "<a href=\"" + resetLink + "\">Đặt lại mật khẩu</a>"
-                    + "<br><br>"
-                    + "<p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>";
-
-            helper.setText(content, true);
+            helper.setSubject("Reset your password");
+            helper.setText(buildResetPasswordContent(resetLink), true);
             mailSender.send(message);
         } catch (Exception e) {
-            throw new RuntimeException("Gửi email thất bại" + e.getMessage());
+            throw new TechnicalException("Failed to send reset password email", e);
         }
+    }
 
+    private String buildResetPasswordContent(String resetLink) {
+        return "<p>You requested to reset your password.</p>"
+                + "<p>Open the link below to set a new password:</p>"
+                + "<a href=\"" + resetLink + "\">Reset password</a>"
+                + "<br><br>"
+                + "<p>If you did not request this, you can safely ignore this email.</p>";
     }
 }

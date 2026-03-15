@@ -40,7 +40,6 @@ public interface IBookingSeatRepository extends JpaRepository<BookingSeat, Long>
     """)
     List<TicketByMovieResponse> statisticTicketByMovie(PaymentStatus status);
 
-    //  THỐNG KÊ THEO PHÒNG CHIẾU
     @Query("""
         SELECT new com.ra.base_spring_boot.dto.resp.statisticResponse.TicketByScreenResponse(
             s.id,
@@ -59,7 +58,6 @@ public interface IBookingSeatRepository extends JpaRepository<BookingSeat, Long>
 
     List<BookingSeat> findByBooking_Id(Long bookingId);
 
-    //KIỂM TRA GHẾ CÓ BỊ ĐẶT RỒI KHÔNG
     boolean existsBySeat_IdAndBooking_ShowTime_IdAndBooking_PaymentStatusIn(
             Long seatId,
             Long showTimeId,

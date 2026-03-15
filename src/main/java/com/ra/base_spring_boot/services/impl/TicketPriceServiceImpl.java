@@ -74,7 +74,6 @@ public class TicketPriceServiceImpl implements ITicketPriceService {
         ticketPriceRepository.delete(ticketPrice);
     }
 
-    /* ===== helper ===== */
 
     private TicketPrice convertToEntity(TicketPriceRequest req) {
         return TicketPrice.builder()

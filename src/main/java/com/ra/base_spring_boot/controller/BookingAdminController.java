@@ -18,7 +18,6 @@ public class BookingAdminController {
 
     private final BookingAdminService bookingAdminService;
 
-    // ✅ 1) LIST + SEARCH + PAGING
     @GetMapping
     public ResponseEntity<ResponseWrapper<Page<Booking>>> getAll(
             @RequestParam(required = false) String keyword,
@@ -31,13 +30,11 @@ public class BookingAdminController {
         return bookingAdminService.getAll(keyword, pageable);
     }
 
-    // ✅ 2) DETAIL
     @GetMapping("/{id}")
     public ResponseEntity<ResponseWrapper<Map<String, Object>>> detail(@PathVariable Long id) {
         return bookingAdminService.getDetail(id);
     }
 
-    // ✅ 3) CHANGE STATUS
     @PutMapping("/{id}/status")
     public ResponseEntity<ResponseWrapper<Object>> changeStatus(
             @PathVariable Long id,

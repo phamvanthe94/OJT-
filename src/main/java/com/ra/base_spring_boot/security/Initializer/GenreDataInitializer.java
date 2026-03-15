@@ -4,11 +4,13 @@ import com.ra.base_spring_boot.model.entity.movie.Genre;
 import com.ra.base_spring_boot.repository.IGenreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 @Order(2)
 public class GenreDataInitializer implements CommandLineRunner {
@@ -18,16 +20,16 @@ public class GenreDataInitializer implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) {
-        if (genreRepository.count() > 0)
+        if (genreRepository.count() > 0) {
             return;
+        }
 
-        saveIfNotExists("Hành Động");
-        saveIfNotExists("Phiêu Lưu");
-        saveIfNotExists("Hài Hước");
-        saveIfNotExists("Kinh Dị");
-        saveIfNotExists("Tình Cảm");
+        saveIfNotExists("Action");
+        saveIfNotExists("Adventure");
+        saveIfNotExists("Comedy");
+        saveIfNotExists("Horror");
+        saveIfNotExists("Romance");
     }
-
 
     private void saveIfNotExists(String genreName) {
         if (!genreRepository.existsByGenreNameIgnoreCase(genreName)) {
@@ -38,5 +40,4 @@ public class GenreDataInitializer implements CommandLineRunner {
             );
         }
     }
-
 }

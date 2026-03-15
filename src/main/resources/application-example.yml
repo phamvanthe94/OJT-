@@ -1,0 +1,66 @@
+spring:
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  application:
+    name: base_spring_boot
+
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/movie_ticket?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo&characterEncoding=UTF-8}
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        show_sql: ${HIBERNATE_SHOW_SQL:false}
+
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  mail:
+    from: ${APP_MAIL_FROM:no-reply@example.com}
+    from-name: ${APP_MAIL_FROM_NAME:Ticket System}
+
+cloudinary:
+  cloud_name: ${CLOUDINARY_CLOUD_NAME:}
+  api_key: ${CLOUDINARY_API_KEY:}
+  api_secret: ${CLOUDINARY_API_SECRET:}
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY:}
+  expired:
+    access: ${JWT_EXPIRED_ACCESS:864000}
+
+paypal:
+  base-url: ${PAYPAL_BASE_URL:https://api-m.sandbox.paypal.com}
+  client-id: ${PAYPAL_CLIENT_ID:}
+  client-secret: ${PAYPAL_CLIENT_SECRET:}
+  webhook-id: ${PAYPAL_WEBHOOK_ID:}
+  return-url: ${PAYPAL_RETURN_URL:http://localhost:8080/api/v1/paypal/return}
+  cancel-url: ${PAYPAL_CANCEL_URL:http://localhost:8080/api/v1/paypal/cancel}
+  webhook-verify-enabled: ${PAYPAL_WEBHOOK_VERIFY_ENABLED:true}
+
+frontend:
+  reset-password-url: ${FRONTEND_RESET_PASSWORD_URL:http://localhost:8080/api/v1/auth/password/reset-token}
+
+reset-password:
+  expire-minutes: ${RESET_PASSWORD_EXPIRE_MINUTES:15}

@@ -23,7 +23,7 @@ public class FestivalRequest {
     private MultipartFile image;
 
     @NotNull
-    @FutureOrPresent(message = "Thời gian bắt đầu không được nhỏ hơn hiện tại")
+    @FutureOrPresent(message = "Start time must be today or a future date")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDateTime startTime;
 
@@ -31,3 +31,4 @@ public class FestivalRequest {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDateTime endTime;
 }
+

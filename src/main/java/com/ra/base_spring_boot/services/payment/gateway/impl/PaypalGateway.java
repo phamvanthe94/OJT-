@@ -14,10 +14,8 @@ public class PaypalGateway implements PaymentGateway {
 
     @Override
     public PaymentInitResponse init(PaymentInitRequest request) {
-        // ✅ giả lập transactionId theo bookingId
         String transactionId = "PAYPAL_" + request.getBookingId();
 
-        // ✅ giả lập link thanh toán (sau này thay bằng link thật của PayPal)
         String paymentUrl = "https://paypal.com/checkout?tx=" + transactionId;
 
         return new PaymentInitResponse(paymentUrl, transactionId);
@@ -25,11 +23,8 @@ public class PaypalGateway implements PaymentGateway {
 
     @Override
     public PaymentVerifyResponse verify(PaymentVerifyRequest request) {
-        // ✅ Giả lập verify: nếu có transactionId thì coi như thanh toán thành công
-        // (Sau này thay bằng gọi API thật của PayPal)
         String tx = request.getTransactionId();
 
-        // Nếu tx null/blank thì coi là FAILED
         if (tx == null || tx.isBlank()) {
             return new PaymentVerifyResponse(PaymentStatus.FAILED, "Missing transactionId");
         }

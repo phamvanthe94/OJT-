@@ -6,6 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentInitResponse {
-    private String paymentUrl;   // FE redirect
+    private String paymentUrl;
     private String transactionId;
 }

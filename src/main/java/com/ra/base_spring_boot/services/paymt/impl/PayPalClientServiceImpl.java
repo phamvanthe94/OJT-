@@ -1,6 +1,8 @@
 package com.ra.base_spring_boot.services.paymt.impl;
 
+import com.ra.base_spring_boot.exception.TechnicalException;
 import com.ra.base_spring_boot.services.paymt.IPayPalClientService;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,10 @@ import java.util.Map;
 
 @Service
 public class PayPalClientServiceImpl implements IPayPalClientService {
+
+    private static final ParameterizedTypeReference<Map<String, Object>> MAP_RESPONSE_TYPE =
+            new ParameterizedTypeReference<>() {
+            };
 
     private final WebClient webClient;
     private final String clientId;
@@ -29,18 +35,18 @@ public class PayPalClientServiceImpl implements IPayPalClientService {
 
     @Override
     public String getAccessToken() {
-        Map<?, ?> resp = webClient.post()
+        Map<String, Object> resp = webClient.post()
                 .uri("/v1/oauth2/token")
                 .headers(h -> h.setBasicAuth(clientId, clientSecret))
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("grant_type=client_credentials")
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(MAP_RESPONSE_TYPE)
                 .timeout(Duration.ofSeconds(15))
                 .block();
 
         if (resp == null || resp.get("access_token") == null) {
-            throw new RuntimeException("PayPal: cannot get access_token");
+            throw new TechnicalException("PayPal access token response is invalid");
         }
         return (String) resp.get("access_token");
     }
@@ -71,7 +77,7 @@ public class PayPalClientServiceImpl implements IPayPalClientService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(payload)
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(MAP_RESPONSE_TYPE)
                 .timeout(Duration.ofSeconds(15))
                 .block();
     }
@@ -84,7 +90,18 @@ public class PayPalClientServiceImpl implements IPayPalClientService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of())
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(MAP_RESPONSE_TYPE)
+                .timeout(Duration.ofSeconds(15))
+                .block();
+    }
+
+    @Override
+    public Map<String, Object> getOrder(String accessToken, String orderId) {
+        return webClient.get()
+                .uri("/v2/checkout/orders/{id}", orderId)
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve()
+                .bodyToMono(MAP_RESPONSE_TYPE)
                 .timeout(Duration.ofSeconds(15))
                 .block();
     }
@@ -97,7 +114,7 @@ public class PayPalClientServiceImpl implements IPayPalClientService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(verifyPayload)
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(MAP_RESPONSE_TYPE)
                 .timeout(Duration.ofSeconds(15))
                 .block();
     }

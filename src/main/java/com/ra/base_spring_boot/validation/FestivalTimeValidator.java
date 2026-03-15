@@ -10,7 +10,7 @@ public class FestivalTimeValidator
     @Override
     public boolean isValid(FestivalRequest dto, ConstraintValidatorContext context) {
         if (dto.getStartTime() == null || dto.getEndTime() == null) {
-            return true; // @NotNull xử lý riêng
+            return true;
         }
         return !dto.getEndTime().isBefore(dto.getStartTime());
     }

@@ -6,15 +6,15 @@ import com.ra.base_spring_boot.exception.HttpNotFound;
 import com.ra.base_spring_boot.model.entity.theater.Theater;
 import com.ra.base_spring_boot.repository.Theater.TheaterRepo;
 import com.ra.base_spring_boot.services.Theater.TheaterService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class TheaterServiceImp implements TheaterService {
-    @Autowired
-    TheaterRepo theaterRepo;
+    private final TheaterRepo theaterRepo;
     @Override
     public Page<TheaterResp> getTheaters(Pageable pageable) {
         Page<Theater> theaters= theaterRepo.findAll(pageable);
@@ -43,7 +43,7 @@ public class TheaterServiceImp implements TheaterService {
     @Override
     public TheaterResp getTheaterById(Long theaterId) {
         Theater theater = theaterRepo.findById(theaterId)
-                .orElseThrow(() -> new RuntimeException("Theater not found"));
+                .orElseThrow(() -> new HttpNotFound("Theater not found"));
 
         return TheaterResp.builder()
                 .name(theater.getName())
@@ -70,7 +70,7 @@ public class TheaterServiceImp implements TheaterService {
     @Override
     public TheaterResp updateTheater(Long theaterId, TheaterReq theaterReq) {
         Theater theater = theaterRepo.findById(theaterId)
-                .orElseThrow(() -> new RuntimeException("Theater not found"));
+                .orElseThrow(() -> new HttpNotFound("Theater not found"));
 
         theater.setName(theaterReq.getName());
         theater.setPhone(theaterReq.getPhone());

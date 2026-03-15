@@ -24,8 +24,6 @@ public interface ITicketPriceRepository extends JpaRepository<TicketPrice, Long>
 
     Optional<TicketPrice>
     findByTypeSeatAndTypeMovieAndDayTypeAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-    //findByShowTime_IdAndTypeSeatAndTypeMovieAndDayTypeAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-            //Long showTimeId,
             SeatType typeSeat,
             MovieType typeMovie,
             Boolean dayType,

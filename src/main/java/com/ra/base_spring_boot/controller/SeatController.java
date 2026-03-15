@@ -4,7 +4,7 @@ import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.SeatReq;
 import com.ra.base_spring_boot.dto.resp.SeatResp;
 import com.ra.base_spring_boot.services.SeatService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,11 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/seat")
+@RequestMapping("/api/v1/admin/seats")
+@RequiredArgsConstructor
 public class SeatController {
 
-    @Autowired
-    private SeatService seatService;
+    private final SeatService seatService;
 
     @GetMapping
     public ResponseEntity<?> findAll(

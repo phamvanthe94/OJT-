@@ -1,6 +1,7 @@
 package com.ra.base_spring_boot.services.homeService.impl;
 
 import com.ra.base_spring_boot.dto.resp.homeresp.MovieTrailerResponse;
+import com.ra.base_spring_boot.exception.HttpNotFound;
 import com.ra.base_spring_boot.model.constants.MovieStatus;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.repository.homerpo.IMovieHomeRepository;
@@ -14,33 +15,25 @@ public class TrailerHomeServiceImpl implements ITrailerHomeService {
 
     private final IMovieHomeRepository movieHomeRepository;
 
-
     @Override
     public MovieTrailerResponse getNowShowingMovieTrailer(Long id) {
-
         Movie movie = movieHomeRepository.findMovieDetailByIdAndStatus(id, MovieStatus.NOW_SHOWING)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phim đang chiếu !"));
+                .orElseThrow(() -> new HttpNotFound("Now-showing movie not found"));
 
-        if (movie.getTrailer() == null || movie.getTrailer().isBlank()) {
-            throw new RuntimeException("Phim hiện không có trailer !");
-        }
-
-        return MovieTrailerResponse.builder()
-                .movieId(movie.getId())
-                .title(movie.getTitle())
-                .trailer(movie.getTrailer())
-                .build();
+        return toTrailerResponse(movie);
     }
-
 
     @Override
     public MovieTrailerResponse getMovieTrailer(Long id) {
-
         Movie movie = movieHomeRepository.findMovieDetail(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phim !"));
+                .orElseThrow(() -> new HttpNotFound("Movie not found"));
 
+        return toTrailerResponse(movie);
+    }
+
+    private MovieTrailerResponse toTrailerResponse(Movie movie) {
         if (movie.getTrailer() == null || movie.getTrailer().isBlank()) {
-            throw new RuntimeException("Phim hiện không có trailer !");
+            throw new HttpNotFound("Movie trailer not found");
         }
 
         return MovieTrailerResponse.builder()

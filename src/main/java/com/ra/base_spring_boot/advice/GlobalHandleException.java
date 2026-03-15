@@ -1,7 +1,9 @@
 package com.ra.base_spring_boot.advice;
 
-import com.ra.base_spring_boot.dto.ResponseWrapper;
+import com.ra.base_spring_boot.dto.ErrorResponse;
 import com.ra.base_spring_boot.exception.*;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,195 +15,156 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalHandleException {
     /**
      * @param ex MethodArgumentNotValidException
-     * @apiNote handle valid exception for validation (400)
+     * @param request HttpServletRequest
+     * @apiNote handle validation exception for invalid request data (400)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<?> handleValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         Map<String, String> errors = new HashMap<>();
         ex.getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ResponseWrapper.builder()
-                        .data(errors)
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .status(HttpStatus.BAD_REQUEST)
-                        .build()
-        );
+        return buildError(HttpStatus.BAD_REQUEST, "Validation failed", request, errors);
     }
 
     /**
      * @param ex MaxUploadSizeExceededException
-     * @apiNote handle exception max upload file (400)
+     * @param request HttpServletRequest
+     * @apiNote handle file upload size exception (400)
      */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .status(HttpStatus.BAD_REQUEST)
-                        .build()
-        );
+    public ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
     /**
      * @param ex NoResourceFoundException
-     * @apiNote handle exception not found resource (404)
-     *
+     * @param request HttpServletRequest
+     * @apiNote handle missing resource exception (404)
      */
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.NOT_FOUND.value())
-                        .status(HttpStatus.NOT_FOUND)
-                        .build()
-        );
+    public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     /**
      * @param ex UsernameNotFoundException
-     * @apiNote handle username not found exception
-     *
+     * @param request HttpServletRequest
+     * @apiNote handle missing username exception (404)
      */
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.NOT_FOUND.value())
-                        .status(HttpStatus.NOT_FOUND)
-                        .build()
-        );
+    public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     /**
      * @param ex HttpBadRequest
-     * @apiNote handle exception bad request (400)
-     *
+     * @param request HttpServletRequest
+     * @apiNote handle bad request exception (400)
      */
     @ExceptionHandler(HttpBadRequest.class)
-    public ResponseEntity<?> handleHttpBadReqeust(HttpBadRequest ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .status(HttpStatus.BAD_REQUEST)
-                        .build()
-        );
+    public ResponseEntity<?> handleHttpBadReqeust(HttpBadRequest ex, HttpServletRequest request) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
     /**
      * @param ex HttpUnAuthorized
-     * @apiNote handle exception unauthorized (401)
-     *
+     * @param request HttpServletRequest
+     * @apiNote handle unauthorized exception (401)
      */
     @ExceptionHandler(HttpUnAuthorized.class)
-    public ResponseEntity<?> handleHttpUnAuthorized(HttpUnAuthorized ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.UNAUTHORIZED.value())
-                        .status(HttpStatus.UNAUTHORIZED)
-                        .build()
-        );
+    public ResponseEntity<?> handleHttpUnAuthorized(HttpUnAuthorized ex, HttpServletRequest request) {
+        return buildError(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
     }
 
     /**
      * @param ex HttpForbiden
-     * @apiNote handle exception forbiden (403)
-     *
+     * @param request HttpServletRequest
+     * @apiNote handle forbidden exception (403)
      */
     @ExceptionHandler(HttpForbiden.class)
-    public ResponseEntity<?> handleHttpForbiden(HttpForbiden ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.FORBIDDEN.value())
-                        .status(HttpStatus.FORBIDDEN)
-                        .build()
-        );
+    public ResponseEntity<?> handleHttpForbiden(HttpForbiden ex, HttpServletRequest request) {
+        return buildError(HttpStatus.FORBIDDEN, ex.getMessage(), request);
     }
 
     /**
      * @param ex HttpNotFound
-     * @apiNote handle exception not found (404)
-     *
+     * @param request HttpServletRequest
+     * @apiNote handle not found exception (404)
      */
     @ExceptionHandler(HttpNotFound.class)
-    public ResponseEntity<?> handleHttpNotFound(HttpNotFound ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.NOT_FOUND.value())
-                        .status(HttpStatus.NOT_FOUND)
-                        .build()
-        );
+    public ResponseEntity<?> handleHttpNotFound(HttpNotFound ex, HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     /**
      * @param ex HttpConflict
-     * @apiNote handle exception conflict (409)
-     *
+     * @param request HttpServletRequest
+     * @apiNote handle conflict exception (409)
      */
     @ExceptionHandler(HttpConflict.class)
-    public ResponseEntity<?> handleHttpConflict(HttpConflict ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.CONFLICT.value())
-                        .status(HttpStatus.CONFLICT)
-                        .build()
-        );
+    public ResponseEntity<?> handleHttpConflict(HttpConflict ex, HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     /**
      * @param ex RuntimeException
-     * @apiNote handle exception server error (500)
-     *
+     * @param request HttpServletRequest
+     * @apiNote handle unexpected runtime exception (500)
      */
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .status(HttpStatus.BAD_REQUEST)
-                        .build()
-        );
+    public ResponseEntity<?> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
+        log.error("Unhandled runtime exception", ex);
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", request);
     }
 
-    /*
+
+    /**
      * @param ex HttpRequestMethodNotSupportedException
-     * @apiNote handle exception method not allowed (405)
-     *
-     * */
-
+     * @param request HttpServletRequest
+     * @apiNote handle unsupported HTTP method exception (405)
+     */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<?> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.METHOD_NOT_ALLOWED.value())
-                        .status(HttpStatus.METHOD_NOT_ALLOWED)
-                        .build()
-        );
+    public ResponseEntity<?> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.METHOD_NOT_ALLOWED, ex.getMessage(), request);
     }
 
+    /**
+     * @param ex HttpMediaTypeNotSupportedException
+     * @param request HttpServletRequest
+     * @apiNote handle unsupported media type exception (415)
+     */
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<?> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
-        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(
-                ResponseWrapper.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value())
-                        .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    public ResponseEntity<?> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getMessage(), request);
+    }
+
+    private ResponseEntity<ErrorResponse> buildError(HttpStatus status, String message, HttpServletRequest request) {
+        return buildError(status, message, request, null);
+    }
+
+    private ResponseEntity<ErrorResponse> buildError(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request,
+            Map<String, String> errors
+    ) {
+        return ResponseEntity.status(status).body(
+                ErrorResponse.builder()
+                        .success(false)
+                        .code(status.value())
+                        .status(status.name())
+                        .message(message)
+                        .path(request.getRequestURI())
+                        .timestamp(Instant.now())
+                        .errors(errors)
                         .build()
         );
     }

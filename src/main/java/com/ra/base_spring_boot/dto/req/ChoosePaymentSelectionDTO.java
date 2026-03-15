@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ChoosePaymentSelectionDTO {
-    private Long providerId;        // user chọn provider nào
-    private String paymentMethod;   // CASH / VNPAY / ...
+    private Long providerId;
+    private String paymentMethod;
 }

@@ -9,7 +9,6 @@ import com.ra.base_spring_boot.services.homeService.ITicketHomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -19,13 +18,12 @@ public class TicketHomeServiceImpl implements ITicketHomeService {
     private final ITicketPriceHomeRepository ticketPriceHomeRepository;
 
     @Override
-    public List<TicketPriceResponse> getTicketPrices(SeatType seatType, MovieType movieType, Boolean dayType, LocalTime time) {
+    public List<TicketPriceResponse> getTicketPrices(SeatType seatType, MovieType movieType, Boolean dayType) {
 
         List<TicketPrice> ticketPriceList = ticketPriceHomeRepository.findTicketPriceBy(
                 seatType,
                 movieType,
-                dayType,
-                time
+                dayType
         );
 
         return ticketPriceList.stream().
@@ -35,8 +33,6 @@ public class TicketHomeServiceImpl implements ITicketHomeService {
                         .movieType(ticketPrice.getTypeMovie())
                         .price(ticketPrice.getPrice())
                         .dayType(ticketPrice.getDayType())
-                        .startTime(ticketPrice.getStartTime())
-                        .endTime(ticketPrice.getEndTime())
                         .build())
                 .toList();
     }

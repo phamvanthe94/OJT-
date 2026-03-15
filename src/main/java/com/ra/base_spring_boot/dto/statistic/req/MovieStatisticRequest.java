@@ -8,9 +8,5 @@ import lombok.*;
 
 public class MovieStatisticRequest {
 
-    // Hiện tại dashboard chưa cần filter
-    // Sau này có thể mở rộng:
-    // private Long cinemaId;
-    // private MovieType type;
 
 }

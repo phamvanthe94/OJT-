@@ -35,12 +35,11 @@ public class FestivalHomeServiceImpl implements IFestivalHomeService {
     public FestivalDetailResponse getFestivalDetail(Long id) {
 
         Festival festival = festivalHomeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy festival !"));
+                .orElseThrow(() -> new RuntimeException("Festival not found"));
 
         return toDetailResponse(festival);
     }
 
-    // ===================== HELPER =====================
 
     private FestivalListResponse toListResponse(Festival festival) {
         return FestivalListResponse.builder()
@@ -62,3 +61,4 @@ public class FestivalHomeServiceImpl implements IFestivalHomeService {
                 .build();
     }
 }
+

@@ -6,11 +6,13 @@ import com.ra.base_spring_boot.repository.IGenreRepository;
 import com.ra.base_spring_boot.repository.homerpo.IMovieHomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 @Order(3)
 public class MovieGenreDataInitializer implements CommandLineRunner {
@@ -21,24 +23,22 @@ public class MovieGenreDataInitializer implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) {
+        Movie classicDrama = movieHomeRepository.findByTitleIgnoreCase("Classic Drama").orElse(null);
+        Movie redCity = movieHomeRepository.findByTitleIgnoreCase("Red City").orElse(null);
 
-        Movie laoHac = movieHomeRepository.findByTitleIgnoreCase("Lão Hạc").orElse(null);
-        Movie soDo = movieHomeRepository.findByTitleIgnoreCase("Số đỏ").orElse(null);
+        Genre romance = genreRepository.findByGenreNameIgnoreCase("Romance").orElse(null);
+        Genre comedy = genreRepository.findByGenreNameIgnoreCase("Comedy").orElse(null);
 
-        Genre hanhDong = genreRepository.findByGenreNameIgnoreCase("Hành Động").orElse(null);
-        Genre haiHuoc = genreRepository.findByGenreNameIgnoreCase("Hài Hước").orElse(null);
-        Genre tinhCam = genreRepository.findByGenreNameIgnoreCase("Tình Cảm").orElse(null);
-
-        if (laoHac == null || soDo == null || hanhDong == null || haiHuoc == null || tinhCam == null) {
+        if (classicDrama == null || redCity == null || romance == null || comedy == null) {
             return;
         }
 
-        laoHac.getGenres().clear();
-        laoHac.getGenres().add(tinhCam);
-        soDo.getGenres().clear();
-        soDo.getGenres().add(haiHuoc);
+        classicDrama.getGenres().clear();
+        classicDrama.getGenres().add(romance);
+        redCity.getGenres().clear();
+        redCity.getGenres().add(comedy);
 
-        movieHomeRepository.save(laoHac);
-        movieHomeRepository.save(soDo);
+        movieHomeRepository.save(classicDrama);
+        movieHomeRepository.save(redCity);
     }
 }

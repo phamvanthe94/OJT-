@@ -17,9 +17,6 @@ public class PasswordController {
 
     private final IPasswordService passwordService;
 
-    /**
-     * @apiNote Handle forgot password request by sending a reset link to the user's email.
-     */
     @PostMapping("/forgot")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         passwordService.forgotPassword(request);
@@ -27,14 +24,11 @@ public class PasswordController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
-                        .data("Link đặt lại mật khẩu đã được gửi đến email của bạn !")
+                .data("Password reset link has been sent to your email")
                         .build()
         );
     }
 
-    /**
-     * @apiNote Handle password reset using the token sent to the user's email.
-     */
     @PostMapping("/reset")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         passwordService.resetPassword(request);
@@ -42,21 +36,18 @@ public class PasswordController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
-                        .data("Đặt lại mật khẩu thành công !")
+                .data("Password has been reset successfully")
                         .build()
         );
     }
 
-    /**
-     * @apiNote Simulate a password reset page for demonstration purposes.
-     */
     @GetMapping("/reset-token")
     public ResponseEntity<?> resetPasswordPage(@RequestParam String token) {
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
-                        .data("Copy token này vào Swagger để reset password: " + token)
+                .data("Copy this token to Swagger reset password: " + token)
                         .build()
         );
     }

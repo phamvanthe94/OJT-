@@ -3,6 +3,7 @@ package com.ra.base_spring_boot.services.impl;
 import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.req.ChoosePaymentSelectionDTO;
 import com.ra.base_spring_boot.dto.req.CompleteBookingDTO;
+import com.ra.base_spring_boot.model.constants.BookingStatus;
 import com.ra.base_spring_boot.model.constants.PaymentMethod;
 import com.ra.base_spring_boot.model.constants.PaymentStatus;
 import com.ra.base_spring_boot.model.entity.booking.Booking;
@@ -13,6 +14,7 @@ import com.ra.base_spring_boot.repository.booking.IBookingRepository;
 import com.ra.base_spring_boot.repository.booking.IBookingSeatRepository;
 import com.ra.base_spring_boot.repository.payment.IPaymentProviderRepository;
 import com.ra.base_spring_boot.repository.payment.PaymentRepository;
+import com.ra.base_spring_boot.services.paymt.impl.EmailServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +31,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentSelectionService {
 
-    // Nếu EmailService nằm package khác, bạn nhớ import đúng class EmailService của bạn
-    private final EmailService emailService;
+
+    private final EmailServiceImpl emailService;
 
     private final IBookingRepository bookingRepository;
     private final PaymentRepository paymentRepository;
@@ -40,21 +42,19 @@ public class PaymentSelectionService {
     public ResponseEntity<?> getBookingDetail(Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking không tồn tại: " + bookingId));
+                .orElseThrow(() -> new RuntimeException("Booking not found: " + bookingId));
 
         List<BookingSeat> seats = bookingSeatRepository.findByBooking_Id(bookingId);
         Payment payment = paymentRepository.findByBooking_Id(bookingId).orElse(null);
 
-        // ✅ Map booking -> plain data (tránh Hibernate proxy)
         Map<String, Object> bookingData = new HashMap<>();
         bookingData.put("id", booking.getId());
         bookingData.put("userId", booking.getUser() != null ? booking.getUser().getId() : null);
         bookingData.put("showTimeId", booking.getShowTime() != null ? booking.getShowTime().getId() : null);
         bookingData.put("totalSeat", booking.getTotalSeat());
-        bookingData.put("totalPriceMovie", booking.getTotalPriceMovie());
+        bookingData.put("totalAmount", booking.getTotalAmount());
         bookingData.put("createdAt", booking.getCreatedAt());
 
-        // ✅ Map seats -> plain data
         List<Map<String, Object>> seatDataList = new ArrayList<>();
         for (BookingSeat bs : seats) {
             Map<String, Object> s = new HashMap<>();
@@ -68,7 +68,6 @@ public class PaymentSelectionService {
             seatDataList.add(s);
         }
 
-        // ✅ Map payment -> plain data
         Map<String, Object> paymentData = null;
         if (payment != null) {
             paymentData = new HashMap<>();
@@ -102,36 +101,31 @@ public class PaymentSelectionService {
 
     public ResponseEntity<?> choose(Long bookingId, ChoosePaymentSelectionDTO dto) {
 
-        // 1) Validate - chưa chọn thì chặn
         if (dto == null || dto.getProviderId() == null
                 || dto.getPaymentMethod() == null || dto.getPaymentMethod().isBlank()) {
-            return badRequest("Bạn phải chọn phương thức thanh toán trước khi tiếp tục.");
+            return badRequest("Provider is disabled.");
         }
 
-        // 2) Parse enum paymentMethod
         PaymentMethod method;
         try {
             method = PaymentMethod.valueOf(dto.getPaymentMethod().trim().toUpperCase());
         } catch (Exception e) {
-            return badRequest("paymentMethod không hợp lệ: " + dto.getPaymentMethod());
+            return badRequest("Invalid paymentMethod: " + dto.getPaymentMethod());
         }
 
-        // 3) Booking tồn tại?
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking không tồn tại: " + bookingId));
+                .orElseThrow(() -> new RuntimeException("Booking not found: " + bookingId));
 
-        // 4) Provider tồn tại & đang hoạt động?
         PaymentProvider provider = paymentProviderRepository.findById(dto.getProviderId())
-                .orElseThrow(() -> new RuntimeException("Provider không tồn tại: " + dto.getProviderId()));
+                .orElseThrow(() -> new RuntimeException("Provider not found: " + dto.getProviderId()));
 
         if (provider.getStatus() == null || !provider.getStatus()) {
-            return badRequest("Provider đang bị khóa.");
+            return badRequest("Provider is disabled.");
         }
 
-        // 5) 1 booking chỉ có 1 payment -> tạo mới hoặc update
         Payment payment = paymentRepository.findByBooking_Id(bookingId).orElse(null);
 
-        BigDecimal amount = toMoney(booking.getTotalPriceMovie());
+        BigDecimal amount = toMoney(booking.getTotalAmount());
 
         if (payment == null) {
             payment = Payment.builder()
@@ -170,14 +164,20 @@ public class PaymentSelectionService {
         Payment payment = paymentRepository.findByBooking_Id(bookingId)
                 .orElseThrow(() -> new RuntimeException("Payment not found for booking: " + bookingId));
 
-        // chưa chọn paymentMethod thì không cho complete
         if (payment.getPaymentMethod() == null || payment.getProvider() == null) {
-            return badRequest("Bạn phải chọn phương thức thanh toán trước khi hoàn tất.");
+            return badRequest("Provider ID and payment method are required before completing booking.");
         }
 
         PaymentStatus successStatus = resolveSuccessStatus();
         payment.setPaymentStatus(successStatus);
         payment.setPaymentTime(LocalDateTime.now());
+
+        Booking booking = payment.getBooking();
+        if (booking != null) {
+            booking.setPaymentStatus(successStatus);
+            booking.setStatus(BookingStatus.COMPLETED);
+            bookingRepository.save(booking);
+        }
 
         if (dto != null && dto.getTransactionId() != null && !dto.getTransactionId().isBlank()) {
             payment.setTransactionId(dto.getTransactionId());
@@ -200,7 +200,6 @@ public class PaymentSelectionService {
         );
     }
 
-    // ===== Helpers =====
 
     private BigDecimal toMoney(Double value) {
         return value == null ? BigDecimal.ZERO : BigDecimal.valueOf(value);
@@ -263,3 +262,4 @@ public class PaymentSelectionService {
         return PaymentStatus.values()[0];
     }
 }
+

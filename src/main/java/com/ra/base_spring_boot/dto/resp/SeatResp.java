@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class SeatResp {
-//    private Screen screen;
 
     private String seatNumber;
 

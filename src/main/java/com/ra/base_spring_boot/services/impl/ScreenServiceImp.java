@@ -6,17 +6,15 @@ import com.ra.base_spring_boot.exception.HttpNotFound;
 import com.ra.base_spring_boot.model.entity.theater.Screen;
 import com.ra.base_spring_boot.repository.ScreenRepository;
 import com.ra.base_spring_boot.services.ScreenService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
+@RequiredArgsConstructor
 public class ScreenServiceImp implements ScreenService {
-    @Autowired
-    ScreenRepository screenRepository;
+    private final ScreenRepository screenRepository;
     @Override
     public Page<ScreenResp> findAll(Pageable pageable) {
         Page<Screen> screens= screenRepository.findAll(pageable);
@@ -44,9 +42,8 @@ public class ScreenServiceImp implements ScreenService {
 
     @Override
     public ScreenResp findById(Long id) {
-        Screen screen = screenRepository.findById(id).orElseThrow(()->new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "Screen not found with id = " + id));
+        Screen screen = screenRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFound("Screen not found with id = " + id));
         return ScreenResp.builder()
                 .name(screen.getName())
                 .seatCapacity(screen.getSeatCapacity())
@@ -72,10 +69,7 @@ public class ScreenServiceImp implements ScreenService {
     @Override
     public ScreenResp updateScreen(Long id, ScreenReq screenReq) {
         Screen screen = screenRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Screen not found with id = " + id
-                ));
+                .orElseThrow(() -> new HttpNotFound("Screen not found with id = " + id));
         screen.setId(id);
         screen.setName(screenReq.getName());
         screen.setSeatCapacity(screenReq.getSeatCapacity());
@@ -91,10 +85,7 @@ public class ScreenServiceImp implements ScreenService {
     @Override
     public void deleteScreen(Long id) {
         Screen screen = screenRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Screen not found with id = " + id
-                ));
+                .orElseThrow(() -> new HttpNotFound("Screen not found with id = " + id));
         screenRepository.deleteById(id);
 
     }

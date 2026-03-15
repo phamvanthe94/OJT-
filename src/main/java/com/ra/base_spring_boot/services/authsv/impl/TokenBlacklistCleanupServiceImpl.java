@@ -14,7 +14,7 @@ public class TokenBlacklistCleanupServiceImpl implements ITokenBlacklistCleanupS
 
     private final IBlacklistTokenRepository blacklistTokenRepository;
 
-    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Tokyo") // Chạy vào phút 0 của mỗi giờ
+    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Tokyo")
     @Override
     public void cleanUpExpiredTokens() {
         blacklistTokenRepository.deleteExpired(new Date());

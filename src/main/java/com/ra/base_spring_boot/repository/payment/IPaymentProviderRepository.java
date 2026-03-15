@@ -11,9 +11,7 @@ public interface IPaymentProviderRepository extends JpaRepository<PaymentProvide
 
     boolean existsByProviderCodeIgnoreCase(String providerCode);
 
-    // ✅ ĐÚNG QUY TẮC: findBy + đúng tên field providerCode
     Optional<PaymentProvider> findByProviderCode(String providerCode);
 
-    // (tuỳ chọn) nếu muốn không phân biệt hoa thường
     Optional<PaymentProvider> findByProviderCodeIgnoreCase(String providerCode);
 }

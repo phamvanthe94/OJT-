@@ -37,7 +37,6 @@ public class BookingSeat extends BaseObject {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // 👉 LƯU GIÁ CỐ ĐỊNH TẠI THỜI ĐIỂM ĐẶT snapshot giá
     @Column(name = "price")
     private Double price;
 

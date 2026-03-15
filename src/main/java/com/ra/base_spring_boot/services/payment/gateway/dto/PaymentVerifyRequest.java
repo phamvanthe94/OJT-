@@ -10,5 +10,5 @@ import lombok.*;
 public class PaymentVerifyRequest {
     private String transactionId;
     private boolean success;
-    private PaymentMethod method; // PAYPAL / VNPAY / STRIPE
+    private PaymentMethod method;
 }

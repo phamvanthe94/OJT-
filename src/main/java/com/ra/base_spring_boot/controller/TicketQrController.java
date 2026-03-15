@@ -1,11 +1,13 @@
 package com.ra.base_spring_boot.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ra.base_spring_boot.dto.ResponseWrapper;
 import com.ra.base_spring_boot.dto.resp.TicketQrData;
-import com.ra.base_spring_boot.services.Theater.QrCodeService;
 import com.ra.base_spring_boot.services.more.TicketQrService;
+import com.ra.base_spring_boot.services.paymt.IQrCodeService;
+import com.ra.base_spring_boot.services.paymt.ITicketQrTextBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,56 +16,61 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/tickets/")
+@RequestMapping("/api/v1/tickets")
 public class TicketQrController {
 
     private final TicketQrService ticketQrService;
-    private final QrCodeService qrCodeService;
-    private final ObjectMapper objectMapper;
+    private final IQrCodeService qrCodeService;
+
+    private final ITicketQrTextBuilder qrTextBuilder;
 
     @GetMapping("/{bookingId}/qr-data")
     public ResponseEntity<?> getQrData(@PathVariable Long bookingId) {
+        List<TicketQrData> list = ticketQrService.getQrData(bookingId);
+
+        if (list == null || list.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ResponseWrapper.builder()
+                            .status(HttpStatus.NOT_FOUND)
+                            .code(404)
+                .data("Booking not found")
+                            .build()
+            );
+        }
+
         return ResponseEntity.ok(
-                ticketQrService.getQrData(bookingId)
+                ResponseWrapper.<List<TicketQrData>>builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(list)
+                        .build()
         );
     }
 
     @GetMapping("/{bookingId}/qr")
-
-    public ResponseEntity<byte[]> generateQr(@PathVariable Long bookingId) throws Exception {
+    public ResponseEntity<?> generateQr(@PathVariable Long bookingId) {
 
         List<TicketQrData> list = ticketQrService.getQrData(bookingId);
 
-        if (list.isEmpty()) {
-            throw new RuntimeException("No data to generate QR");
+        if (list == null || list.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ResponseWrapper.builder()
+                            .status(HttpStatus.NOT_FOUND)
+                            .code(404)
+                .data("No data found to generate QR code")
+                            .build()
+            );
         }
 
-        TicketQrData first = list.get(0);
-
-        String seats = list.stream()
-                .map(TicketQrData::getSeatNumber)
-                .distinct()
-                .collect(Collectors.joining(", "));
-
-        String booking = "Booking";
-        String qrText =
-                booking + " ID: " + first.getBookingId() + "\n" +
-                        "Khách hàng: " + first.getFullName() + "\n" +
-                        "Phim: " + first.getTitle() + "\n" +
-                        "Phòng chiếu: " + first.getScreenName() + "\n" +
-                        "Giờ chiếu: " + first.getStartTime() + "\n" +
-                        "Ghế: " + seats;
-
-        byte[] qrImage = qrCodeService.generateQrCode(qrText, 300, 300);
+        String qrText = qrTextBuilder.buildQrText(list);
+        byte[] qrImage = qrCodeService.generateQrCode(qrText, 320, 320);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE)
+                .contentType(MediaType.IMAGE_PNG)
+                .header(HttpHeaders.CACHE_CONTROL, "no-store")
                 .body(qrImage);
     }
-
 }
-

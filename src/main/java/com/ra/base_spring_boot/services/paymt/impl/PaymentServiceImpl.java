@@ -1,7 +1,11 @@
 package com.ra.base_spring_boot.services.paymt.impl;
 
-import com.ra.base_spring_boot.dto.resp.PayPalCreateOrderResponse;
+import com.ra.base_spring_boot.dto.resp.payment.PayPalCreateOrderResponse;
 import com.ra.base_spring_boot.dto.resp.payment.PayPalPaymentResultResponse;
+import com.ra.base_spring_boot.exception.HttpBadRequest;
+import com.ra.base_spring_boot.exception.HttpConflict;
+import com.ra.base_spring_boot.exception.HttpNotFound;
+import com.ra.base_spring_boot.model.constants.BookingStatus;
 import com.ra.base_spring_boot.model.constants.PaymentMethod;
 import com.ra.base_spring_boot.model.constants.PaymentStatus;
 import com.ra.base_spring_boot.model.entity.booking.Booking;
@@ -12,9 +16,11 @@ import com.ra.base_spring_boot.repository.payment.IPaymentProviderRepository;
 import com.ra.base_spring_boot.repository.payment.PaymentRepository;
 import com.ra.base_spring_boot.services.paymt.IPayPalClientService;
 import com.ra.base_spring_boot.services.paymt.IPaymentService;
+import com.ra.base_spring_boot.services.paymt.ITicketIssuanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,12 +30,17 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class PaymentServiceImpl implements IPaymentService {
+
+    private static final String PAYPAL_PROVIDER_CODE = "PAYPAL";
+    private static final String CURRENCY_JPY = "JPY";
 
     private final IPayPalClientService payPalClientService;
     private final PaymentRepository paymentRepository;
     private final IBookingRepository bookingRepository;
     private final IPaymentProviderRepository paymentProviderRepository;
+    private final ITicketIssuanceService ticketIssuanceService;
 
     @Value("${paypal.return-url}")
     private String returnUrl;
@@ -37,89 +48,55 @@ public class PaymentServiceImpl implements IPaymentService {
     @Value("${paypal.cancel-url}")
     private String cancelUrl;
 
-    // ✅ Tính tiền JPY từ booking (JPY không có số lẻ)
-    private BigDecimal calcAmountJpy(Booking booking) {
-        if (booking == null || booking.getTotalPriceMovie() == null) {
-            return BigDecimal.ZERO;
-        }
-        BigDecimal raw = BigDecimal.valueOf(booking.getTotalPriceMovie());
-        return raw.setScale(0, RoundingMode.HALF_UP);
-    }
+    @Override
+    public void cancelByOrderId(String orderId) {
+        Payment payment = paymentRepository.findByPaypalOrderId(orderId)
+                .orElseThrow(() -> new HttpNotFound("Payment not found"));
 
-    // ✅ format amount cho PayPal theo currency
-    private String formatPayPalAmount(String currency, BigDecimal amount) {
-        if (amount == null) amount = BigDecimal.ZERO;
-
-        if ("JPY".equalsIgnoreCase(currency)) {
-            return amount.setScale(0, RoundingMode.HALF_UP).toPlainString();
+        if (payment.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            return;
         }
-        return amount.setScale(2, RoundingMode.HALF_UP).toPlainString();
+
+        payment.setPaymentStatus(PaymentStatus.CANCELLED);
+        payment.setPaymentTime(LocalDateTime.now());
+        syncBookingStatus(payment.getBooking(), BookingStatus.CANCELLED, PaymentStatus.CANCELLED);
+        paymentRepository.save(payment);
     }
 
     @Override
     public PayPalCreateOrderResponse createPayPalOrder(Long bookingId) {
-
-        // 1) Lấy booking
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy booking!"));
+                .orElseThrow(() -> new HttpNotFound("Booking not found"));
 
-        // ✅ CHẶN 1: Nếu booking đã hoàn tất thanh toán => không cho thanh toán lại
-        // (nếu Booking của bạn có field paymentStatus)
-        if (booking.getPaymentStatus() == PaymentStatus.COMPLETED) {
-            throw new RuntimeException("Booking này đã thanh toán thành công, không thể thanh toán lại.");
-        }
-
-        // ✅ CHẶN 2: Nếu trong bảng payments đã có 1 payment COMPLETED cho booking này => chặn
         if (paymentRepository.existsByBooking_IdAndPaymentStatus(bookingId, PaymentStatus.COMPLETED)) {
-            throw new RuntimeException("Booking này đã có giao dịch thanh toán thành công, không thể thanh toán lại.");
+            throw new HttpConflict("Booking already has a completed payment");
         }
 
-        // ✅ CHẶN 3 (khuyến nghị): Nếu đang có payment PENDING => tránh bấm nhiều lần tạo nhiều order
-        if (paymentRepository.existsByBooking_IdAndPaymentStatusIn(
-                bookingId, List.of(PaymentStatus.PENDING))) {
-            throw new RuntimeException("Booking đang có giao dịch thanh toán đang chờ (PENDING). Vui lòng hoàn tất hoặc huỷ.");
+        Payment pending = paymentRepository.findByBooking_Id(bookingId)
+                .filter(payment -> payment.getPaymentStatus() == PaymentStatus.PENDING)
+                .orElse(null);
+
+        if (pending != null) {
+            return buildPendingPaymentResponse(bookingId, pending);
         }
 
-        // ✅ tiền thật theo booking
-        BigDecimal amount = calcAmountJpy(booking);
+        BigDecimal amount = calculateJpyAmount(booking);
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Số tiền thanh toán không hợp lệ (<=0).");
+            throw new HttpBadRequest("Payment amount must be greater than zero");
         }
 
-        // 2) Lấy provider PAYPAL (status=true)
-        PaymentProvider provider = paymentProviderRepository.findByProviderCode("PAYPAL")
+        PaymentProvider provider = paymentProviderRepository.findByProviderCode(PAYPAL_PROVIDER_CODE)
                 .filter(PaymentProvider::getStatus)
-                .orElseThrow(() -> new RuntimeException("PaymentProvider PAYPAL không tồn tại hoặc đã bị disable"));
+                .orElseThrow(() -> new HttpNotFound("PayPal payment provider is not available"));
 
-        // 3) Tạo payment PENDING
-        Payment payment = new Payment();
-        payment.setBooking(booking);
-        payment.setProvider(provider);
-        payment.setPaymentMethod(PaymentMethod.PAYPAL);
-        payment.setPaymentStatus(PaymentStatus.PENDING);
-        payment.setAmount(amount);
-        payment = paymentRepository.save(payment);
-
-        // 4) Tạo order bên PayPal (JPY)
-        String token = payPalClientService.getAccessToken();
-        String customId = "BOOKING_" + bookingId;
-
-        String currency = "JPY";
-        String amountStr = formatPayPalAmount(currency, amount);
-
-        Map<String, Object> order = payPalClientService.createOrder(
-                token,
-                returnUrl,
-                cancelUrl,
-                currency,
-                amountStr,
-                customId
-        );
+        Payment payment = createPendingPayment(booking, provider, amount);
+        Map<String, Object> order = createPayPalOrder(bookingId, amount);
 
         String orderId = (String) order.get("id");
-        String approveUrl = extractApproveUrl(order);
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalStateException("PayPal order response does not contain an id");
+        }
 
-        // 5) Lưu paypalOrderId để map return/webhook
         payment.setPaypalOrderId(orderId);
         paymentRepository.save(payment);
 
@@ -127,86 +104,46 @@ public class PaymentServiceImpl implements IPaymentService {
                 .paymentId(payment.getId())
                 .bookingId(bookingId)
                 .orderId(orderId)
-                .approveUrl(approveUrl)
+                .approveUrl(extractApproveUrl(order))
                 .status(payment.getPaymentStatus().name())
                 .amount(amount.doubleValue())
-                .currency(currency)
+                .currency(CURRENCY_JPY)
                 .build();
     }
 
     @Override
     public PayPalPaymentResultResponse captureFromReturn(String orderId) {
-
         Payment payment = paymentRepository.findByPaypalOrderId(orderId)
-                .orElseThrow(() -> new RuntimeException("Payment not found for orderId=" + orderId));
+                .orElseThrow(() -> new HttpNotFound("Payment not found"));
 
         Booking booking = payment.getBooking();
         Long bookingId = booking != null ? booking.getId() : null;
 
-        // ✅ Nếu booking đã COMPLETED rồi thì return luôn (chặn xử lý lại)
-        if (booking != null && booking.getPaymentStatus() == PaymentStatus.COMPLETED) {
-            return PayPalPaymentResultResponse.builder()
-                    .paymentId(payment.getId())
-                    .bookingId(bookingId)
-                    .paymentStatus(PaymentStatus.COMPLETED.name())
-                    .transactionId(payment.getTransactionId())
-                    .amount(payment.getAmount().doubleValue())
-                    .currency("JPY")
-                    .message("Booking đã thanh toán trước đó, không xử lý lại.")
-                    .build();
-        }
-
-        // Nếu webhook đã cập nhật payment trước
         if (payment.getPaymentStatus() == PaymentStatus.COMPLETED) {
-            // ✅ đồng bộ booking luôn cho chắc
-            if (booking != null) {
-                booking.setPaymentStatus(PaymentStatus.COMPLETED);
-                bookingRepository.save(booking);
-            }
-
-            return PayPalPaymentResultResponse.builder()
-                    .paymentId(payment.getId())
-                    .bookingId(bookingId)
-                    .paymentStatus(PaymentStatus.COMPLETED.name())
-                    .transactionId(payment.getTransactionId())
-                    .amount(payment.getAmount().doubleValue())
-                    .currency("JPY")
-                    .message("Thanh toán đã được xác nhận (webhook).")
-                    .build();
+            syncBookingStatus(booking, BookingStatus.COMPLETED, PaymentStatus.COMPLETED);
+            return buildPaymentResult(payment, bookingId, payment.getTransactionId(), "Payment was already completed");
         }
 
-        // Fallback capture tại return
         String token = payPalClientService.getAccessToken();
-        Map<String, Object> captureResp = payPalClientService.captureOrder(token, orderId);
+        Map<String, Object> captureResponse = payPalClientService.captureOrder(token, orderId);
+        String status = (String) captureResponse.get("status");
 
-        String status = (String) captureResp.get("status");
         if ("COMPLETED".equalsIgnoreCase(status)) {
-            String captureId = extractCaptureId(captureResp);
-
+            String captureId = extractCaptureId(captureResponse);
             payment.setPaymentStatus(PaymentStatus.COMPLETED);
             payment.setPaymentTime(LocalDateTime.now());
             payment.setPaypalCaptureId(captureId);
             payment.setTransactionId(captureId);
+            syncBookingStatus(booking, BookingStatus.COMPLETED, PaymentStatus.COMPLETED);
             paymentRepository.save(payment);
 
-            // ✅ QUAN TRỌNG: update luôn booking để lần sau createPayPalOrder chặn được
-            if (booking != null) {
-                booking.setPaymentStatus(PaymentStatus.COMPLETED);
-                bookingRepository.save(booking);
-            }
+            ticketIssuanceService.issueTicketAfterPaymentCompleted(payment);
 
-            return PayPalPaymentResultResponse.builder()
-                    .paymentId(payment.getId())
-                    .bookingId(bookingId)
-                    .paymentStatus(PaymentStatus.COMPLETED.name())
-                    .transactionId(captureId)
-                    .amount(payment.getAmount().doubleValue())
-                    .currency("JPY")
-                    .message("Thanh toán thành công (return capture).")
-                    .build();
+            return buildPaymentResult(payment, bookingId, captureId, "Payment completed successfully");
         }
 
         payment.setPaymentStatus(PaymentStatus.FAILED);
+        syncBookingStatus(booking, BookingStatus.FAILED, PaymentStatus.FAILED);
         paymentRepository.save(payment);
 
         return PayPalPaymentResultResponse.builder()
@@ -214,28 +151,129 @@ public class PaymentServiceImpl implements IPaymentService {
                 .bookingId(bookingId)
                 .paymentStatus(PaymentStatus.FAILED.name())
                 .transactionId(null)
-                .amount(payment.getAmount().doubleValue())
-                .currency("JPY")
-                .message("Thanh toán thất bại hoặc chưa hoàn tất.")
+                .amount(payment.getAmount() != null ? payment.getAmount().doubleValue() : 0D)
+                .currency(CURRENCY_JPY)
+                .message("Payment failed or was not completed")
                 .build();
+    }
+
+    private PayPalCreateOrderResponse buildPendingPaymentResponse(Long bookingId, Payment pending) {
+        if (pending.getPaypalOrderId() == null || pending.getPaypalOrderId().isBlank()) {
+            throw new HttpConflict("Pending payment is missing PayPal order id");
+        }
+
+        String token = payPalClientService.getAccessToken();
+        Map<String, Object> order = payPalClientService.getOrder(token, pending.getPaypalOrderId());
+
+        return PayPalCreateOrderResponse.builder()
+                .paymentId(pending.getId())
+                .bookingId(bookingId)
+                .orderId(pending.getPaypalOrderId())
+                .approveUrl(extractApproveUrl(order))
+                .status(pending.getPaymentStatus().name())
+                .amount(pending.getAmount() != null ? pending.getAmount().doubleValue() : 0D)
+                .currency(CURRENCY_JPY)
+                .build();
+    }
+
+    private Payment createPendingPayment(Booking booking, PaymentProvider provider, BigDecimal amount) {
+        Payment payment = new Payment();
+        payment.setBooking(booking);
+        payment.setProvider(provider);
+        payment.setPaymentMethod(PaymentMethod.PAYPAL);
+        payment.setPaymentStatus(PaymentStatus.PENDING);
+        payment.setAmount(amount);
+        return paymentRepository.save(payment);
+    }
+
+    private Map<String, Object> createPayPalOrder(Long bookingId, BigDecimal amount) {
+        String token = payPalClientService.getAccessToken();
+        return payPalClientService.createOrder(
+                token,
+                returnUrl,
+                cancelUrl,
+                CURRENCY_JPY,
+                formatPayPalAmount(CURRENCY_JPY, amount),
+                "BOOKING_" + bookingId
+        );
+    }
+
+    private BigDecimal calculateJpyAmount(Booking booking) {
+        if (booking == null || booking.getTotalAmount() == null) {
+            return BigDecimal.ZERO;
+        }
+        return BigDecimal.valueOf(booking.getTotalAmount()).setScale(0, RoundingMode.HALF_UP);
+    }
+
+    private String formatPayPalAmount(String currency, BigDecimal amount) {
+        BigDecimal normalizedAmount = amount == null ? BigDecimal.ZERO : amount;
+        if (CURRENCY_JPY.equalsIgnoreCase(currency)) {
+            return normalizedAmount.setScale(0, RoundingMode.HALF_UP).toPlainString();
+        }
+        return normalizedAmount.setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 
     @SuppressWarnings("unchecked")
     private String extractApproveUrl(Map<String, Object> order) {
         List<Map<String, Object>> links = (List<Map<String, Object>>) order.get("links");
+        if (links == null) {
+            throw new IllegalStateException("PayPal order response does not contain links");
+        }
+
         return links.stream()
-                .filter(l -> "approve".equals(l.get("rel")))
-                .map(l -> (String) l.get("href"))
+                .filter(link -> "approve".equals(link.get("rel")))
+                .map(link -> (String) link.get("href"))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No approve link"));
+                .orElseThrow(() -> new IllegalStateException("PayPal order response does not contain approve link"));
     }
 
     @SuppressWarnings("unchecked")
     private String extractCaptureId(Map<String, Object> capture) {
-        List<Map<String, Object>> pus = (List<Map<String, Object>>) capture.get("purchase_units");
-        Map<String, Object> pu0 = pus.get(0);
-        Map<String, Object> payments = (Map<String, Object>) pu0.get("payments");
+        List<Map<String, Object>> purchaseUnits = (List<Map<String, Object>>) capture.get("purchase_units");
+        if (purchaseUnits == null || purchaseUnits.isEmpty()) {
+            throw new IllegalStateException("PayPal capture response does not contain purchase units");
+        }
+
+        Map<String, Object> payments = (Map<String, Object>) purchaseUnits.get(0).get("payments");
+        if (payments == null) {
+            throw new IllegalStateException("PayPal capture response does not contain payments");
+        }
+
         List<Map<String, Object>> captures = (List<Map<String, Object>>) payments.get("captures");
-        return (String) captures.get(0).get("id");
+        if (captures == null || captures.isEmpty()) {
+            throw new IllegalStateException("PayPal capture response does not contain captures");
+        }
+
+        String captureId = (String) captures.get(0).get("id");
+        if (captureId == null || captureId.isBlank()) {
+            throw new IllegalStateException("PayPal capture response does not contain capture id");
+        }
+        return captureId;
+    }
+
+    private PayPalPaymentResultResponse buildPaymentResult(
+            Payment payment,
+            Long bookingId,
+            String transactionId,
+            String message
+    ) {
+        return PayPalPaymentResultResponse.builder()
+                .paymentId(payment.getId())
+                .bookingId(bookingId)
+                .paymentStatus(payment.getPaymentStatus().name())
+                .transactionId(transactionId)
+                .amount(payment.getAmount() != null ? payment.getAmount().doubleValue() : 0D)
+                .currency(CURRENCY_JPY)
+                .message(message)
+                .build();
+    }
+
+    private void syncBookingStatus(Booking booking, BookingStatus bookingStatus, PaymentStatus paymentStatus) {
+        if (booking == null) {
+            return;
+        }
+        booking.setStatus(bookingStatus);
+        booking.setPaymentStatus(paymentStatus);
+        bookingRepository.save(booking);
     }
 }

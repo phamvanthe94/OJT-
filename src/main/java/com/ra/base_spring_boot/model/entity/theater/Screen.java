@@ -23,7 +23,7 @@ public class Screen extends BaseObject {
     private String name;
 
     @Column(name = "seat_capacity")
-    private Integer seatCapacity; // so luong ghe trong 1 rap
+    private Integer seatCapacity;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

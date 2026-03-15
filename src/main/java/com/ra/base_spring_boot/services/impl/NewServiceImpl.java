@@ -2,6 +2,7 @@ package com.ra.base_spring_boot.services.impl;
 
 import com.ra.base_spring_boot.dto.req.NewRequest;
 import com.ra.base_spring_boot.dto.resp.NewResponse;
+import com.ra.base_spring_boot.exception.HttpNotFound;
 import com.ra.base_spring_boot.model.entity.content.Festival;
 import com.ra.base_spring_boot.model.entity.content.News;
 import com.ra.base_spring_boot.repository.IFestivalRepository;
@@ -55,7 +56,7 @@ public class NewServiceImpl implements INewService {
     public NewResponse createNews(NewRequest request) {
 
         Festival festival = festivalRepository.findById(request.getFestivalId())
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new HttpNotFound(
                         "Festival not found with id: " + request.getFestivalId()
                 ));
 
@@ -74,10 +75,10 @@ public class NewServiceImpl implements INewService {
     public NewResponse updateNews(Long id, NewRequest request) {
 
         News oldNews = newRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("News không tồn tại"));
+                .orElseThrow(() -> new HttpNotFound("News not found with id: " + id));
 
         Festival festival = festivalRepository.findById(request.getFestivalId())
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new HttpNotFound(
                         "Festival not found with id: " + request.getFestivalId()
                 ));
 
@@ -92,16 +93,17 @@ public class NewServiceImpl implements INewService {
     @Override
     public void deleteNews(Long id) {
         News news = newRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("News không tồn tại"));
+                .orElseThrow(() -> new HttpNotFound("News not found with id: " + id));
         newRepository.delete(news);
     }
 
     private NewResponse toResponse(News news) {
+        Festival festival = news.getFestival();
         return NewResponse.builder()
                 .id(news.getId())
                 .title(news.getTitle())
                 .content(news.getContent())
-                .festivalTitle(news.getFestival().getTitle())
+                .festivalTitle(festival == null ? null : festival.getTitle())
                 .createdAt(news.getCreatedAt())
                 .build();
     }

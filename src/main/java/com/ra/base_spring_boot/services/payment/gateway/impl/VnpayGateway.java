@@ -2,12 +2,11 @@ package com.ra.base_spring_boot.services.payment.gateway.impl;
 
 import com.ra.base_spring_boot.model.constants.PaymentStatus;
 import com.ra.base_spring_boot.services.payment.gateway.PaymentGateway;
-import com.ra.base_spring_boot.services.payment.gateway.dto.PaymentInitRequest;   // ✅ THÊM DÒNG NÀY
+import com.ra.base_spring_boot.services.payment.gateway.dto.PaymentInitRequest;
 import com.ra.base_spring_boot.services.payment.gateway.dto.PaymentInitResponse;
 import com.ra.base_spring_boot.services.payment.gateway.dto.PaymentVerifyRequest;
 import com.ra.base_spring_boot.services.payment.gateway.dto.PaymentVerifyResponse;
 import org.springframework.stereotype.Component;
-
 
 @Component("vnpayGateway")
 public class VnpayGateway implements PaymentGateway {
@@ -16,8 +15,7 @@ public class VnpayGateway implements PaymentGateway {
     public PaymentInitResponse init(PaymentInitRequest request) {
         String transactionId = "VNPAY_" + request.getBookingId();
 
-        // ✅ link giả lập giống kiểu redirect của VNPay
-        String paymentUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_TxnRef=" + transactionId;
+        String paymentUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?txnRef=" + transactionId;
 
         return new PaymentInitResponse(paymentUrl, transactionId);
     }
@@ -25,8 +23,8 @@ public class VnpayGateway implements PaymentGateway {
     @Override
     public PaymentVerifyResponse verify(PaymentVerifyRequest request) {
         if (request.isSuccess()) {
-            return new PaymentVerifyResponse(PaymentStatus.COMPLETED, "VNPay: thanh toán thành công");
+            return new PaymentVerifyResponse(PaymentStatus.COMPLETED, "VNPay: payment completed successfully");
         }
-        return new PaymentVerifyResponse(PaymentStatus.FAILED, "VNPay: thanh toán thất bại");
+        return new PaymentVerifyResponse(PaymentStatus.FAILED, "VNPay: payment failed");
     }
 }

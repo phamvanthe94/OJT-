@@ -4,12 +4,14 @@ import com.ra.base_spring_boot.model.entity.content.Festival;
 import com.ra.base_spring_boot.repository.homerpo.IFestivalHomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 public class FestivalInitializer implements CommandLineRunner {
 

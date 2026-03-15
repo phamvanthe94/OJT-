@@ -70,7 +70,7 @@ public class FestivalController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(200)
-                        .data("Xoá festival thành công")
+                .data("Festival deleted successfully")
                         .build()
         );
     }

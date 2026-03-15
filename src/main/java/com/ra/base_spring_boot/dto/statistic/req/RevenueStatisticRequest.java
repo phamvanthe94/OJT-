@@ -9,8 +9,8 @@ import lombok.*;
 @Builder
 public class RevenueStatisticRequest {
 
-    private Long movieId;    // Lọc theo phim
-    private Long genreId;    // Lọc theo thể loại phim
-    private Long theaterId;  // Lọc theo rạp
-    private Long screenId;   // Lọc theo phòng chiếu
+    private Long movieId;
+    private Long genreId;
+    private Long theaterId;
+    private Long screenId;
 }

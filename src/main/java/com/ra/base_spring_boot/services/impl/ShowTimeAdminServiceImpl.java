@@ -3,6 +3,9 @@ package com.ra.base_spring_boot.services.impl;
 import com.ra.base_spring_boot.dto.req.ShowTimeRequest;
 import com.ra.base_spring_boot.dto.resp.ShowTimeDetailResponse;
 import com.ra.base_spring_boot.dto.resp.ShowTimeListResponse;
+import com.ra.base_spring_boot.exception.HttpBadRequest;
+import com.ra.base_spring_boot.exception.HttpConflict;
+import com.ra.base_spring_boot.exception.HttpNotFound;
 import com.ra.base_spring_boot.model.entity.movie.Movie;
 import com.ra.base_spring_boot.model.entity.theater.Screen;
 import com.ra.base_spring_boot.model.entity.theater.ShowTime;
@@ -28,34 +31,106 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
     private final ScreenRepository screenRepository;
     private final IMovieRepository movieRepository;
 
-    private void validateTime(LocalDateTime startTime, LocalDateTime endTime) {
+    @Override
+    public Page<ShowTimeListResponse> getAllShowTimes(String keyword, int page, int size, String sortBy, String direction) {
+        String sortField = sortBy == null || sortBy.isBlank() ? "id" : sortBy;
+        Sort sort = "desc".equalsIgnoreCase(direction)
+                ? Sort.by(sortField).descending()
+                : Sort.by(sortField).ascending();
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), sort);
 
-        if (startTime == null || endTime == null) {
-            throw new RuntimeException("Thời gian bắt đầu và kết thúc không được để trống.");
-        }
-
-        if (startTime.isBefore(LocalDateTime.now()))
-            throw new RuntimeException("Thời gian bắt đầu phải sau thời gian hiện tại.");
-
-        if (!endTime.isAfter(startTime))
-            throw new RuntimeException("Thời gian kết thúc phải sau thời gian bắt đầu.");
-
+        return showTimeAdminRepository.searchShowTime(keyword == null ? "" : keyword.trim(), pageable)
+                .map(this::toListResponse);
     }
 
     @Override
-    public Page<ShowTimeListResponse> getAllShowTimes(String keyword, int page, int size, String sortBy, String direction) {
+    public ShowTimeDetailResponse getDetailShowTime(Long showTimeId) {
+        ShowTime showTime = findShowTime(showTimeId);
+        return toDetailResponse(showTime);
+    }
 
-        String sortField = (sortBy == null || sortBy.isBlank()) ? "id" : sortBy;
+    @Transactional
+    @Override
+    public ShowTimeDetailResponse createShowTime(ShowTimeRequest showTimeRequest) {
+        validateTime(showTimeRequest.getStartTime(), showTimeRequest.getEndTime());
+        Screen screen = findScreen(showTimeRequest.getScreenId());
+        Movie movie = findMovie(showTimeRequest.getMovieId());
+        ensureNoOverlap(screen.getId(), null, showTimeRequest);
 
-        Sort sort = "desc".equalsIgnoreCase(direction) ?
-                Sort.by(sortField).descending() :
-                Sort.by(sortField).ascending();
+        ShowTime savedShowTime = showTimeAdminRepository.save(ShowTime.builder()
+                .screen(screen)
+                .movie(movie)
+                .startTime(showTimeRequest.getStartTime())
+                .endTime(showTimeRequest.getEndTime())
+                .build());
 
-        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), sort);
+        return toDetailResponse(savedShowTime);
+    }
 
-        Page<ShowTime> result = showTimeAdminRepository.searchShowTime(keyword == null ? "" : keyword.trim(), pageable);
+    @Transactional
+    @Override
+    public ShowTimeDetailResponse updateShowTime(Long showTimeId, ShowTimeRequest showTimeRequest) {
+        validateTime(showTimeRequest.getStartTime(), showTimeRequest.getEndTime());
 
-        return result.map(showTime -> ShowTimeListResponse.builder()
+        ShowTime showTime = findShowTime(showTimeId);
+        Screen screen = findScreen(showTimeRequest.getScreenId());
+        Movie movie = findMovie(showTimeRequest.getMovieId());
+        ensureNoOverlap(screen.getId(), showTimeId, showTimeRequest);
+
+        showTime.setScreen(screen);
+        showTime.setMovie(movie);
+        showTime.setStartTime(showTimeRequest.getStartTime());
+        showTime.setEndTime(showTimeRequest.getEndTime());
+
+        return toDetailResponse(showTimeAdminRepository.save(showTime));
+    }
+
+    @Transactional
+    @Override
+    public void deleteShowTime(Long showTimeId) {
+        showTimeAdminRepository.delete(findShowTime(showTimeId));
+    }
+
+    private void validateTime(LocalDateTime startTime, LocalDateTime endTime) {
+        if (startTime == null || endTime == null) {
+            throw new HttpBadRequest("Start time and end time are required");
+        }
+        if (startTime.isBefore(LocalDateTime.now())) {
+            throw new HttpBadRequest("Start time must be in the future");
+        }
+        if (!endTime.isAfter(startTime)) {
+            throw new HttpBadRequest("End time must be after start time");
+        }
+    }
+
+    private ShowTime findShowTime(Long showTimeId) {
+        return showTimeAdminRepository.findById(showTimeId)
+                .orElseThrow(() -> new HttpNotFound("Showtime not found with id = " + showTimeId));
+    }
+
+    private Screen findScreen(Long screenId) {
+        return screenRepository.findById(screenId)
+                .orElseThrow(() -> new HttpNotFound("Screen not found with id = " + screenId));
+    }
+
+    private Movie findMovie(Long movieId) {
+        return movieRepository.findById(movieId)
+                .orElseThrow(() -> new HttpNotFound("Movie not found with id = " + movieId));
+    }
+
+    private void ensureNoOverlap(Long screenId, Long showTimeId, ShowTimeRequest request) {
+        if (showTimeAdminRepository.existsOverlapping(
+                screenId,
+                showTimeId,
+                request.getStartTime(),
+                request.getEndTime()
+        )) {
+            throw new HttpConflict("Showtime overlaps with another showtime in the same screen");
+        }
+    }
+
+    private ShowTimeListResponse toListResponse(ShowTime showTime) {
+        return ShowTimeListResponse.builder()
                 .id(showTime.getId())
                 .theaterId(showTime.getScreen().getTheater().getId())
                 .theaterName(showTime.getScreen().getTheater().getName())
@@ -65,15 +140,10 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
                 .movieTitle(showTime.getMovie().getTitle())
                 .startTime(showTime.getStartTime())
                 .endTime(showTime.getEndTime())
-                .build());
+                .build();
     }
 
-    @Override
-    public ShowTimeDetailResponse getDetailShowTime(Long showTimeId) {
-
-        ShowTime showTime = showTimeAdminRepository.findById(showTimeId).
-                orElseThrow(() -> new RuntimeException("Không tìm thấy suất chiếu với ID: " + showTimeId));
-
+    private ShowTimeDetailResponse toDetailResponse(ShowTime showTime) {
         return ShowTimeDetailResponse.builder()
                 .id(showTime.getId())
                 .theaterId(showTime.getScreen().getTheater().getId())
@@ -89,101 +159,5 @@ public class ShowTimeAdminServiceImpl implements IShowTimeAdminService {
                 .createdAt(showTime.getCreatedAt())
                 .updatedAt(showTime.getUpdatedAt())
                 .build();
-    }
-
-    @Transactional
-    @Override
-    public ShowTimeDetailResponse createShowTime(ShowTimeRequest showTimeRequest) {
-
-        validateTime(showTimeRequest.getStartTime(), showTimeRequest.getEndTime());
-
-        Screen screen = screenRepository.findById(showTimeRequest.getScreenId())
-                .orElseThrow(() -> new RuntimeException("Không tìm tấy phòng chiếu với ID: " + showTimeRequest.getScreenId()));
-
-        Movie movie = movieRepository.findById(showTimeRequest.getMovieId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phim với ID: " + showTimeRequest.getMovieId()));
-
-        if (showTimeAdminRepository.existsOverlapping(screen.getId(), null, showTimeRequest.getStartTime(), showTimeRequest.getEndTime())) {
-            throw new RuntimeException("Thời gian chiếu bị trùng với một suất chiếu khác trong cùng phòng.");
-        }
-
-        ShowTime showTime = ShowTime.builder()
-                .screen(screen)
-                .movie(movie)
-                .startTime(showTimeRequest.getStartTime())
-                .endTime(showTimeRequest.getEndTime())
-                .build();
-
-        ShowTime savedShowTime = showTimeAdminRepository.save(showTime);
-
-
-        return ShowTimeDetailResponse.builder()
-                .id(savedShowTime.getId())
-                .theaterId(savedShowTime.getScreen().getTheater().getId())
-                .theaterName(savedShowTime.getScreen().getTheater().getName())
-                .theaterLocation(savedShowTime.getScreen().getTheater().getLocation())
-                .screenId(savedShowTime.getScreen().getId())
-                .screenName(savedShowTime.getScreen().getName())
-                .seatCapacity(savedShowTime.getScreen().getSeatCapacity())
-                .movieId(savedShowTime.getMovie().getId())
-                .movieTitle(savedShowTime.getMovie().getTitle())
-                .startTime(savedShowTime.getStartTime())
-                .endTime(savedShowTime.getEndTime())
-                .createdAt(savedShowTime.getCreatedAt())
-                .updatedAt(savedShowTime.getUpdatedAt())
-                .build();
-    }
-
-    @Transactional
-    @Override
-    public ShowTimeDetailResponse updateShowTime(Long showTimeId, ShowTimeRequest showTimeRequest) {
-
-        validateTime(showTimeRequest.getStartTime(), showTimeRequest.getEndTime());
-
-        ShowTime showTime = showTimeAdminRepository.findById(showTimeId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy suất chiếu với ID: " + showTimeId));
-
-        Screen screen = screenRepository.findById(showTimeRequest.getScreenId())
-                .orElseThrow(() -> new RuntimeException("Không tìm tấy phòng chiếu với ID: " + showTimeRequest.getScreenId()));
-
-        Movie movie = movieRepository.findById(showTimeRequest.getMovieId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phim với ID: "
-                        + showTimeRequest.getMovieId()));
-
-        if (showTimeAdminRepository.existsOverlapping(screen.getId(), showTimeId, showTimeRequest.getStartTime(), showTimeRequest.getEndTime())) {
-            throw new RuntimeException("Thời gian chiếu bị trùng với một suất chiếu khác trong cùng phòng.");
-        }
-
-        showTime.setScreen(screen);
-        showTime.setMovie(movie);
-        showTime.setStartTime(showTimeRequest.getStartTime());
-        showTime.setEndTime(showTimeRequest.getEndTime());
-
-        ShowTime savedShowTime = showTimeAdminRepository.save(showTime);
-
-        return ShowTimeDetailResponse.builder()
-                .id(savedShowTime.getId())
-                .theaterId(savedShowTime.getScreen().getTheater().getId())
-                .theaterName(savedShowTime.getScreen().getTheater().getName())
-                .theaterLocation(savedShowTime.getScreen().getTheater().getLocation())
-                .screenId(savedShowTime.getScreen().getId())
-                .screenName(savedShowTime.getScreen().getName())
-                .seatCapacity(savedShowTime.getScreen().getSeatCapacity())
-                .movieId(savedShowTime.getMovie().getId())
-                .movieTitle(savedShowTime.getMovie().getTitle())
-                .startTime(savedShowTime.getStartTime())
-                .endTime(savedShowTime.getEndTime())
-                .createdAt(savedShowTime.getCreatedAt())
-                .updatedAt(savedShowTime.getUpdatedAt())
-                .build();
-    }
-
-    @Transactional
-    @Override
-    public void deleteShowTime(Long showTimeId) {
-        ShowTime showTime = showTimeAdminRepository.findById(showTimeId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy suất chiếu với ID: " + showTimeId));
-        showTimeAdminRepository.delete(showTime);
-
     }
 }

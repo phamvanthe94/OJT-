@@ -14,9 +14,6 @@ public class BookingController {
 
     private final IBookingService bookingService;
 
-    /**
-     * 🎟 Tạo booking mới
-     */
     @PostMapping
     public BookingResponse createBooking(
             @Valid @RequestBody BookingRequest request
@@ -24,9 +21,6 @@ public class BookingController {
         return bookingService.createBooking(request);
     }
 
-    /**
-     * 🔍 Lấy booking theo ID
-     */
     @GetMapping("/detail/{id}")
     public BookingResponse getBookingById(
             @PathVariable Long id
@@ -34,9 +28,6 @@ public class BookingController {
         return bookingService.getBookingById(id);
     }
 
-    /**
-     * 🔎 Lấy booking theo bookingCode
-     */
     @GetMapping("/code/{bookingCode}")
     public BookingResponse getBookingByCode(
             @PathVariable String bookingCode
@@ -44,7 +35,6 @@ public class BookingController {
         return bookingService.getBookingByCode(bookingCode);
     }
 
-    // xac nhan hoan tat thanh toan
     @PutMapping("/complete/{bookingCode}")
     public BookingResponse complete(@PathVariable String bookingCode) {
         return bookingService.completePayment(bookingCode);

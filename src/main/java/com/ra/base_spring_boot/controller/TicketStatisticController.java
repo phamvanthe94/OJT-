@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/statistic/ticket")
+@RequestMapping("/api/v1/admin/statistics/tickets")
 public class TicketStatisticController {
 
     private final TicketStatisticService ticketStatisticService;

@@ -27,7 +27,6 @@ public class PaymentGatewayFactory {
             throw new IllegalArgumentException("PaymentMethod is null");
         }
 
-        // ✅ Tên enum của cậu có thể khác (PAYPAL / VNPAY / STRIPE)
         return switch (method) {
             case PAYPAL -> paypalGateway;
             case VNPAY -> vnpayGateway;

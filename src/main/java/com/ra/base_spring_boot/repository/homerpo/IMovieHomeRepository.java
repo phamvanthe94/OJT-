@@ -14,10 +14,8 @@ import java.util.Optional;
 
 public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
 
-    // (1) Hiển thị phim đang chiếu / sắp chiếu (tùy status admin set)
     Page<Movie> findByStatus(MovieStatus status, Pageable pageable);
 
-    // (2) Thể loại đang công chiếu (genres của các phim theo status)
     @Query("""
             SELECT DISTINCT g
             FROM Movie m
@@ -26,7 +24,6 @@ public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
             """)
     List<Genre> findGenresByMovieStatus(@Param("status") MovieStatus status);
 
-    // (3) Hiển thị chi tiết phim đang chiếu (theo id + status) + load genres
     @Query("""
             SELECT m
             FROM Movie m
@@ -39,15 +36,12 @@ public interface IMovieHomeRepository extends JpaRepository<Movie, Long> {
             @Param("status") MovieStatus status
     );
 
-    // (Phụ) Tìm theo title để check trùng / search đơn giản
     Optional<Movie> findByTitleIgnoreCase(String title);
 
-    // (4) Hiển thị phim sắp chiếu (về bản chất vẫn là status)
     default Page<Movie> findComingSoonMovies(MovieStatus status, Pageable pageable) {
         return findByStatus(status, pageable);
     }
 
-    // (Phụ) Chi tiết phim (không filter status) + load genres
     @Query("""
             SELECT m
             FROM Movie m

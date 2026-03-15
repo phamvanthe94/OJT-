@@ -73,7 +73,7 @@ public class ShowTimeController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(200)
-                        .data("Xóa lịch chiếu thành công")
+                .data("Showtime deleted successfully")
                         .build()
         );
     }

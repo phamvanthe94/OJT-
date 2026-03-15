@@ -38,7 +38,7 @@ public class UserController {
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
-                        .data("Đổi mật khẩu thành công !")
+                .data("Password changed successfully")
                         .build()
         );
     }

@@ -23,7 +23,7 @@ public class TicketPriceRequest {
     private Double price;
 
     @NotNull(message = " Day type cannot be null")
-    private Boolean dayType; // false: T2-5, true: T6-7-CN-Lễ
+    private Boolean dayType;
     @NotNull(message = " Start time cannot be null")
     private LocalTime startTime;
     @NotNull(message = " End time cannot be null")

@@ -10,13 +10,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TicketQrService {
+
     private final ITicketQrRepository ticketQrRepository;
 
     public List<TicketQrData> getQrData(Long bookingId) {
-        List<TicketQrData> qrDataList = ticketQrRepository.getQrDataByBookingId(bookingId);
-        if (qrDataList.isEmpty()) {
-            throw new RuntimeException("Booking not paid or not found");
-        }
-        return qrDataList;
+        return ticketQrRepository.getQrDataByBookingId(bookingId);
     }
 }

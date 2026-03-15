@@ -10,15 +10,14 @@ import lombok.*;
 
 public class RevenueStatisticResponse {
 
-    private Long groupId;         // id của phim, thể loại, rạp, phòng chiếu
-    private String groupName;     // tên phim, tên thể loại, tên rạp, tên phòng chiếu
+    private Long groupId;
+    private String groupName;
     private Double todayRevenue;
     private Double weekRevenue;
     private Double monthRevenue;
     private Double yearRevenue;
     private Double totalRevenue;
 
-    // JPQL may return SUM(...) as Long in some DB/JPA setups; provide a matching constructor
     public RevenueStatisticResponse(Long groupId, String groupName,
                                     Long todayRevenue, Long weekRevenue, Long monthRevenue, Long yearRevenue,
                                     Double totalRevenue) {

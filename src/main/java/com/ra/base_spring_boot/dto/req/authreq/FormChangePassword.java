@@ -8,13 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FormChangePassword {
-    @NotBlank(message = "Mật khẩu cũ không được để trống")
+    @NotBlank(message = "Old password must not be blank")
     private String oldPassword;
 
-    @Size(min = 8, message = "Mật khẩu mới phải có ít nhất 8 ký tự")
+    @NotBlank(message = "New password must not be blank")
+    @Size(min = 8, message = "New password must contain at least 8 characters")
     private String newPassword;
 
-    @NotBlank(message = "Xác nhận mật khẩu không được để trống")
+    @NotBlank(message = "Confirm password must not be blank")
     private String confirmPassword;
-
 }

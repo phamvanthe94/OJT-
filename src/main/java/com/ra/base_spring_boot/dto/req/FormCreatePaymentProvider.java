@@ -7,12 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FormCreatePaymentProvider {
-    @NotBlank(message = "Tên nhà cung cấp không được để trống")
+    @NotBlank(message = "Provider name must not be blank")
     private String providerName;
 
-    @NotBlank(message = "Tên mã nhà cung cấp không được để trống")
+    @NotBlank(message = "Provider code must not be blank")
     private String providerCode;
 
     private String description;
-
 }
